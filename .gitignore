@@ -1,0 +1,47 @@
+# Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+node_modules
+dist
+dist-ssr
+*.local
+
+# Editor directories and files
+.vscode/*
+!.vscode/extensions.json
+.idea
+.DS_Store
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+# Arquivos de IDE (JetBrains/IntelliJ, VS Code, etc.)
+.idea/
+.cache/
+
+# Adicione ou modifique estas linhas no seu .gitignore
+# Isso é VITAL para ignorar arquivos que estão *fora* da pasta do projeto,
+# mas que o Git consegue ver devido a um repositório pai.
+
+# Ignora qualquer coisa que tente subir na hierarquia de diretórios
+**/../../../
+**/../../
+**/../
+
+# Arquivos gerados pela OS, IDEs e caches de apps (Firefox, VSCode, etc.)
+*.log
+.vscode/
+.idea/
+.cache/
+snap/
+.local/
+**/../
+**/../../
