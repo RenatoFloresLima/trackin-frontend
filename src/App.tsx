@@ -1,5 +1,5 @@
 // src/App.tsx
-
+import { AuthProvider } from "./contexts/AuthContext";
 import React from "react";
 import {
   createBrowserRouter,
@@ -14,6 +14,7 @@ import {
 import Login from "./Components/Login/Login";
 import CadastroFuncionario from "./Components/funcionario/Cadastro";
 import RegistroPonto from "./Components/Ponto/RegistroPonto";
+import PrivateRoute from "./Components/PrivateRoute";
 
 // Estilos Globais
 import "./App.css";
@@ -46,8 +47,18 @@ const appRouter = createBrowserRouter(
 
       {/* Rotas Públicas */}
       <Route path="/login" element={<Login />} />
-      <Route path="/cadastro" element={<CadastroFuncionario />} />
-      <Route path="/registroPonto" element={<RegistroPonto />} />
+
+      <Route element={<PrivateRoute />}>
+        {/* Todas as rotas abaixo só podem ser acessadas com token válido */}
+
+        {/* Rota Padrão (Funcionário Comum, ou fallback) */}
+        <Route path="/ponto" element={<RegistroPonto />} />
+
+        {/* Rota ADMINISTRATIVA: Proteção extra por ROLE */}
+        <Route element={<PrivateRoute roles={["ROLE_ADMIN"]} />}>
+          <Route path="/cadastro" element={<CadastroFuncionario />} />
+        </Route>
+      </Route>
 
       {/* Rota 404 */}
       <Route path="*" element={<div>404: Página Não Encontrada</div>} />
@@ -60,7 +71,11 @@ const appRouter = createBrowserRouter(
 // -----------------------------------------------------
 
 function App() {
-  return <RouterProvider router={appRouter} />;
+  return (
+    <AuthProvider>
+      <RouterProvider router={appRouter} />
+    </AuthProvider>
+  );
 }
 
 export default App;
