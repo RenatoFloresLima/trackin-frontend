@@ -21,11 +21,9 @@ const Login = () => {
 
     try {
       const userRole = await login(loginInput, senha);
-      // A função login atualiza o estado do AuthContext.
-      // O redirecionamento é baseado no valor atualizado de isAdmin.
 
       if (userRole === "ROLE_ADMIN") {
-        // ADMIN: Redireciona para a tela de cadastro de funcionários
+        // ROLE_ADMIN: Redireciona para a tela de cadastro de funcionários
         navigate("/cadastro", { replace: true });
       } else {
         // FUNCIONÁRIO COMUM: Redireciona para a tela de registro de ponto

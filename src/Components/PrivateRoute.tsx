@@ -1,36 +1,42 @@
-// src/Components/PrivateRoute.tsx (Revisão)
+// src/Components/PrivateRoute.tsx (CÓDIGO COMPLETO A SER UTILIZADO)
 
-import React from "react";
-import { Navigate, Outlet } from "react-router-dom";
+import React, { ReactNode } from "react"; // 🔑 ADICIONE ReactNode
+import { Navigate, Outlet, useLocation } from "react-router-dom";
 import { useAuth } from "../contexts/AuthContext";
 
 interface PrivateRouteProps {
   roles?: ("ROLE_ADMIN" | "ROLE_FUNCIONARIO" | string)[];
+  children?: ReactNode; // 🔑 NOVO: Para suportar o componente aninhado
 }
 
-const PrivateRoute: React.FC<PrivateRouteProps> = ({ roles }) => {
+const PrivateRoute: React.FC<PrivateRouteProps> = ({ roles, children }) => {
   const { isAuthenticated, user } = useAuth();
+  const location = useLocation();
 
-  // 🔑 1. CHECAGEM DE AUTENTICAÇÃO
+  // 1. CHECAGEM DE AUTENTICAÇÃO
   if (!isAuthenticated) {
-    // NÃO AUTENTICADO: Redireciona para o login
-    return <Navigate to="/login" replace />;
+    // Redireciona para o login (salvando o local que ele tentou acessar)
+    return <Navigate to="/login" state={{ from: location }} replace />;
   }
 
-  // 🔑 2. CHECAGEM DE AUTORIZAÇÃO (Se a rota exige uma role específica)
+  // 2. CHECAGEM DE AUTORIZAÇÃO (Se a rota exige uma role específica)
   if (roles && user && !roles.includes(user.role)) {
-    // Autenticado, mas sem a ROLE necessária.
+    // Se logado mas sem a permissão correta, redireciona para a tela padrão.
+    const redirectPath = user.role === "ROLE_ADMIN" ? "/cadastro" : "/ponto";
 
-    // Fallback: Redireciona para a tela padrão do funcionário, se não for admin
-    if (user.role !== "ROLE_ADMIN") {
-      return <Navigate to="/ponto" replace />;
+    // Garante que não redireciona infinitamente se tentar acessar a própria rota de redirecionamento.
+    if (location.pathname === redirectPath) {
+      // Se já está na rota de redirecionamento, apenas mostra um erro ou a própria tela.
+      return children ? <>{children}</> : <Outlet />;
     }
-    // Se for admin, mas tentou acessar algo que não deveria, pode ir para uma tela de erro ou a principal do admin.
-    return <Navigate to="/cadastro" replace />; // Ou para o destino principal do Admin
+
+    return <Navigate to={redirectPath} replace />;
   }
 
-  // AUTENTICADO E AUTORIZADO: Permite a navegação para o componente filho (Outlet)
-  return <Outlet />;
+  // 3. RENDERIZAÇÃO: Decide se renderiza 'children' ou o 'Outlet'
+  // Se 'children' existir, significa que ele foi usado como filtro de permissão.
+  // Se não, ele foi usado como Layout Wrapper para rotas filhas.
+  return children ? <>{children}</> : <Outlet />;
 };
 
 export default PrivateRoute;

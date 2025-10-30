@@ -1,5 +1,3 @@
-// src/contexts/AuthContext.tsx
-
 import React, {
   createContext,
   useContext,
@@ -7,7 +5,8 @@ import React, {
   useEffect,
   ReactNode,
 } from "react";
-import api from "../services/api";
+import { AxiosError } from "axios"; // Importa o tipo de erro do Axios
+import api from "../services/api"; // O caminho de importação ajustado
 
 // -----------------------------------------------------
 // 1. Tipagem
@@ -15,23 +14,26 @@ import api from "../services/api";
 
 interface User {
   login: string;
+  // É comum que a role no front-end seja simplificada, mas 'ROLE_' é padrão Spring Security
   role: "ROLE_ADMIN" | "ROLE_FUNCIONARIO" | string;
 }
 
 interface AuthContextType {
   user: User | null;
   token: string | null;
-  // 🔑 CRÍTICO: Agora a função login retorna a ROLE como string para uso imediato no Login.tsx
   login: (login: string, senha: string) => Promise<string>;
   logout: () => void;
   isAuthenticated: boolean;
   isAdmin: boolean;
 }
 
+// -----------------------------------------------------
+// 2. Definição do Contexto
+// -----------------------------------------------------
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 // -----------------------------------------------------
-// 2. Provedor do Contexto
+// 3. Provedor do Contexto
 // -----------------------------------------------------
 
 interface AuthProviderProps {
@@ -43,7 +45,6 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const [token, setToken] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
 
-  // 🔑 Lógica de persistência: Carregar dados do localStorage
   useEffect(() => {
     const storedToken = localStorage.getItem("authToken");
     const storedUser = localStorage.getItem("authUser");
@@ -51,7 +52,6 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     if (storedToken && storedUser) {
       setToken(storedToken);
       setUser(JSON.parse(storedUser));
-      api.defaults.headers.common["Authorization"] = `Bearer ${storedToken}`;
     }
     setLoading(false);
   }, []);
@@ -59,7 +59,6 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   // 1. Função de Login
   const login = async (loginInput: string, senha: string) => {
     try {
-      // Endpoint mantido em /api/auth/login conforme sua última confirmação
       const response = await api.post("/api/auth/login", {
         login: loginInput,
         senha,
@@ -76,14 +75,13 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       localStorage.setItem("authToken", token);
       localStorage.setItem("authUser", JSON.stringify(newUser));
 
-      // Configurar o Axios
-      api.defaults.headers.common["Authorization"] = `Bearer ${token}`;
-
-      // 🔑 CRÍTICO: Retorna a role imediatamente para o componente de login
       return role;
     } catch (error) {
+      // ✅ Aprimoramento na captura do erro
+      const axiosError = error as AxiosError;
+
       const errorMessage =
-        error.response && error.response.status === 401
+        axiosError.response && axiosError.response.status === 401
           ? "Usuário ou senha inválidos."
           : "Falha na conexão ou erro desconhecido.";
 
@@ -98,7 +96,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     setToken(null);
     localStorage.removeItem("authToken");
     localStorage.removeItem("authUser");
-    delete api.defaults.headers.common["Authorization"];
+    // O Interceptor no api.ts garante que o token não será enviado mais
   };
 
   // 🔑 Variáveis computadas
@@ -119,7 +117,10 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   );
 };
 
+// -----------------------------------------------------
 // 4. Hook Customizado para usar o Contexto
+// -----------------------------------------------------
+
 export const useAuth = () => {
   const context = useContext(AuthContext);
   if (context === undefined) {

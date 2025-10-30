@@ -1,5 +1,5 @@
 // src/App.tsx
-import { AuthProvider } from "./contexts/AuthContext";
+import { AuthProvider, useAuth } from "./contexts/AuthContext";
 import React from "react";
 import {
   createBrowserRouter,
@@ -15,57 +15,98 @@ import Login from "./Components/Login/Login";
 import CadastroFuncionario from "./Components/funcionario/Cadastro";
 import RegistroPonto from "./Components/Ponto/RegistroPonto";
 import PrivateRoute from "./Components/PrivateRoute";
+import ListaFuncionarios from "./Components/funcionario/lista/ListaFuncionarios";
+import EditarFuncionario from "./Components/funcionario/FuncionarioEdicaoPage";
+
+import Sidebar from "./Components/Layout/Sidebar"; // Importado
 
 // Estilos Globais
 import "./App.css";
+// Certifique-se de que Layout.css (ou o CSS com main-app-layout) está importado
 
 // -----------------------------------------------------
-// 1. Crie o Componente de Layout PRIMEIRO
+// 1. Componente de Layout para Rotas AUTENTICADAS (COM Sidebar)
 // -----------------------------------------------------
+// Este componente é o 'element' da rota protegida.
+// Ele só será renderizado se o PrivateRoute permitir.
 
-// Este componente é o 'element' da rota pai "/"
 const AppLayout: React.FC = () => {
+  // Não precisa checar autenticação aqui, o PrivateRoute faz isso.
   return (
-    // Sua div de layout que usa o App.css
+    // As classes 'main-app-layout' e 'main-content' devem ser definidas no seu CSS
     <div className="App">
-      {/* O Outlet renderiza o componente da rota filha (/login, /cadastro, etc.) */}
-      <Outlet />
+      {/* 🔑 Sidebar: Aparece SEMPRE que o AppLayout for alcançado */}
+      <Sidebar />
+
+      <main className="main-content">
+        {/* O Outlet renderiza o componente da rota filha (/ponto, /cadastro, etc.) */}
+        <Outlet />
+      </main>
     </div>
   );
 };
 
 // -----------------------------------------------------
-// 2. Defina o Roteador DEPOIS (usando o AppLayout)
+// 2. Defina o Roteador
 // -----------------------------------------------------
 
 const appRouter = createBrowserRouter(
   createRoutesFromElements(
-    // 🛑 AGORA AppLayout está definido e pode ser usado
-    <Route path="/" element={<AppLayout />}>
-      {/* Rota inicial / redireciona para /login */}
+    <Route
+      path="/"
+      element={
+        <div className="App">
+          <Outlet />
+        </div>
+      }
+    >
+      {/* Rota inicial / redireciona para /login (PÚBLICA) */}
       <Route index element={<Navigate to="/login" replace />} />
 
-      {/* Rotas Públicas */}
+      {/* ROTA PÚBLICA (Login): Não usa AppLayout, nem Sidebar */}
       <Route path="/login" element={<Login />} />
 
+      {/* 🛑 INÍCIO DAS ROTAS PROTEGIDAS 🛑 */}
+      {/* Rota 1: Checa o Token (PrivateRoute) E Define o Layout (AppLayout) */}
       <Route element={<PrivateRoute />}>
-        {/* Todas as rotas abaixo só podem ser acessadas com token válido */}
+        <Route element={<AppLayout />}>
+          {/* 1. Rotas com Sidebar (Funcionário padrão/logado) */}
+          <Route path="/ponto" element={<RegistroPonto />} />
+          <Route
+            path="/funcionarios/editar/:id"
+            element={<EditarFuncionario />}
+          />
 
-        {/* Rota Padrão (Funcionário Comum, ou fallback) */}
-        <Route path="/ponto" element={<RegistroPonto />} />
-
-        {/* Rota ADMINISTRATIVA: Proteção extra por ROLE */}
-        <Route element={<PrivateRoute roles={["ROLE_ADMIN"]} />}>
-          <Route path="/cadastro" element={<CadastroFuncionario />} />
+          {/* 2. Rota de Cadastro (APENAS ADMIN): 
+                 O PrivateRoute AGORA É O ELEMENTO DA ROTA. */}
+          <Route
+            path="/cadastro"
+            // 🔑 NOVO USO: PrivateRoute é um filtro para o componente CadastroFuncionario
+            element={
+              <PrivateRoute roles={["ROLE_ADMIN"]}>
+                {/* O CadastroFuncionario HERDA o layout AppLayout */}
+                <CadastroFuncionario />
+              </PrivateRoute>
+            }
+          />
+          <Route
+            path="/lista-funcionarios"
+            // 🔑 NOVO USO: PrivateRoute é um filtro para o componente CadastroFuncionario
+            element={
+              <PrivateRoute roles={["ROLE_ADMIN"]}>
+                {/* O CadastroFuncionario HERDA o layout AppLayout */}
+                <ListaFuncionarios />
+              </PrivateRoute>
+            }
+          />
         </Route>
       </Route>
 
-      {/* Rota 404 */}
+      {/* Rota 404 (Acessível publicamente) */}
       <Route path="*" element={<div>404: Página Não Encontrada</div>} />
     </Route>
   )
 );
-
 // -----------------------------------------------------
 // 3. Componente App (Provedor do Roteador)
 // -----------------------------------------------------

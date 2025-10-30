@@ -6,4 +6,21 @@ const api = axios.create({
   baseURL: API_BASE_URL,
 });
 
+// Adiciona um interceptor de requisição para injetar o token JWT
+api.interceptors.request.use(
+  (config) => {
+    // Busca o token do localStorage (usando a chave correta 'authToken')
+    const token = localStorage.getItem("authToken");
+
+    if (token) {
+      // Injeta o token no cabeçalho Authorization de cada requisição
+      config.headers.Authorization = `Bearer ${token}`;
+    }
+    return config;
+  },
+  (error) => {
+    return Promise.reject(error);
+  }
+);
+
 export default api;

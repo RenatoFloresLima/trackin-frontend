@@ -1,37 +1,55 @@
+// src/Components/funcionario/EdicaoFuncionario.tsx
+
 import { useForm } from "react-hook-form";
 import type { SubmitHandler } from "react-hook-form";
-import React, { useState, useEffect } from "react";
-// ❌ REMOVA: import axios from "axios";
-// ✅ ADICIONE: Importa a instância configurada com o token JWT
+import React, { useState, useEffect, useCallback } from "react";
+// 🔑 NOVO: Importa hooks para obter ID da URL e navegar
+import { useParams, useNavigate } from "react-router-dom";
 import api from "../../services/api";
-import "./Cadastro.css";
+// import "./Cadastro.css"; // Se o CSS for o mesmo, mantenha.
+import { useAuth } from "../../contexts/AuthContext";
 
 // ------------------------------------------
 // Constantes de API
 // ------------------------------------------
-// Usamos apenas o path relativo, pois o baseURL (http://localhost:8080) já está no api.ts
 const API_BASE_URL = "/api";
 const API_FUNCIONARIOS = `${API_BASE_URL}/funcionarios`;
 const API_SEDES = `${API_BASE_URL}/sedes`;
 const API_FUNCOES = `${API_BASE_URL}/funcoes`;
 
 // ------------------------------------------
-// Interfaces de Tipagem
+// Interfaces de Tipagem (Atualizadas/Reutilizadas)
 // ------------------------------------------
 
+// Reutiliza as interfaces de dados auxiliares
 interface Sede {
   id: number;
   nome: string;
-  endereco: string;
-  identificadorUnico: string;
+  // ... outros campos (endereco, identificadorUnico)
 }
 
 interface Funcao {
   id: number;
   nome: string;
-  descricao: string;
+  // ... outros campos (descricao)
 }
 
+// Interface que reflete o DTO de resposta do GET /api/funcionarios/{id}
+interface FuncionarioResponse {
+  id: number;
+  nome: string;
+  matricula: string; // 🔑 ADICIONADO: Matrícula para exibição
+  email: string;
+  endereco: string;
+  telefone: string;
+  cpf: string;
+  sedePrincipalId: number;
+  funcaoId: number;
+  role: "ROLE_FUNCIONARIO" | "ROLE_ADMIN";
+  // ... outros campos (usuarioAssociado, login, etc.)
+}
+
+// Interface de Input (a mesma do Cadastro, mas usaremos para o PUT)
 interface IFormInput {
   nome: string;
   endereco: string;
@@ -43,14 +61,24 @@ interface IFormInput {
   role: "ROLE_FUNCIONARIO" | "ROLE_ADMIN";
 }
 
-const Cadastro = () => {
-  // Hooks do Formulário
-  const { register, handleSubmit, reset } = useForm<IFormInput>();
+const EdicaoFuncionario: React.FC = () => {
+  // 🔑 NOVO: Obtém o ID da URL
+  const { isAdmin } = useAuth();
+  const { id } = useParams<{ id: string }>();
+  const navigate = useNavigate();
+  const funcionarioId = Number(id);
+
+  // Hooks do Formulário - usamos `defaultValues` para preenchimento
+  const { register, handleSubmit, reset, watch, setValue } =
+    useForm<IFormInput>();
 
   // Estados para Dados Dinâmicos
   const [sedes, setSedes] = useState<Sede[]>([]);
   const [funcoes, setFuncoes] = useState<Funcao[]>([]);
 
+  // Estado para o valor não editável (Matrícula)
+  const [matricula, setMatricula] = useState<string>("");
+  const [cpf, setCpf] = useState<string>("");
   // Estados para Feedback
   const [status, setStatus] = useState("");
   const [loading, setLoading] = useState(false);
@@ -59,67 +87,98 @@ const Cadastro = () => {
   // ------------------------------------------
   // Lógica de Carregamento de Dados (useEffect)
   // ------------------------------------------
-  useEffect(() => {
-    const fetchDropdownData = async () => {
-      try {
-        // 🎯 CORREÇÃO 1: Usando 'api' para buscar dados
-        const [sedesResponse, funcoesResponse] = await Promise.all([
+  const fetchInitialData = useCallback(async () => {
+    if (isNaN(funcionarioId)) {
+      setStatus("ID de funcionário inválido para edição.");
+      setDataLoading(false);
+      return;
+    }
+
+    try {
+      // 1. Carregar Dados Auxiliares (Sedes e Funções)
+      const [sedesResponse, funcoesResponse, funcionarioResponse] =
+        await Promise.all([
           api.get<Sede[]>(API_SEDES),
           api.get<Funcao[]>(API_FUNCOES),
+          // 2. Carregar Dados do Funcionário por ID
+          api.get<FuncionarioResponse>(`${API_FUNCIONARIOS}/${funcionarioId}`),
         ]);
 
-        setSedes(sedesResponse.data);
-        setFuncoes(funcoesResponse.data);
+      setSedes(sedesResponse.data);
+      setFuncoes(funcoesResponse.data);
 
-        setStatus("");
-      } catch (error) {
-        console.error("Erro ao carregar dados de Sedes ou Funções:", error);
-        // Feedback para o usuário caso falhe a busca inicial (Exige ROLE_FUNCIONARIO ou ROLE_ADMIN)
-        setStatus(
-          "Erro ao carregar dados essenciais. Verifique o backend ou sua permissão de acesso."
-        );
-      } finally {
-        setDataLoading(false);
-      }
-    };
+      const funcionario = funcionarioResponse.data;
 
-    fetchDropdownData();
-  }, []);
+      // 3. Preencher o Formulário e Matrícula
+      setMatricula(funcionario.matricula);
+      setCpf(funcionario.cpf);
+
+      // Reseta e preenche o formulário com os dados existentes
+      reset({
+        nome: funcionario.nome,
+        endereco: funcionario.endereco,
+        telefone: funcionario.telefone,
+        cpf: funcionario.cpf,
+        email: funcionario.email,
+        // Converte IDs de number (API) para string (Select)
+        sedePrincipalId: funcionario.sedePrincipalId.toString(),
+        funcaoId: funcionario.funcaoId.toString(),
+        role: funcionario.role,
+      });
+
+      setStatus("");
+    } catch (error: any) {
+      console.error("Erro ao carregar dados iniciais:", error);
+      const msg =
+        error.response?.data?.message ||
+        "Erro ao carregar dados. Verifique a permissão.";
+      setStatus(`❌ Falha na Carga: ${msg}`);
+    } finally {
+      setDataLoading(false);
+    }
+  }, [funcionarioId, reset]);
+
+  useEffect(() => {
+    fetchInitialData();
+  }, [fetchInitialData]);
 
   // ------------------------------------------
-  // Lógica de Submissão do Formulário
+  // Lógica de Submissão do Formulário (PUT)
   // ------------------------------------------
   const onSubmit: SubmitHandler<IFormInput> = async (data) => {
     setStatus("");
     setLoading(true);
 
     try {
-      // Converte os IDs de string (vindo do <select>) para number para o payload
+      // Prepara o payload para o PUT (o DTO FuncionarioUpdateRequest no backend)
       const payload = {
         ...data,
+        // Os IDs devem ser passados como number para o DTO do backend
         sedePrincipalId: parseInt(data.sedePrincipalId),
         funcaoId: parseInt(data.funcaoId),
-        role: data.role, // O valor é diretamente 'ROLE_ADMIN' ou 'ROLE_FUNCIONARIO'
+        role: data.role,
       };
 
-      console.log("Payload sendo enviado:", payload);
+      console.log("Payload de atualização sendo enviado:", payload);
 
-      // 🎯 CORREÇÃO 2: Usando 'api' para o POST de cadastro (injeta o token)
-      const response = await api.post(API_FUNCIONARIOS, payload);
+      // 🔑 ALTERAÇÃO CHAVE: PUT para o ID específico
+      const response = await api.put(
+        `${API_FUNCIONARIOS}/${funcionarioId}`,
+        payload
+      );
 
       setStatus(
-        `✅ Sucesso! Funcionário ${response.data.nome} (ID: ${response.data.id}) cadastrado.`
+        `✅ Sucesso! Funcionário ${response.data.nome} (ID: ${funcionarioId}) atualizado.`
       );
-      reset(); // Limpa o formulário
+      // Poderia redirecionar para a tela de detalhes: navigate(`/funcionarios/detalhe/${funcionarioId}`);
     } catch (error: any) {
-      console.error("Erro no cadastro:", error);
+      console.error("Erro na atualização:", error);
 
       let errorMessage = "Erro desconhecido.";
       if (error.response) {
-        // Se o erro for 403, o motivo mais provável é a falta de Authority ROLE_ADMIN
         errorMessage = `Erro ${error.response.status}: ${
           error.response.status === 403
-            ? "Permissão negada (403). Você precisa ser ROLE_ADMIN para cadastrar."
+            ? "Permissão negada (403). Você precisa ser ROLE_ADMIN para editar."
             : error.response.data.message || "Dados inválidos."
         }`;
       } else if (error.request) {
@@ -127,7 +186,7 @@ const Cadastro = () => {
           "Erro de rede: O servidor backend pode estar offline ou inacessível.";
       }
 
-      setStatus(`❌ Falha no Cadastro: ${errorMessage}`);
+      setStatus(`❌ Falha na Atualização: ${errorMessage}`);
     } finally {
       setLoading(false);
     }
@@ -138,14 +197,14 @@ const Cadastro = () => {
     return (
       <div className="container">
         <h1>Carregando...</h1>
-        <p>Buscando dados de Sedes e Funções...</p>
+        <p>Buscando dados do funcionário, Sedes e Funções...</p>
       </div>
     );
   }
 
   return (
     <div className="container">
-      <h1>Cadastro de Funcionário</h1>
+      <h1>Editar Cadastro de Funcionário</h1>
 
       {/* Feedback de Status */}
       {status && (
@@ -163,7 +222,19 @@ const Cadastro = () => {
       )}
 
       <form onSubmit={handleSubmit(onSubmit)}>
-        {/* Campos de Texto */}
+        {/* 🔑 NOVO: Campo Matrícula (Apenas Leitura) */}
+        <div className="form-group">
+          <label>Matrícula:</label>
+          <input
+            type="text"
+            className="form-control"
+            value={matricula}
+            readOnly
+            style={{ backgroundColor: "#f0f0f0" }}
+          />
+        </div>
+
+        {/* Campos de Texto (Preenchidos automaticamente) */}
         <div className="form-group">
           <label>Nome:</label>
           <input
@@ -196,8 +267,9 @@ const Cadastro = () => {
           <input
             type="text"
             className="form-control"
-            placeholder="Digite o CPF"
-            {...register("cpf", { required: true })}
+            value={cpf}
+            readOnly
+            style={{ backgroundColor: "#f0f0f0" }}
           />
         </div>
         <div className="form-group">
@@ -210,7 +282,7 @@ const Cadastro = () => {
           />
         </div>
 
-        {/* SELECT SEDE (Renderizado com dados da API) */}
+        {/* SELECT SEDE (Preenchido com ID atual) */}
         <div className="form-group">
           <label>Sede:</label>
           <select
@@ -226,7 +298,7 @@ const Cadastro = () => {
           </select>
         </div>
 
-        {/* SELECT FUNÇÃO (Renderizado com dados da API) */}
+        {/* SELECT FUNÇÃO (Preenchido com ID atual) */}
         <div className="form-group">
           <label>Função:</label>
           <select
@@ -242,28 +314,29 @@ const Cadastro = () => {
           </select>
         </div>
 
-        {/* SELECT ROLE */}
+        {/* SELECT ROLE (Preenchido com ROLE atual) */}
         <div className="form-group">
           <label>Perfil de Acesso:</label>
           <select
             {...register("role", { required: true })}
             className="form-control"
+            disabled={!isAdmin}
           >
-            <option value="ROLE_FUNCIONARIO">Funcionário Comum</option>
-            <option value="ROLE_ADMIN">Administrador</option>
+            <option value="FUNCIONARIO">Funcionário Comum</option>
+            <option value="ADMIN">Administrador</option>
           </select>
         </div>
 
         <button
           type="submit"
           disabled={loading || dataLoading}
-          className="btn btn-primary"
+          className="btn btn-success"
         >
-          {loading ? "Cadastrando..." : "Cadastrar"}
+          {loading ? "Salvando..." : "Salvar Alterações"}
         </button>
       </form>
     </div>
   );
 };
 
-export default Cadastro;
+export default EdicaoFuncionario;
