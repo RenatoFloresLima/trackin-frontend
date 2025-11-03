@@ -13,22 +13,19 @@ import {
   TableRow,
   TableCell,
 } from "@mui/material";
-// 🔑 NOVO/ATUALIZADO: Importa 'useNavigate' para a navegação programática
 import { Navigate, useNavigate } from "react-router-dom";
 
 // Componentes da lista
 import FiltroFuncionarios from "./FiltroFuncionarios";
-// LinhaFuncionario NÃO PRECISA MAIS DE onEdit se ele for auto-navegável (como ajustamos antes)
 import LinhaFuncionario from "./LinhaFuncionario";
+import DesligamentoModal from "./DesligamentoModal"; // 🔑 Importado o Modal
 
 // Tipagens
 import {
   type FuncionarioAPI,
   type FiltrosFuncionario,
 } from "../../../interfaces/funcionarioInterfaces";
-// ✅ Importa a instância configurada do seu serviço de API (Axios)
 import api from "../../../services/api";
-// ✅ Importa o hook real de autenticação
 import { useAuth } from "../../../contexts/AuthContext";
 import "./Lista.css";
 
@@ -37,14 +34,12 @@ import "./Lista.css";
 // ----------------------------------------------------
 const API_BASE_URL = "/api";
 const API_FUNCIONARIOS = `${API_BASE_URL}/funcionarios`;
-const API_DESLIGAMENTO = `${API_BASE_URL}/solicitacoes/desligamento`;
 
 // ----------------------------------------------------
 // LÓGICA DO COMPONENTE PRINCIPAL
 // ----------------------------------------------------
 const ListaFuncionarios: React.FC = () => {
   const { user, isAuthenticated, isAdmin } = useAuth();
-  // 🔑 ADICIONADO: Inicializa o hook de navegação
   const navigate = useNavigate();
 
   // ----------------------------------------------------
@@ -63,10 +58,15 @@ const ListaFuncionarios: React.FC = () => {
   const [filtros, setFiltros] =
     useState<FiltrosFuncionario>(estadoInicialFiltros);
 
-  // ... (função carregarFuncionarios e useEffect permanecem inalterados) ...
+  // 🔑 Estado do Modal
+  const [funcionarioADesligar, setFuncionarioADesligar] =
+    useState<FuncionarioAPI | null>(null);
+
+  // ----------------------------------------------------
+  // LÓGICA DE CARREGAMENTO
+  // ----------------------------------------------------
   const carregarFuncionarios = useCallback(
     async (currentFiltros: FiltrosFuncionario) => {
-      // [Lógica da função carregarFuncionarios]
       if (!isAuthenticated) return;
 
       setLoading(true);
@@ -130,64 +130,43 @@ const ListaFuncionarios: React.FC = () => {
   }, [filtros, carregarFuncionarios]);
 
   // ----------------------------------------------------
-  // HANDLERS DE AÇÃO E FILTROS
+  // HANDLERS DE AÇÃO
   // ----------------------------------------------------
 
   const handleFiltroChange = (novosFiltros: Partial<FiltrosFuncionario>) => {
     setFiltros((prev) => ({ ...prev, ...novosFiltros }));
   };
 
-  const handleDesligar = async (funcionarioId: number) => {
-    // [Lógica de Desligamento]
-    if (!user) return;
-
-    if (
-      window.confirm(
-        `Confirma a solicitação de desligamento do Funcionário ID ${funcionarioId}?`
-      )
-    ) {
-      try {
-        await api.post(API_DESLIGAMENTO, {
-          funcionarioId,
-          solicitanteLogin: user.login,
-        });
-        alert(
-          "✅ Solicitação de Desligamento enviada com sucesso para aprovação!"
-        );
-        carregarFuncionarios(filtros);
-      } catch (error) {
-        console.error("Erro ao solicitar desligamento:", error);
-        alert(
-          "❌ Falha ao enviar solicitação de desligamento. Verifique permissões."
-        );
-      }
-    }
+  // 🔑 HANDLER: Abre o modal de desligamento
+  const handleDesligar = (funcionario: FuncionarioAPI) => {
+    // Abre o modal de desligamento com os dados do funcionário
+    setFuncionarioADesligar(funcionario);
   };
 
-  // ❌ REMOVER: Esta função não é mais necessária, pois a navegação é feita no LinhaFuncionario.tsx
-  // No entanto, se LinhaFuncionario.tsx ainda espera onEdit, você deve mantê-la e fazê-la chamar navigate.
-  // Pelo ajuste anterior, LinhaFuncionario.tsx já faz a navegação interna e não precisa de onEdit.
-  /*
-  const handleEdit = (funcionarioId: number) => {
-    console.log(
-      `[Navegação] Redirecionar para /funcionarios/editar/${funcionarioId}`
+  // 🔑 HANDLER: Chamado pelo modal após sucesso na API
+  const handleDesligamentoSucesso = () => {
+    alert(
+      `✅ Funcionário ${funcionarioADesligar?.nome} desligado com sucesso!`
     );
-    navigate(`/funcionarios/editar/${funcionarioId}`); // 🔑 IMPLEMENTADO
+    setFuncionarioADesligar(null); // Fecha o modal
+    carregarFuncionarios(filtros); // Recarrega a lista
   };
-  */
+
+  // 🔑 HANDLER: Fecha o modal (chamado pelo botão Cancelar)
+  const handleCloseModal = () => {
+    setFuncionarioADesligar(null);
+  };
 
   const handleInformacoes = (funcionarioId: number) => {
     console.log(
       `[Navegação] Redirecionar para /funcionarios/perfil/${funcionarioId}`
     );
-    // 🔑 IMPLEMENTADO: Redireciona para a tela de perfil/detalhes
     navigate(`/funcionarios/perfil/${funcionarioId}`);
   };
 
   // ----------------------------------------------------
   // RENDERIZAÇÃO
   // ----------------------------------------------------
-  // ... (O restante do componente permanece inalterado) ...
 
   if (!isAdmin) {
     return <Navigate to="/ponto" replace />;
@@ -230,14 +209,13 @@ const ListaFuncionarios: React.FC = () => {
                     <LinhaFuncionario
                       key={funcionario.id}
                       funcionario={funcionario}
-                      onDesligar={handleDesligar}
+                      // Passa a função que abre o modal com o objeto correto
+                      onDesligar={() => handleDesligar(funcionario)}
                       onInformacoes={handleInformacoes}
-                      // 🔑 REMOVIDO: onEdit não é mais passado, pois a navegação é interna em LinhaFuncionario
-                      // Se LinhaFuncionario ainda espera onEdit, descomente a função handleEdit e passe-a aqui.
-                      // Se LinhaFuncionario foi ajustado como na resposta anterior, essa linha está correta.
                     />
                   ))
                 ) : (
+                  // ✅ CORREÇÃO APLICADA: Bloco JSX válido para dados vazios
                   <TableRow>
                     <TableCell colSpan={6} align="center">
                       Nenhum funcionário encontrado.
@@ -249,6 +227,15 @@ const ListaFuncionarios: React.FC = () => {
           </TableContainer>
         </Paper>
       </Box>
+
+      {/* 🔑 NOVO: Modal de Desligamento */}
+      {funcionarioADesligar && (
+        <DesligamentoModal
+          funcionario={funcionarioADesligar}
+          onClose={handleCloseModal}
+          onSuccess={handleDesligamentoSucesso}
+        />
+      )}
     </Container>
   );
 };

@@ -16,6 +16,7 @@ export interface FuncionarioAPI {
   usuarioAssociado: boolean;
   login: string | null;
   role: "ADMIN" | "FUNCIONARIO" | "SUPER_ADMIN" | null;
+  status: string;
 }
 
 export interface FiltrosFuncionario {
