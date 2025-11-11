@@ -8,6 +8,7 @@ import {
   TextField,
   Button,
   Box,
+  Grid,
   MenuItem,
   Alert,
   CircularProgress,
@@ -15,7 +16,6 @@ import {
   InputLabel,
   Select,
 } from "@mui/material";
-import Grid from "@mui/material/Grid2";
 import { Save as SaveIcon } from "@mui/icons-material";
 import PageContainer from "../UI/PageContainer";
 

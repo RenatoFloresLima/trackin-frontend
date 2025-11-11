@@ -13,13 +13,13 @@ import {
   TextField,
   MenuItem,
   Button,
+  Grid,
   CircularProgress,
   Alert,
   InputLabel,
   FormControl,
   Select,
 } from "@mui/material";
-import Grid from "@mui/material/Grid2";
 
 import SendIcon from "@mui/icons-material/Send";
 
