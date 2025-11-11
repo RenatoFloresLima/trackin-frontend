@@ -3,11 +3,11 @@ import {
   Box,
   Typography,
   TextField,
+  Grid,
   IconButton,
   CircularProgress,
   Alert,
 } from "@mui/material";
-import Grid from "@mui/material/Grid2";
 import EditIcon from "@mui/icons-material/Edit";
 import SaveIcon from "@mui/icons-material/Save";
 import CancelIcon from "@mui/icons-material/Cancel";

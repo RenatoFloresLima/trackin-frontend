@@ -3,11 +3,11 @@ import {
   Container,
   Paper,
   Typography,
+  Grid,
   CircularProgress,
   Alert,
   Box, // Importado Box
 } from "@mui/material";
-import Grid from "@mui/material/Grid2";
 import AccountCircleIcon from "@mui/icons-material/AccountCircle";
 
 import { useAuth } from "../../contexts/AuthContext";

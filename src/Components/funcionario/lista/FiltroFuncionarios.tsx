@@ -2,6 +2,7 @@
 import React, { useState, useEffect } from "react";
 import {
   TextField,
+  Grid,
   InputAdornment,
   Paper,
   FormControl,
@@ -9,7 +10,6 @@ import {
   Select,
   MenuItem,
 } from "@mui/material";
-import Grid from "@mui/material/Grid2";
 import SearchIcon from "@mui/icons-material/Search";
 
 // ✅ Importa a API e as tipagens
