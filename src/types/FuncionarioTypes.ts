@@ -60,12 +60,12 @@ export interface SenhaUpdateFuncionarioRequest {
 /**
  * Enum para Status de Ponto
  */
-export enum StatusPontoEnum {
-  APROVADO_AUTOMATICO = "APROVADO_AUTOMATICO",
-  APROVADO_MANUAL = "APROVADO_MANUAL",
-  PENDENTE_APROVACAO = "PENDENTE_APROVACAO",
-  REJEITADO = "REJEITADO",
-}
+export const StatusPontoEnum = {
+  APROVADO_AUTOMATICO: "APROVADO_AUTOMATICO",
+  APROVADO_MANUAL: "APROVADO_MANUAL",
+  PENDENTE_APROVACAO: "PENDENTE_APROVACAO",
+  REJEITADO: "REJEITADO",
+} as const;
 
 /**
  * DTO de Resposta para a lista de pontos
@@ -75,7 +75,7 @@ export interface RegistroPontoDetalheResponse {
   dataRegistro: string; // yyyy-MM-dd
   horaRegistro: string; // HH:mm:ss
   horaSaida: string | null; // HH:mm:ss
-  status: StatusPontoEnum;
+  status: typeof StatusPontoEnum[keyof typeof StatusPontoEnum];
   temSolicitacaoAjuste: boolean;
 }
 

@@ -1,5 +1,5 @@
 // src/Components/funcionario/lista/FiltroFuncionarios.tsx
-import React, { type ChangeEvent, useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import {
   TextField,
   Grid,
@@ -16,9 +16,9 @@ import SearchIcon from "@mui/icons-material/Search";
 import api from "../../../services/api";
 import {
   type FiltrosFuncionario,
-  type Sede,
-  type Funcao,
 } from "../../../interfaces/funcionarioInterfaces";
+import type { SedeResponse } from "../../../types/SedeTypes";
+import type { FuncaoResponse } from "../../../types/FuncaoTypes";
 
 // ------------------------------------------
 // Constantes de API
@@ -40,8 +40,8 @@ const FiltroFuncionarios: React.FC<FiltroFuncionariosProps> = ({
   // ------------------------------------------
   // ESTADOS DE DADOS
   // ------------------------------------------
-  const [sedes, setSedes] = useState<Sede[]>([]);
-  const [funcoes, setFuncoes] = useState<Funcao[]>([]);
+  const [sedes, setSedes] = useState<SedeResponse[]>([]);
+  const [funcoes, setFuncoes] = useState<FuncaoResponse[]>([]);
   const [dataLoading, setDataLoading] = useState(true);
 
   // ------------------------------------------
@@ -51,8 +51,8 @@ const FiltroFuncionarios: React.FC<FiltroFuncionariosProps> = ({
     const fetchDropdownData = async () => {
       try {
         const [sedesResponse, funcoesResponse] = await Promise.all([
-          api.get<Sede[]>(API_SEDES),
-          api.get<Funcao[]>(API_FUNCOES),
+          api.get<SedeResponse[]>(API_SEDES),
+          api.get<FuncaoResponse[]>(API_FUNCOES),
         ]);
 
         setSedes(sedesResponse.data);
@@ -73,14 +73,7 @@ const FiltroFuncionarios: React.FC<FiltroFuncionariosProps> = ({
   // ------------------------------------------
   // HANDLER DE MUDANÇA (Genérico e CORRIGIDO para Select e Text)
   // ------------------------------------------
-  const handleChange = (
-    // Tipagem que cobre TextFields e Selects do MUI
-    event: React.ChangeEvent<
-      | HTMLInputElement
-      | HTMLTextAreaElement
-      | { name?: string | undefined; value: unknown }
-    >
-  ) => {
+  const handleChange = (event: any) => {
     const target = event.target as { name: string; value: unknown };
     const name = target.name;
     const value = target.value;
