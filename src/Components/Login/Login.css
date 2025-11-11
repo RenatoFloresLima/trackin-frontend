@@ -1,83 +1,147 @@
+/* src/Components/Login/Login.css - Layout Profissional */
+
+:root {
+  --primary-color: #1abc9c; /* Cor de destaque (do seu sidebar) */
+  --text-light: #ecf0f1;
+  --text-dark: #34495e;
+  --bg-blur: rgba(255, 255, 255, 0.1); /* Menos opaco para mais elegância */
+  --border-blur: rgba(255, 255, 255, 0.3);
+}
+
 .container {
-  width: 450px;
-  background-color: rgba(255, 255, 255, 0.15);
-  backdrop-filter: blur(10px);
-  border: 2px solid rgba(255, 255, 255, 0.2);
-  border-radius: 10px;
+  width: 400px; /* Levemente mais estreito */
+  background-color: var(--bg-blur);
+  backdrop-filter: blur(12px); /* Blur mais forte */
+  border: 1px solid var(--border-blur); /* Borda mais fina */
+  border-radius: 12px;
   padding: 40px;
+  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3); /* Sombra suave para profundidade */
+  transition: transform 0.3s ease;
+}
+
+.container:hover {
+  transform: translateY(-5px); /* Efeito de elevação sutil */
 }
 
 .container h1 {
   text-align: center;
-  margin-bottom: 30px;
-  color: #fff;
+  margin-bottom: 35px;
+  color: var(--text-light);
+  font-size: 2.2rem;
+  font-weight: 300; /* Título mais leve */
+  letter-spacing: 1px; /* Espaçamento para o título */
 }
 
+/* Campo de Input e Ícone */
 .container .input-field {
   position: relative;
   width: 100%;
-  height: 50px;
-  margin: 30px auto;
+  height: 55px; /* Mais alto */
+  margin: 25px auto;
 }
 
 .input-field input {
   width: 100%;
   height: 100%;
-  padding: 0 40px;
-  border: 2px solid rgba(255, 255, 255, 0.2);
-  border-radius: 25px;
-  background-color: transparent;
-  color: #fff;
+  padding: 0 15px 0 20px; /* Ajusta o padding para melhor alinhamento */
+  border: 1px solid var(--border-blur);
+  border-radius: 8px; /* Cantos menos arredondados (mais corporativo) */
+  background-color: rgba(255, 255, 255, 0.05); /* Fundo sutil no campo */
+  color: var(--text-light);
   font-size: 16px;
   outline: none;
+  transition: all 0.3s ease;
+}
+
+/* Destaque ao Foco */
+.input-field input:focus {
+  border-color: var(--primary-color);
+  box-shadow: 0 0 8px rgba(26, 188, 156, 0.5); /* Sombra de foco */
 }
 
 .input-field input::placeholder {
-  color: #fff;
+  color: rgba(255, 255, 255, 0.7); /* Placeholder mais suave */
 }
 
 .input-field .icon {
   position: absolute;
-  right: 25px;
+  right: 20px;
   top: 50%;
   transform: translateY(-50%);
-  font-size: 18px;
-  color: #fff;
+  font-size: 1.1rem;
+  color: rgba(255, 255, 255, 0.8);
+  pointer-events: none; /* Garante que o ícone não interfira no clique */
 }
 
+/* Lembrete e Esqueci a Senha */
 .container .recall-forget {
   display: flex;
   justify-content: space-between;
-  font-size: 14.5px;
-  margin: -15px 0 15px;
+  font-size: 14px;
+  margin: 5px 0 25px; /* Mais espaçamento */
+  align-items: center;
 }
 
 .recall-forget label {
-  color: #fff;
+  color: var(--text-light);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
 }
 
 .recall-forget input {
-  margin-right: 5px;
+  margin-right: 8px;
+  /* Estilo para checkbox */
+  accent-color: var(--primary-color);
 }
 
 .recall-forget a {
-  color: #fff;
+  color: var(--text-light);
   text-decoration: none;
+  font-weight: 500;
+  transition: color 0.2s;
 }
 
 .recall-forget a:hover {
+  color: var(--primary-color); /* Destaque no hover */
   text-decoration: underline;
 }
 
+/* Botão de Entrar */
 .container button {
   width: 100%;
   height: 50px;
-  background-color: #fff;
+  background-color: var(--primary-color); /* Usa a cor de destaque */
+  color: var(--text-dark); /* Texto escuro no botão claro para contraste */
   border: none;
   outline: none;
-  border-radius: 25px;
+  border-radius: 8px;
   cursor: pointer;
-  font-size: 16px;
+  font-size: 17px;
   font-weight: bold;
-  text-shadow: none;
+  letter-spacing: 0.5px;
+  box-shadow: 0 4px 10px rgba(26, 188, 156, 0.4); /* Sombra para destacar o botão */
+  transition: background-color 0.2s, box-shadow 0.2s;
+}
+
+.container button:hover {
+  background-color: #16a085; /* Cor um pouco mais escura no hover */
+  box-shadow: 0 6px 15px rgba(26, 188, 156, 0.6);
+}
+
+.container button:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+/* Mensagem de Erro */
+.error-message {
+  color: #e74c3c; /* Vermelho padrão para erros */
+  background-color: rgba(231, 76, 60, 0.1);
+  border: 1px solid #e74c3c;
+  padding: 10px;
+  border-radius: 5px;
+  text-align: center;
+  margin-bottom: 15px;
+  font-size: 14px;
 }

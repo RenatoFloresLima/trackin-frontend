@@ -23,52 +23,63 @@ const Login = () => {
       const userRole = await login(loginInput, senha);
 
       if (userRole === "ROLE_ADMIN") {
-        // ROLE_ADMIN: Redireciona para a tela de cadastro de funcionários
-        navigate("/cadastro", { replace: true });
+        // ROLE_ADMIN: Redireciona para a tela de aprovação de pontos
+        navigate("/aprovacao-pontos", { replace: true });
       } else {
-        // FUNCIONÁRIO COMUM: Redireciona para a tela de registro de ponto
-        navigate("/ponto", { replace: true });
+        // FUNCIONÁRIO COMUM: Redireciona para a tela de perfil
+        navigate("/meu-perfil", { replace: true });
       }
     } catch (e) {
-      // 5. Tratar e exibir erros da função login (API)
-      setError(e.message || "Ocorreu um erro desconhecido durante o login.");
+      // Tratar e exibir erros da função login (API)
+      // Usamos e.message se for um erro de exceção lançado pelo useAuth/API
+      const errorMessage =
+        e.message || "Erro de conexão. Verifique o servidor.";
+      setError(errorMessage);
     }
   };
 
   return (
-    <div className="container">
-      <form onSubmit={handleSubmit}>
-        <h1>Trackin</h1>
-        {error && <p className="error-message">{error}</p>}
-        <div className="input-field">
-          <input
-            type="text"
-            placeholder="Matricula"
-            value={loginInput}
-            onChange={(e) => setLoginInput(e.target.value)}
-            required
-          />
-          <FaUser className="icon" />
-        </div>
-        <div className="input-field">
-          <input
-            type="password"
-            placeholder="Senha"
-            value={senha}
-            onChange={(e) => setSenha(e.target.value)}
-            required
-          />
-          <FaLock className="icon" />
-        </div>
-        <div className="recall-forget">
-          <label>
-            <input type="checkbox" />
-            Lembrar-me
-          </label>
-          <a href="#">Esqueci minha senha</a>
-        </div>
-        <button>Entrar</button>
-      </form>
+    // 🔑 MUDANÇA CRÍTICA: Envolvemos o contêiner com a classe de fundo.
+    // Esta classe deve ter height: 100vh e a background-image definida no App.css
+    <div className="App-login-background">
+      <div className="container">
+        <form onSubmit={handleSubmit}>
+          <h1 className="logo-text">Trackin</h1>
+
+          {/* Exibição da mensagem de erro */}
+          {error && <p className="error-message">{error}</p>}
+
+          <div className="input-field">
+            <input
+              type="text"
+              placeholder="Matricula"
+              value={loginInput}
+              onChange={(e) => setLoginInput(e.target.value)}
+              required
+            />
+            <FaUser className="icon" />
+          </div>
+          <div className="input-field">
+            <input
+              type="password"
+              placeholder="Senha"
+              value={senha}
+              onChange={(e) => setSenha(e.target.value)}
+              required
+            />
+            <FaLock className="icon" />
+          </div>
+          <div className="recall-forget">
+            <label>
+              <input type="checkbox" />
+              Lembrar-me
+            </label>
+            <a href="#">Esqueci minha senha</a>
+          </div>
+          {/* 🔑 Adicionamos type="submit" para maior compatibilidade, embora o form já lide com o submit */}
+          <button type="submit">Entrar</button>
+        </form>
+      </div>
     </div>
   );
 };

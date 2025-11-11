@@ -40,6 +40,7 @@ interface IFormInput {
   email: string;
   sedePrincipalId: string; // IDs vêm como string do select
   funcaoId: string; // IDs vêm como string do select
+  dataContratacao: string;
   role: "ROLE_FUNCIONARIO" | "ROLE_ADMIN";
 }
 
@@ -207,6 +208,15 @@ const Cadastro = () => {
             className="form-control"
             placeholder="Digite o email"
             {...register("email", { required: true })}
+          />
+        </div>
+
+        <div className="form-group">
+          <label>Data de Contratação:</label>
+          <input
+            type="date" // Use 'date' para o seletor de data
+            className="form-control"
+            {...register("dataContratacao", { required: true })}
           />
         </div>
 

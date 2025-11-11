@@ -1,15 +1,17 @@
 // src/Components/funcionario/lista/LinhaFuncionario.tsx
+
 import React from "react";
 import { TableCell, TableRow, IconButton, Tooltip } from "@mui/material";
 import EditIcon from "@mui/icons-material/Edit";
 import InfoIcon from "@mui/icons-material/Info";
 import PersonOffIcon from "@mui/icons-material/PersonOff";
-import { type FuncionarioAPI } from "../../../interfaces/funcionarioInterfaces"; // Caminho OK
+import { type FuncionarioAPI } from "../../../interfaces/funcionarioInterfaces";
 import { useNavigate } from "react-router-dom";
 
 interface LinhaFuncionarioProps {
   funcionario: FuncionarioAPI;
-  onDesligar: (id: number) => void;
+  // 🔑 CORRIGIDO: onDesligar é uma função que não recebe argumentos, pois ListaFuncionarios já mapeia o objeto.
+  onDesligar: () => void;
   onInformacoes: (id: number) => void;
 }
 
@@ -19,23 +21,17 @@ const LinhaFuncionario: React.FC<LinhaFuncionarioProps> = ({
   onInformacoes,
 }) => {
   const navigate = useNavigate();
-  // Função de Desligamento com Confirmação e Aviso
-  const handleDesligar = () => {
-    if (
-      window.confirm(
-        `Tem certeza que deseja solicitar o desligamento de ${funcionario.nome}? (Requer Aprovação)`
-      )
-    ) {
-      onDesligar(funcionario.id);
-    }
+
+  // 🔑 NOVO HANDLER: Apenas chama a função de prop que abre o modal.
+  const handleDesligarClick = () => {
+    onDesligar();
   };
 
   const handleEditClick = () => {
     navigate(`/funcionarios/editar/${funcionario.id}`);
   };
 
-  // Simula a verificação de status (mantido)
-  const statusFuncionario = funcionario.usuarioAssociado ? "Ativo" : "Pendente";
+  const statusFuncionario = funcionario.status;
 
   return (
     <TableRow hover>
@@ -63,12 +59,15 @@ const LinhaFuncionario: React.FC<LinhaFuncionarioProps> = ({
           </IconButton>
         </Tooltip>
 
-        {/* Botão Desligar (Requer Aprovação) */}
-        <Tooltip title="Desligar Funcionário (Requer Aprovação)">
-          <IconButton color="error" onClick={handleDesligar}>
-            <PersonOffIcon />
-          </IconButton>
-        </Tooltip>
+        {/* 🔑 Botão Desligar (Só ATIVO pode ser desligado) */}
+        {funcionario.status === "ATIVO" && (
+          <Tooltip title="Desligar Funcionário">
+            {/* Chama o handler simplificado */}
+            <IconButton color="error" onClick={handleDesligarClick}>
+              <PersonOffIcon />
+            </IconButton>
+          </Tooltip>
+        )}
       </TableCell>
     </TableRow>
   );

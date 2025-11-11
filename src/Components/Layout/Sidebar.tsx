@@ -1,22 +1,29 @@
 // src/Components/Layout/Sidebar.tsx
-
 import React from "react";
-import { NavLink, Link } from "react-router-dom";
-import { useAuth } from "../../contexts/AuthContext"; // Para saber se é Admin
-import { FaClock, FaUserPlus, FaSignOutAlt, FaHome } from "react-icons/fa";
+import { NavLink } from "react-router-dom";
+import { useAuth } from "../../contexts/AuthContext";
+import {
+  FaClock,
+  FaUserPlus,
+  FaSignOutAlt,
+  FaHome,
+  FaCheckCircle,
+  FaUserCircle, // NOVO: Ícone para o perfil
+} from "react-icons/fa";
 
-import "./Sidebar.css"; // Vamos criar este CSS a seguir
+import "./Sidebar.css"; // Assumindo que este arquivo de estilos existe
 
 const Sidebar: React.FC = () => {
   const { user, isAuthenticated, logout } = useAuth();
-  const userRole = user?.role; // Ex: 'ROLE_ADMIN' ou 'ROLE_FUNCIONARIO'
+  const userRole = user?.role; // 'ROLE_ADMIN' ou 'ROLE_FUNCIONARIO'
 
   // Itens de navegação padrão
   const navItems = [
+    // 🔑 ITEM ATUALIZADO: "Início" agora aponta para o Perfil
     {
-      path: "/",
-      label: "Início",
-      icon: FaHome,
+      path: "/meu-perfil",
+      label: "Meu Perfil",
+      icon: FaUserCircle, // Usamos o ícone de perfil
       roles: ["ROLE_ADMIN", "ROLE_FUNCIONARIO"],
     },
     {
@@ -25,7 +32,13 @@ const Sidebar: React.FC = () => {
       icon: FaClock,
       roles: ["ROLE_ADMIN", "ROLE_FUNCIONARIO"],
     },
-    // A rota de Cadastro só aparece para ROLE_ADMIN
+    // Apenas admins veem Aprovação de Pontos
+    {
+      path: "/aprovacao-pontos",
+      label: "Aprovação de Pontos",
+      icon: FaCheckCircle,
+      roles: ["ROLE_ADMIN"],
+    },
     {
       path: "/cadastro",
       label: "Cadastro Func.",
@@ -35,18 +48,14 @@ const Sidebar: React.FC = () => {
     {
       path: "/lista-funcionarios",
       label: "Funcionários",
-      icon: FaUserPlus,
+      icon: FaHome, // Mudando o ícone, já que FaUserPlus foi para cadastro
       roles: ["ROLE_ADMIN"],
     },
   ];
 
-  // Filtra os itens com base na role do usuário
+  // Filtra itens com base na role do usuário
   const filteredNavItems = navItems.filter((item) => {
-    // Se for ROLE_ADMIN, permite acesso aos itens dele
-    if (!isAuthenticated || !userRole) {
-      return false;
-    }
-    // Se for ROLE_FUNCIONARIO, permite acesso aos itens dele (e itens comuns)
+    if (!isAuthenticated || !userRole) return false;
     return item.roles.includes(userRole);
   });
 
@@ -58,7 +67,6 @@ const Sidebar: React.FC = () => {
       <ul className="sidebar-menu">
         {filteredNavItems.map((item) => (
           <li key={item.path} className="sidebar-menu-item">
-            {/* NavLink para destacar o link ativo */}
             <NavLink
               to={item.path}
               className={({ isActive }) =>

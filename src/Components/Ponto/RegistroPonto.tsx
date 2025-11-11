@@ -1,11 +1,29 @@
 import { useForm } from "react-hook-form";
 import type { SubmitHandler } from "react-hook-form";
-// 🎯 CORREÇÃO: Importação explícita de useState e useEffect do React
 import React, { useState, useEffect } from "react";
 // ⚠️ ATENÇÃO: Verifique o caminho real para o seu arquivo api.ts
 import api from "../../services/api";
 import { format } from "date-fns";
-import "./RegistroPonto.css";
+
+// 🔑 IMPORTAÇÕES DO MUI
+import {
+  Container,
+  Paper,
+  Typography,
+  Box,
+  TextField,
+  Select,
+  MenuItem,
+  Button,
+  Grid,
+  CircularProgress,
+  Alert,
+  InputLabel,
+  FormControl,
+} from "@mui/material";
+
+import SendIcon from "@mui/icons-material/Send";
+import AccessTimeIcon from "@mui/icons-material/AccessTime";
 
 // ------------------------------------------
 // Constantes e Interfaces de Tipagem
@@ -36,28 +54,34 @@ interface IFormInput {
   horaRegistro: string;
 }
 
-const RegistroPonto = () => {
+// ------------------------------------------
+// COMPONENTE PRINCIPAL
+// ------------------------------------------
+
+const RegistroPonto: React.FC = () => {
   const {
     register,
     handleSubmit,
     reset,
     formState: { errors },
+    setValue,
   } = useForm<IFormInput>({
     defaultValues: {
-      // Preenche com data/hora atual por padrão
       dataRegistro: format(new Date(), "yyyy-MM-dd"),
       horaRegistro: format(new Date(), "HH:mm"),
       tipo: "ENTRADA",
+      sedeId: "",
     },
   });
 
   const [sedes, setSedes] = useState<Sede[]>([]);
   const [status, setStatus] = useState("");
+  const [isSuccess, setIsSuccess] = useState(false);
   const [loading, setLoading] = useState(false);
   const [dataLoading, setDataLoading] = useState(true);
 
   // ------------------------------------------
-  // Lógica de Carregamento de Sedes (Exige JWT)
+  // Lógica de Carregamento de Sedes
   // ------------------------------------------
   useEffect(() => {
     const fetchSedes = async () => {
@@ -66,23 +90,23 @@ const RegistroPonto = () => {
         setSedes(response.data);
       } catch (error) {
         console.error("Erro ao carregar sedes:", error);
-        setStatus("❌ Erro ao carregar sedes. Verifique se você está logado.");
+        setStatus("Erro ao carregar sedes. Verifique se você está logado.");
+        setIsSuccess(false);
       } finally {
         setDataLoading(false);
       }
     };
     fetchSedes();
-  }, []);
+  }, [setValue]);
 
   // ------------------------------------------
-  // Lógica de Submissão (Usa JWT do Operador e Matrícula/Senha do Funcionário)
+  // Lógica de Submissão
   // ------------------------------------------
   const onSubmit: SubmitHandler<IFormInput> = async (data) => {
     setStatus("");
     setLoading(true);
 
     try {
-      // Combina data e hora para o formato ISO exigido pelo backend (LocalDateTime)
       const horarioCompleto = `${data.dataRegistro}T${data.horaRegistro}:00`;
 
       const payload = {
@@ -91,16 +115,19 @@ const RegistroPonto = () => {
         sedeId: parseInt(data.sedeId),
         tipo: data.tipo,
         horario: horarioCompleto,
-        observacao: data.justificativa, // Mapeado como 'observacao' no DTO do backend
+        observacao: data.justificativa,
       };
 
-      console.log("Payload de ponto manual:", payload);
-
-      // 🎯 CRÍTICO: Usa a instância 'api' que injeta o token JWT do Operador
       const response = await api.post(API_REGISTROS, payload);
 
-      setStatus(`✅ Ponto registrado! ${response.data.mensagem}`);
-      reset();
+      setStatus(`Ponto registrado! ${response.data.mensagem}`);
+      setIsSuccess(true);
+      reset({
+        dataRegistro: format(new Date(), "yyyy-MM-dd"),
+        horaRegistro: format(new Date(), "HH:mm"),
+        tipo: data.tipo,
+        sedeId: data.sedeId,
+      });
     } catch (error: any) {
       console.error("Erro ao registrar ponto:", error);
       const statusCode = error.response?.status;
@@ -116,173 +143,309 @@ const RegistroPonto = () => {
         errorMessage = error.response.data.message;
       }
 
-      setStatus(`❌ Falha no Ponto: ${errorMessage}`);
+      setStatus(`Falha no Ponto: ${errorMessage}`);
+      setIsSuccess(false);
     } finally {
       setLoading(false);
     }
   };
 
+  // ------------------------------------------
+  // RENDERIZAÇÃO
+  // ------------------------------------------
+
   if (dataLoading) {
     return (
-      <div className="container">
-        <h1>Carregando...</h1>
-        <p>Buscando dados de Sedes...</p>
-      </div>
+      <Container maxWidth="sm" sx={{ mt: 4, textAlign: "center" }}>
+        <CircularProgress />
+        <Typography variant="body1" sx={{ mt: 2 }}>
+          Carregando dados de Sedes...
+        </Typography>
+      </Container>
     );
   }
 
   return (
-    <div className="container">
-      <h1>Registro de Ponto Manual</h1>
-
-      {/* Feedback de Status */}
-      {status && (
-        <div
-          style={{
-            padding: "10px",
-            margin: "15px 0",
-            borderRadius: "4px",
-            backgroundColor: status.includes("✅") ? "#d4edda" : "#f8d7da",
-            color: status.includes("✅") ? "#155724" : "#721c24",
+    <Container maxWidth="lg" sx={{ mt: 4 }}>
+      {/* BOX DO TÍTULO COM FUNDO BRANCO E SOMBRA */}
+      <Box
+        sx={{
+          backgroundColor: "#ffffff",
+          borderRadius: "8px",
+          boxShadow: "0 2px 4px rgba(0,0,0,0.1)",
+          p: 2,
+          mb: 3,
+          textAlign: "center",
+        }}
+      >
+        <Typography
+          variant="h4"
+          gutterBottom
+          component="h1"
+          sx={{
+            color: "#333",
+            textAlign: "center",
+            fontWeight: 600,
+            mb: 0,
           }}
         >
-          {status}
-        </div>
-      )}
-
-      {/* ⚠️ Alteração: Usando handleSubmit do react-hook-form no form */}
-      <form onSubmit={handleSubmit(onSubmit)}>
-        {/* 1. SELECT SEDE */}
-        <div className="form-group">
-          <label>Sede:</label>
-          <select
-            className="form-control"
-            {...register("sedeId", { required: "A sede é obrigatória" })}
-            disabled={loading}
-          >
-            <option value="">Selecione a sede da batida</option>
-            {sedes.map((sede) => (
-              <option key={sede.id} value={sede.id.toString()}>
-                {sede.nome}
-              </option>
-            ))}
-          </select>
-          {errors.sedeId && (
-            <p className="error-message">{errors.sedeId.message}</p>
-          )}
-        </div>
-
-        {/* 2. SELECT TIPO DE REGISTRO (NOVO CAMPO) */}
-        <div className="form-group">
-          <label>Tipo de Registro:</label>
-          <select
-            className="form-control"
-            {...register("tipo", {
-              required: "O tipo de registro é obrigatório",
-            })}
-            disabled={loading}
-          >
-            <option value="ENTRADA">Entrada</option>
-            <option value="SAIDA">Saída</option>
-            <option value="INICIO_INTERVALO">Início de Intervalo</option>
-            <option value="FIM_INTERVALO">Fim de Intervalo</option>
-          </select>
-          {errors.tipo && (
-            <p className="error-message">{errors.tipo.message}</p>
-          )}
-        </div>
-
-        {/* 3. MATRÍCULA */}
-        <div className="form-group">
-          <label>Matrícula do Funcionário:</label>
-          <input
-            type="text"
-            className="form-control"
-            placeholder="Digite a matrícula do funcionário"
-            {...register("matricula", {
-              required: "A matrícula é obrigatória",
-            })}
-            disabled={loading}
+          <AccessTimeIcon
+            fontSize="inherit"
+            sx={{ mr: 1, verticalAlign: "middle" }}
           />
-          {errors.matricula && (
-            <p className="error-message">{errors.matricula.message}</p>
-          )}
-        </div>
+          Registro de Ponto Manual
+        </Typography>
+      </Box>
 
-        {/* 4. SENHA */}
-        <div className="form-group">
-          <label>Senha:</label>
-          <input
-            type="password"
-            className="form-control"
-            placeholder="Digite a senha do funcionário"
-            {...register("senha", { required: "A senha é obrigatória" })}
-            disabled={loading}
-          />
-          {errors.senha && (
-            <p className="error-message">{errors.senha.message}</p>
-          )}
-        </div>
+      <Paper
+        elevation={0}
+        sx={{ p: 4, border: "1px solid #ddd", borderRadius: "8px" }}
+      >
+        {status && (
+          <Alert severity={isSuccess ? "success" : "error"} sx={{ mb: 3 }}>
+            {status}
+          </Alert>
+        )}
 
-        {/* 5. DATA E HORA DA BATIDA (NOVO CAMPO - Mantendo padrão de layout com duas colunas implícitas) */}
-        <div
-          className="form-group-datetime"
-          style={{ display: "flex", gap: "20px" }}
-        >
-          <div className="form-group" style={{ flex: 1 }}>
-            <label>Data da Batida:</label>
-            <input
-              type="date"
-              className="form-control"
-              {...register("dataRegistro", {
-                required: "A data é obrigatória",
-              })}
-              disabled={loading}
-            />
-            {errors.dataRegistro && (
-              <p className="error-message">{errors.dataRegistro.message}</p>
-            )}
-          </div>
-          <div className="form-group" style={{ flex: 1 }}>
-            <label>Hora da Batida:</label>
-            <input
-              type="time"
-              className="form-control"
-              {...register("horaRegistro", {
-                required: "A hora é obrigatória",
-              })}
-              disabled={loading}
-            />
-            {errors.horaRegistro && (
-              <p className="error-message">{errors.horaRegistro.message}</p>
-            )}
-          </div>
-        </div>
+        <form onSubmit={handleSubmit(onSubmit)}>
+          {/* O Grid PARENTAL DEVE TER APENAS a prop 'container' */}
+          <Grid container spacing={3}>
+            {/* 1. LINHA FIXA 1: Sede(4), Tipo(2), Data(3), Hora(3) = 12 */}
 
-        {/* 6. JUSTIFICATIVA */}
-        <div className="form-group">
-          <label>Justificativa:</label>
-          {/* Ajustado para textarea para melhor inserção de justificativa e mantendo o padrão de classe */}
-          <textarea
-            className="form-control"
-            placeholder="Justifique seu ponto (Obrigatório)"
-            {...register("justificativa", {
-              required: "A justificativa é obrigatória",
-            })}
-            rows={3}
-            disabled={loading}
-          />
-          {errors.justificativa && (
-            <p className="error-message">{errors.justificativa.message}</p>
-          )}
-        </div>
+            {/* 1.1 Sede (sm=4) - ADICIONADO component="div" para tentar corrigir o erro de tipagem */}
+            <Grid component="div">
+              <FormControl fullWidth error={!!errors.sedeId}>
+                <InputLabel
+                  id="sede-label"
+                  sx={{
+                    maxWidth: "90%",
+                    overflow: "hidden",
+                    textOverflow: "ellipsis",
+                    whiteSpace: "nowrap",
+                  }}
+                >
+                  Sede
+                </InputLabel>
+                <Select
+                  labelId="sede-label"
+                  label="Sede"
+                  variant="outlined"
+                  fullWidth
+                  {...register("sedeId", {
+                    required: "A sede é obrigatória",
+                  })}
+                  disabled={loading}
+                  sx={{
+                    borderRadius: "8px",
+                    "& .MuiSelect-select": {
+                      paddingTop: "10px",
+                      paddingBottom: "10px",
+                      overflow: "hidden",
+                      whiteSpace: "nowrap",
+                      textOverflow: "ellipsis",
+                    },
+                  }}
+                >
+                  <MenuItem value="">Selecione a sede da batida</MenuItem>
+                  {sedes.map((sede) => (
+                    <MenuItem key={sede.id} value={sede.id.toString()}>
+                      <Box
+                        sx={{
+                          overflow: "hidden",
+                          textOverflow: "ellipsis",
+                          whiteSpace: "nowrap",
+                          width: "100%",
+                        }}
+                      >
+                        {sede.nome}
+                      </Box>
+                    </MenuItem>
+                  ))}
+                </Select>
+                {errors.sedeId && (
+                  <Typography variant="caption" color="error" sx={{ mt: 0.5 }}>
+                    {errors.sedeId.message}
+                  </Typography>
+                )}
+              </FormControl>
+            </Grid>
 
-        {/* 7. BOTÃO DE SUBMISSÃO */}
-        <button type="submit" className="btn btn-primary" disabled={loading}>
-          {loading ? "Registrando..." : "Registrar Ponto Manual"}
-        </button>
-      </form>
-    </div>
+            {/* 1.2 Tipo de Registro (sm=2) */}
+            <Grid>
+              <FormControl fullWidth error={!!errors.tipo}>
+                <InputLabel id="tipo-label">Tipo</InputLabel>
+                <Select
+                  labelId="tipo-label"
+                  label="Tipo"
+                  variant="outlined"
+                  fullWidth
+                  {...register("tipo", {
+                    required: "O tipo de registro é obrigatório",
+                  })}
+                  disabled={loading}
+                  sx={{
+                    borderRadius: "8px",
+                    "& .MuiSelect-select": {
+                      paddingTop: "10px",
+                      paddingBottom: "10px",
+                    },
+                  }}
+                >
+                  <MenuItem value="ENTRADA">Entrada</MenuItem>
+                  <MenuItem value="SAIDA">Saída</MenuItem>
+                  <MenuItem value="INICIO_INTERVALO">
+                    Intervalo (Início)
+                  </MenuItem>
+                  <MenuItem value="FIM_INTERVALO">Intervalo (Fim)</MenuItem>
+                </Select>
+                {errors.tipo && (
+                  <Typography variant="caption" color="error" sx={{ mt: 0.5 }}>
+                    {errors.tipo.message}
+                  </Typography>
+                )}
+              </FormControl>
+            </Grid>
+
+            {/* 1.3 Data da Batida (sm=3) */}
+            <Grid>
+              <TextField
+                label="Data"
+                type="date"
+                fullWidth
+                error={!!errors.dataRegistro}
+                helperText={errors.dataRegistro?.message}
+                InputLabelProps={{ shrink: true }}
+                {...register("dataRegistro", {
+                  required: "A data é obrigatória",
+                })}
+                disabled={loading}
+                InputProps={{
+                  sx: {
+                    borderRadius: "8px",
+                    paddingTop: "3px",
+                    paddingBottom: "3px",
+                  },
+                }}
+              />
+            </Grid>
+
+            {/* 1.4 Hora da Batida (sm=3) */}
+            <Grid>
+              <TextField
+                label="Hora"
+                type="time"
+                fullWidth
+                error={!!errors.horaRegistro}
+                helperText={errors.horaRegistro?.message}
+                InputLabelProps={{ shrink: true }}
+                {...register("horaRegistro", {
+                  required: "A hora é obrigatória",
+                })}
+                disabled={loading}
+                InputProps={{
+                  sx: {
+                    borderRadius: "8px",
+                    paddingTop: "3px",
+                    paddingBottom: "3px",
+                  },
+                }}
+              />
+            </Grid>
+
+            {/* 2. LINHA FIXA 2: Matrícula(6) e Senha(6) = 12 */}
+
+            <Grid>
+              <TextField
+                label="Matrícula do Funcionário"
+                type="text"
+                fullWidth
+                placeholder="Digite a matrícula do funcionário"
+                error={!!errors.matricula}
+                helperText={errors.matricula?.message}
+                {...register("matricula", {
+                  required: "A matrícula é obrigatória",
+                })}
+                disabled={loading}
+                InputProps={{
+                  sx: {
+                    borderRadius: "8px",
+                    paddingTop: "3px",
+                    paddingBottom: "3px",
+                  },
+                }}
+              />
+            </Grid>
+
+            <Grid>
+              <TextField
+                label="Senha do Funcionário"
+                type="password"
+                fullWidth
+                placeholder="Digite a senha do funcionário"
+                error={!!errors.senha}
+                helperText={errors.senha?.message}
+                {...register("senha", { required: "A senha é obrigatória" })}
+                disabled={loading}
+                InputProps={{
+                  sx: {
+                    borderRadius: "8px",
+                    paddingTop: "3px",
+                    paddingBottom: "3px",
+                  },
+                }}
+              />
+            </Grid>
+
+            {/* 3. LINHA FIXA 3: Justificativa (12) */}
+            <Grid>
+              <TextField
+                label="Justificativa (Observação)"
+                multiline
+                rows={3}
+                fullWidth
+                placeholder="Justifique seu ponto (Obrigatório)"
+                error={!!errors.justificativa}
+                helperText={errors.justificativa?.message}
+                {...register("justificativa", {
+                  required: "A justificativa é obrigatória",
+                })}
+                disabled={loading}
+                sx={{
+                  borderRadius: "8px",
+                  "& .MuiOutlinedInput-root": { borderRadius: "8px" },
+                }}
+              />
+            </Grid>
+
+            {/* 4. LINHA FIXA 4: Botão (Centralizado) */}
+            <Grid sx={{ display: "flex", justifyContent: "center" }}>
+              <Button
+                type="submit"
+                variant="contained"
+                color="primary"
+                disabled={loading}
+                startIcon={
+                  loading ? (
+                    <CircularProgress size={20} color="inherit" />
+                  ) : (
+                    <SendIcon />
+                  )
+                }
+                sx={{
+                  mt: 2,
+                  borderRadius: "8px",
+                  py: 1.5,
+                  fontWeight: 600,
+                  width: { xs: "100%", sm: "400px" },
+                }}
+              >
+                {loading ? "Registrando..." : "Registrar Ponto Manual"}
+              </Button>
+            </Grid>
+          </Grid>
+        </form>
+      </Paper>
+    </Container>
   );
 };
 
