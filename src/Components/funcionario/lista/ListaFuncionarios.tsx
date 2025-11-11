@@ -51,7 +51,7 @@ const ListaFuncionarios: React.FC = () => {
 
   const estadoInicialFiltros: FiltrosFuncionario = {
     termoBusca: "",
-    funcaoNome: null,
+    funcaoNome: "",
     sedePrincipalId: null,
     apenasMinhaSede: false,
   };

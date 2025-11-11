@@ -2,7 +2,7 @@
 import React, { type ChangeEvent, useState, useEffect } from "react";
 import {
   TextField,
-  Grid,
+  Grid2 as Grid,
   InputAdornment,
   Paper,
   FormControl,
@@ -16,9 +16,9 @@ import SearchIcon from "@mui/icons-material/Search";
 import api from "../../../services/api";
 import {
   type FiltrosFuncionario,
-  type Sede,
-  type Funcao,
 } from "../../../interfaces/funcionarioInterfaces";
+import type { SedeResponse } from "../../../types/SedeTypes";
+import type { FuncaoResponse } from "../../../types/FuncaoTypes";
 
 // ------------------------------------------
 // Constantes de API
@@ -40,8 +40,8 @@ const FiltroFuncionarios: React.FC<FiltroFuncionariosProps> = ({
   // ------------------------------------------
   // ESTADOS DE DADOS
   // ------------------------------------------
-  const [sedes, setSedes] = useState<Sede[]>([]);
-  const [funcoes, setFuncoes] = useState<Funcao[]>([]);
+  const [sedes, setSedes] = useState<SedeResponse[]>([]);
+  const [funcoes, setFuncoes] = useState<FuncaoResponse[]>([]);
   const [dataLoading, setDataLoading] = useState(true);
 
   // ------------------------------------------
@@ -51,8 +51,8 @@ const FiltroFuncionarios: React.FC<FiltroFuncionariosProps> = ({
     const fetchDropdownData = async () => {
       try {
         const [sedesResponse, funcoesResponse] = await Promise.all([
-          api.get<Sede[]>(API_SEDES),
-          api.get<Funcao[]>(API_FUNCOES),
+          api.get<SedeResponse[]>(API_SEDES),
+          api.get<FuncaoResponse[]>(API_FUNCOES),
         ]);
 
         setSedes(sedesResponse.data);
@@ -123,7 +123,7 @@ const FiltroFuncionarios: React.FC<FiltroFuncionariosProps> = ({
     <Paper elevation={1} sx={{ p: 2, mb: 2 }}>
       <Grid container spacing={2} alignItems="center">
         {/* 1. Campo de Pesquisa Geral (Nome, Matrícula) */}
-        <Grid item xs={12} sm={6} md={4}>
+        <Grid xs={12} sm={6} md={4}>
           <TextField
             fullWidth
             label="Pesquisar por Nome, Matrícula ou E-mail"
@@ -143,7 +143,7 @@ const FiltroFuncionarios: React.FC<FiltroFuncionariosProps> = ({
         </Grid>
 
         {/* 2. SELECT FUNÇÃO (Filtro por nome da função) */}
-        <Grid item xs={12} sm={6} md={4}>
+        <Grid xs={12} sm={6} md={4}>
           <FormControl fullWidth size="small">
             <InputLabel>Filtrar por Função</InputLabel>
             <Select
@@ -164,7 +164,7 @@ const FiltroFuncionarios: React.FC<FiltroFuncionariosProps> = ({
         </Grid>
 
         {/* 3. SELECT SEDE (Filtro por ID da sede) */}
-        <Grid item xs={12} sm={6} md={4}>
+        <Grid xs={12} sm={6} md={4}>
           <FormControl fullWidth size="small">
             <InputLabel>Filtrar por Sede</InputLabel>
             <Select

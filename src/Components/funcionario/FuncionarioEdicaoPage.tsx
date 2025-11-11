@@ -60,10 +60,9 @@ interface IFormInput {
 const EdicaoFuncionario: React.FC = () => {
   const { isAdmin } = useAuth();
   const { id } = useParams<{ id: string }>();
-  const navigate = useNavigate();
   const funcionarioId = Number(id);
 
-  const { register, handleSubmit, reset, watch, setValue } =
+  const { register, handleSubmit, reset } =
     useForm<IFormInput>();
 
   const [sedes, setSedes] = useState<Sede[]>([]);

@@ -62,8 +62,8 @@ const AprovacaoPontoPage: React.FC = () => {
       const data = await buscarPontos(params);
       console.log("Pontos buscados:", data);
       setPontos(data || []);
-    } catch (e: any) {
-      setErro(e.message || "Erro desconhecido ao buscar pontos.");
+    } catch (error) {
+      setErro((error instanceof Error ? error.message : undefined) || "Erro desconhecido ao buscar pontos.");
       setPontos([]);
     } finally {
       setLoading(false);
@@ -161,7 +161,7 @@ const AprovacaoPontoPage: React.FC = () => {
       {/* 🔹 Abas */}
       <Tabs
         value={abaAtiva}
-        onChange={(e, newValue) => setAbaAtiva(newValue as any)}
+                    onChange={(_, newValue) => setAbaAtiva(newValue as "dia" | "pendentes" | "todos")}
         sx={{ mb: 2 }}
       >
         <Tab label="Pontos do Dia" value="dia" />

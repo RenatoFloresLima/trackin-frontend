@@ -3,13 +3,12 @@ import type { SubmitHandler } from "react-hook-form";
 import React, { useState, useEffect } from "react";
 import api from "../../services/api";
 import {
-  Container,
   Paper,
   Typography,
   TextField,
   Button,
   Box,
-  Grid,
+  Grid2 as Grid,
   MenuItem,
   Alert,
   CircularProgress,
@@ -169,7 +168,7 @@ const Cadastro: React.FC = () => {
         <form onSubmit={handleSubmit(onSubmit)}>
           <Grid container spacing={3}>
             {/* Nome */}
-            <Grid item xs={12} md={6}>
+            <Grid xs={12} md={6}>
               <TextField
                 fullWidth
                 label="Nome Completo"
@@ -182,7 +181,7 @@ const Cadastro: React.FC = () => {
             </Grid>
 
             {/* CPF */}
-            <Grid item xs={12} md={6}>
+            <Grid xs={12} md={6}>
               <TextField
                 fullWidth
                 label="CPF"
@@ -195,7 +194,7 @@ const Cadastro: React.FC = () => {
             </Grid>
 
             {/* Email */}
-            <Grid item xs={12} md={6}>
+            <Grid xs={12} md={6}>
               <TextField
                 fullWidth
                 type="email"
@@ -215,7 +214,7 @@ const Cadastro: React.FC = () => {
             </Grid>
 
             {/* Telefone */}
-            <Grid item xs={12} md={6}>
+            <Grid xs={12} md={6}>
               <TextField
                 fullWidth
                 label="Telefone"
@@ -228,7 +227,7 @@ const Cadastro: React.FC = () => {
             </Grid>
 
             {/* Endereço */}
-            <Grid item xs={12}>
+            <Grid xs={12}>
               <TextField
                 fullWidth
                 label="Endereço"
@@ -241,7 +240,7 @@ const Cadastro: React.FC = () => {
             </Grid>
 
             {/* Data de Contratação */}
-            <Grid item xs={12} md={6}>
+            <Grid xs={12} md={6}>
               <TextField
                 fullWidth
                 type="date"
@@ -257,7 +256,7 @@ const Cadastro: React.FC = () => {
             </Grid>
 
             {/* Perfil de Acesso */}
-            <Grid item xs={12} md={6}>
+            <Grid xs={12} md={6}>
               <Controller
                 name="role"
                 control={control}
@@ -317,7 +316,7 @@ const Cadastro: React.FC = () => {
             </Grid>
 
             {/* Sede - Linha separada com mais espaço */}
-            <Grid item xs={12}>
+            <Grid xs={12}>
               <Controller
                 name="sedePrincipalId"
                 control={control}
@@ -401,7 +400,7 @@ const Cadastro: React.FC = () => {
             </Grid>
 
             {/* Função - Linha separada com mais espaço */}
-            <Grid item xs={12}>
+            <Grid xs={12}>
               <Controller
                 name="funcaoId"
                 control={control}
@@ -485,7 +484,7 @@ const Cadastro: React.FC = () => {
             </Grid>
 
             {/* Botões - Abaixo dos campos Sede e Função */}
-            <Grid item xs={12}>
+            <Grid xs={12}>
               <Box sx={{ display: "flex", justifyContent: "flex-end", gap: 2, mt: 2 }}>
                 <Button
                   variant="outlined"
