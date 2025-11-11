@@ -33,3 +33,17 @@ export interface UserContext {
   sede_id: number;
   nomeSede: string;
 }
+
+export interface FuncionarioDetalheDTO {
+  id: number;
+  nome: string;
+  matricula: string; // Imutável
+  email: string; // Imutável
+  cpf: string; // Imutável
+  endereco: string; // Mutável
+  telefone: string; // Mutável
+  funcaoNome: string; // Imutável (da entidade Funcao)
+  sedePrincipalNome: string; // Imutável (da entidade Sede)
+  status: "ATIVO" | "INATIVO" | "AFASTADO" | "DESLIGADO"; // Imutável
+  dataAdmissao: string; // 'yyyy-mm-dd' - Imutável
+}

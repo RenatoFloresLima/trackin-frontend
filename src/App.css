@@ -1,17 +1,36 @@
-* {
+/* src/App.css */
+
+/* Regras Básicas: Descomente e MANTENHA estas */
+html,
+body,
+#root {
+  height: 100%;
   margin: 0;
   padding: 0;
-  box-sizing: border-box;
-  font-family: Helvetica;
-  text-shadow: #000 1px 1px;
+  /* 🔑 FORÇA A COR DE FUNDO NO NÍVEL MAIS ALTO PARA EVITAR BRANCO PURO */
+  background-color: #2c3e50;
 }
 
-.App {
+* {
+  box-sizing: border-box;
+  /* Remova qualquer text-shadow aqui para manter o visual profissional */
+}
+
+/* Regras de Layout do Login: Descomente e MANTENHA estas */
+.App-login-background {
+  min-height: 100vh; /* Garante altura total */
+  width: 100%;
   display: flex;
   justify-content: center;
   align-items: center;
-  min-height: 100vh;
-  background-image: url("assets/image\(3\).jpg");
+
+  /* 🔑 Use o caminho absoluto correto, assumindo que /assets está na pasta public */
+  background-image: url("/image(3).jpg");
   background-size: cover;
   background-position: center;
+}
+
+/* Opcional: Remova ou renomeie a classe .App antiga para evitar confusão */
+.App {
+  /* Deixe esta classe vazia se não for mais usada ou remova */
 }

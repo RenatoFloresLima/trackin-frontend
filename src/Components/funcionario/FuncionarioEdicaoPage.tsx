@@ -1,12 +1,10 @@
-// src/Components/funcionario/EdicaoFuncionario.tsx
+// src/Components/funcionario/EdicaoFuncionario.tsx (FINAL CORRIGIDO)
 
 import { useForm } from "react-hook-form";
 import type { SubmitHandler } from "react-hook-form";
 import React, { useState, useEffect, useCallback } from "react";
-// 🔑 NOVO: Importa hooks para obter ID da URL e navegar
 import { useParams, useNavigate } from "react-router-dom";
 import api from "../../services/api";
-// import "./Cadastro.css"; // Se o CSS for o mesmo, mantenha.
 import { useAuth } from "../../contexts/AuthContext";
 
 // ------------------------------------------
@@ -18,68 +16,60 @@ const API_SEDES = `${API_BASE_URL}/sedes`;
 const API_FUNCOES = `${API_BASE_URL}/funcoes`;
 
 // ------------------------------------------
-// Interfaces de Tipagem (Atualizadas/Reutilizadas)
+// Interfaces de Tipagem
 // ------------------------------------------
-
-// Reutiliza as interfaces de dados auxiliares
 interface Sede {
   id: number;
   nome: string;
-  // ... outros campos (endereco, identificadorUnico)
 }
 
 interface Funcao {
   id: number;
   nome: string;
-  // ... outros campos (descricao)
 }
 
 // Interface que reflete o DTO de resposta do GET /api/funcionarios/{id}
 interface FuncionarioResponse {
   id: number;
   nome: string;
-  matricula: string; // 🔑 ADICIONADO: Matrícula para exibição
+  matricula: string;
   email: string;
   endereco: string;
   telefone: string;
   cpf: string;
   sedePrincipalId: number;
   funcaoId: number;
-  role: "ROLE_FUNCIONARIO" | "ROLE_ADMIN";
-  // ... outros campos (usuarioAssociado, login, etc.)
+  // 🔑 Campo correto vindo da API
+  roleEnum: string;
+  // O backend também envia: funcaoNome, sedePrincipalNome, status, dataAdmissao
 }
 
-// Interface de Input (a mesma do Cadastro, mas usaremos para o PUT)
+// Interface de Input (o que o formulário espera para registro/submissão)
 interface IFormInput {
   nome: string;
   endereco: string;
   telefone: string;
   cpf: string;
   email: string;
-  sedePrincipalId: string; // IDs vêm como string do select
-  funcaoId: string; // IDs vêm como string do select
-  role: "ROLE_FUNCIONARIO" | "ROLE_ADMIN";
+  sedePrincipalId: string;
+  funcaoId: string;
+  // 🔑 Nome da propriedade de submissão
+  role: "FUNCIONARIO" | "ADMIN";
 }
 
 const EdicaoFuncionario: React.FC = () => {
-  // 🔑 NOVO: Obtém o ID da URL
   const { isAdmin } = useAuth();
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const funcionarioId = Number(id);
 
-  // Hooks do Formulário - usamos `defaultValues` para preenchimento
   const { register, handleSubmit, reset, watch, setValue } =
     useForm<IFormInput>();
 
-  // Estados para Dados Dinâmicos
   const [sedes, setSedes] = useState<Sede[]>([]);
   const [funcoes, setFuncoes] = useState<Funcao[]>([]);
-
-  // Estado para o valor não editável (Matrícula)
   const [matricula, setMatricula] = useState<string>("");
   const [cpf, setCpf] = useState<string>("");
-  // Estados para Feedback
   const [status, setStatus] = useState("");
   const [loading, setLoading] = useState(false);
   const [dataLoading, setDataLoading] = useState(true);
@@ -108,6 +98,7 @@ const EdicaoFuncionario: React.FC = () => {
       setFuncoes(funcoesResponse.data);
 
       const funcionario = funcionarioResponse.data;
+      console.log("ROLE Vindo da API:", funcionario.roleEnum);
 
       // 3. Preencher o Formulário e Matrícula
       setMatricula(funcionario.matricula);
@@ -120,10 +111,10 @@ const EdicaoFuncionario: React.FC = () => {
         telefone: funcionario.telefone,
         cpf: funcionario.cpf,
         email: funcionario.email,
-        // Converte IDs de number (API) para string (Select)
         sedePrincipalId: funcionario.sedePrincipalId.toString(),
         funcaoId: funcionario.funcaoId.toString(),
-        role: funcionario.role,
+        // 🔑 CORREÇÃO CRÍTICA AQUI: Usar 'roleEnum' da API e mapear para 'role' do FormInput
+        role: funcionario.roleEnum as "FUNCIONARIO" | "ADMIN",
       });
 
       setStatus("");
@@ -156,12 +147,12 @@ const EdicaoFuncionario: React.FC = () => {
         // Os IDs devem ser passados como number para o DTO do backend
         sedePrincipalId: parseInt(data.sedePrincipalId),
         funcaoId: parseInt(data.funcaoId),
+        // 🔑 'role' já está correto com 'ADMIN'/'FUNCIONARIO'
         role: data.role,
       };
 
       console.log("Payload de atualização sendo enviado:", payload);
 
-      // 🔑 ALTERAÇÃO CHAVE: PUT para o ID específico
       const response = await api.put(
         `${API_FUNCIONARIOS}/${funcionarioId}`,
         payload
@@ -170,10 +161,8 @@ const EdicaoFuncionario: React.FC = () => {
       setStatus(
         `✅ Sucesso! Funcionário ${response.data.nome} (ID: ${funcionarioId}) atualizado.`
       );
-      // Poderia redirecionar para a tela de detalhes: navigate(`/funcionarios/detalhe/${funcionarioId}`);
     } catch (error: any) {
       console.error("Erro na atualização:", error);
-
       let errorMessage = "Erro desconhecido.";
       if (error.response) {
         errorMessage = `Erro ${error.response.status}: ${
@@ -222,7 +211,8 @@ const EdicaoFuncionario: React.FC = () => {
       )}
 
       <form onSubmit={handleSubmit(onSubmit)}>
-        {/* 🔑 NOVO: Campo Matrícula (Apenas Leitura) */}
+        {/* ... (Matrícula e campos de texto) ... */}
+
         <div className="form-group">
           <label>Matrícula:</label>
           <input
@@ -234,7 +224,6 @@ const EdicaoFuncionario: React.FC = () => {
           />
         </div>
 
-        {/* Campos de Texto (Preenchidos automaticamente) */}
         <div className="form-group">
           <label>Nome:</label>
           <input
@@ -282,7 +271,7 @@ const EdicaoFuncionario: React.FC = () => {
           />
         </div>
 
-        {/* SELECT SEDE (Preenchido com ID atual) */}
+        {/* SELECT SEDE */}
         <div className="form-group">
           <label>Sede:</label>
           <select
@@ -298,7 +287,7 @@ const EdicaoFuncionario: React.FC = () => {
           </select>
         </div>
 
-        {/* SELECT FUNÇÃO (Preenchido com ID atual) */}
+        {/* SELECT FUNÇÃO */}
         <div className="form-group">
           <label>Função:</label>
           <select
@@ -314,7 +303,7 @@ const EdicaoFuncionario: React.FC = () => {
           </select>
         </div>
 
-        {/* SELECT ROLE (Preenchido com ROLE atual) */}
+        {/* SELECT ROLE (Perfil de Acesso) */}
         <div className="form-group">
           <label>Perfil de Acesso:</label>
           <select
@@ -322,6 +311,7 @@ const EdicaoFuncionario: React.FC = () => {
             className="form-control"
             disabled={!isAdmin}
           >
+            {/* ✅ Valores correspondem ao retorno da API (ADMIN/FUNCIONARIO) */}
             <option value="FUNCIONARIO">Funcionário Comum</option>
             <option value="ADMIN">Administrador</option>
           </select>

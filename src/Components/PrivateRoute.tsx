@@ -22,7 +22,8 @@ const PrivateRoute: React.FC<PrivateRouteProps> = ({ roles, children }) => {
   // 2. CHECAGEM DE AUTORIZAÇÃO (Se a rota exige uma role específica)
   if (roles && user && !roles.includes(user.role)) {
     // Se logado mas sem a permissão correta, redireciona para a tela padrão.
-    const redirectPath = user.role === "ROLE_ADMIN" ? "/cadastro" : "/ponto";
+    const redirectPath =
+      user.role === "ROLE_ADMIN" ? "/aprovacao-pontos" : "/meu-perfil";
 
     // Garante que não redireciona infinitamente se tentar acessar a própria rota de redirecionamento.
     if (location.pathname === redirectPath) {
