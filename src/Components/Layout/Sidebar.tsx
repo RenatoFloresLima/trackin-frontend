@@ -10,6 +10,7 @@ import {
   FaCheckCircle,
   FaUserCircle,
   FaBuilding,
+  FaBriefcase,
 } from "react-icons/fa";
 import { Box, Typography, Avatar, Divider, Tooltip } from "@mui/material";
 import "./Sidebar.css";
@@ -55,6 +56,12 @@ const Sidebar: React.FC = () => {
       path: "/sedes",
       label: "Sedes",
       icon: FaBuilding,
+      roles: ["ROLE_ADMIN"],
+    },
+    {
+      path: "/funcoes",
+      label: "Funções",
+      icon: FaBriefcase,
       roles: ["ROLE_ADMIN"],
     },
   ];
