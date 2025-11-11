@@ -87,7 +87,7 @@ const AprovacaoPontoPage: React.FC = () => {
    * @returns String formatada ou "-"
    */
   const formatDate = (
-    isoString: string | undefined,
+    isoString: string | null | undefined,
     formatString: string
   ): string => {
     if (!isoString) return "-";
