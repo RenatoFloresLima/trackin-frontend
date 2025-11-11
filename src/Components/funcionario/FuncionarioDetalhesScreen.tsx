@@ -3,7 +3,7 @@ import {
   Container,
   Paper,
   Typography,
-  Grid2 as Grid,
+  Grid,
   CircularProgress,
   Alert,
   Box, // Importado Box
@@ -152,7 +152,7 @@ const FuncionarioDetalhesScreen: React.FC = () => {
         </Typography>
 
         <Grid container spacing={3}>
-          <Grid xs={12} md={3}>
+          <Grid item xs={12} md={3}>
             <Paper
               elevation={0}
               sx={{ p: 3, height: "100%", border: "1px solid #ddd" }}
@@ -181,7 +181,7 @@ const FuncionarioDetalhesScreen: React.FC = () => {
             </Paper>
           </Grid>
 
-          <Grid xs={12} md={9}>
+          <Grid item xs={12} md={9}>
             <Paper elevation={0} sx={{ p: 3, border: "1px solid #ddd", width: "100%" }}>
               <ListaRegistrosPonto funcionarioId={funcionario.id} />
             </Paper>

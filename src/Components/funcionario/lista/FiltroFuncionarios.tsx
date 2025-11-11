@@ -1,8 +1,8 @@
 // src/Components/funcionario/lista/FiltroFuncionarios.tsx
-import React, { type ChangeEvent, useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import {
   TextField,
-  Grid2 as Grid,
+  Grid,
   InputAdornment,
   Paper,
   FormControl,
@@ -73,14 +73,7 @@ const FiltroFuncionarios: React.FC<FiltroFuncionariosProps> = ({
   // ------------------------------------------
   // HANDLER DE MUDANÇA (Genérico e CORRIGIDO para Select e Text)
   // ------------------------------------------
-  const handleChange = (
-    // Tipagem que cobre TextFields e Selects do MUI
-    event: React.ChangeEvent<
-      | HTMLInputElement
-      | HTMLTextAreaElement
-      | { name?: string | undefined; value: unknown }
-    >
-  ) => {
+  const handleChange = (event: any) => {
     const target = event.target as { name: string; value: unknown };
     const name = target.name;
     const value = target.value;
@@ -123,7 +116,7 @@ const FiltroFuncionarios: React.FC<FiltroFuncionariosProps> = ({
     <Paper elevation={1} sx={{ p: 2, mb: 2 }}>
       <Grid container spacing={2} alignItems="center">
         {/* 1. Campo de Pesquisa Geral (Nome, Matrícula) */}
-        <Grid xs={12} sm={6} md={4}>
+        <Grid item xs={12} sm={6} md={4}>
           <TextField
             fullWidth
             label="Pesquisar por Nome, Matrícula ou E-mail"
@@ -143,7 +136,7 @@ const FiltroFuncionarios: React.FC<FiltroFuncionariosProps> = ({
         </Grid>
 
         {/* 2. SELECT FUNÇÃO (Filtro por nome da função) */}
-        <Grid xs={12} sm={6} md={4}>
+        <Grid item xs={12} sm={6} md={4}>
           <FormControl fullWidth size="small">
             <InputLabel>Filtrar por Função</InputLabel>
             <Select
@@ -164,7 +157,7 @@ const FiltroFuncionarios: React.FC<FiltroFuncionariosProps> = ({
         </Grid>
 
         {/* 3. SELECT SEDE (Filtro por ID da sede) */}
-        <Grid xs={12} sm={6} md={4}>
+        <Grid item xs={12} sm={6} md={4}>
           <FormControl fullWidth size="small">
             <InputLabel>Filtrar por Sede</InputLabel>
             <Select

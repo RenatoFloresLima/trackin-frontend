@@ -213,7 +213,7 @@ const AprovacaoPontoPage: React.FC = () => {
                     <TableCell>{formatDate(p.horario, "dd/MM/yyyy")}</TableCell>
                     <TableCell>{formatDate(p.horario, "HH:mm:ss")}</TableCell>
                     <TableCell>
-                      {formatDate(p.horarioCriacao, "HH:mm:ss")}
+                      {p.horarioCriacao ? formatDate(p.horarioCriacao, "HH:mm:ss") : "-"}
                     </TableCell>
                     <TableCell
                       sx={{

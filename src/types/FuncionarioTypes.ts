@@ -75,7 +75,7 @@ export interface RegistroPontoDetalheResponse {
   dataRegistro: string; // yyyy-MM-dd
   horaRegistro: string; // HH:mm:ss
   horaSaida: string | null; // HH:mm:ss
-  status: StatusPontoEnum;
+  status: typeof StatusPontoEnum[keyof typeof StatusPontoEnum];
   temSolicitacaoAjuste: boolean;
 }
 
