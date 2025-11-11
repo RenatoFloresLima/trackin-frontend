@@ -57,6 +57,15 @@ const FuncionarioDetalhesScreen: React.FC = () => {
         const result =
           await FuncionarioAPIService.getFuncionarioIdDoUsuarioLogado();
         resolvedFuncId = result.funcionarioId;
+        
+        if (!resolvedFuncId) {
+          setError(
+            "Funcionário não encontrado. Verifique se o usuário está associado a um funcionário."
+          );
+          setLoading(false);
+          return;
+        }
+        
         setFuncionarioId(resolvedFuncId);
       }
 
@@ -66,11 +75,10 @@ const FuncionarioDetalhesScreen: React.FC = () => {
       setFuncionario(data);
     } catch (err: any) {
       console.error("Erro ao buscar perfil:", err);
-      setError(
-        "Falha ao carregar perfil: " +
-          (err.response?.data?.message ||
-            "Verifique se o usuário está associado a um funcionário ou o status do servidor.")
-      );
+      const errorMessage = err.response?.data?.message || 
+                          err.message || 
+                          "Ocorreu um erro inesperado. Por favor, tente novamente mais tarde.";
+      setError(`Falha ao carregar perfil: ${errorMessage}`);
     } finally {
       setLoading(false);
     }
@@ -129,7 +137,7 @@ const FuncionarioDetalhesScreen: React.FC = () => {
   // 2. Renderização da Tela
   return (
     <Box sx={{ p: 4, minHeight: "100vh", bgcolor: "#f4f6f8" }}>
-      <Container maxWidth="lg">
+      <Container maxWidth="xl">
         <Typography
           variant="h4"
           gutterBottom
@@ -144,7 +152,7 @@ const FuncionarioDetalhesScreen: React.FC = () => {
         </Typography>
 
         <Grid container spacing={3}>
-          <Grid item xs={12} md={4}>
+          <Grid item xs={12} md={3}>
             <Paper
               elevation={0}
               sx={{ p: 3, height: "100%", border: "1px solid #ddd" }}
@@ -173,8 +181,8 @@ const FuncionarioDetalhesScreen: React.FC = () => {
             </Paper>
           </Grid>
 
-          <Grid item xs={12} md={8}>
-            <Paper elevation={0} sx={{ p: 3, border: "1px solid #ddd" }}>
+          <Grid item xs={12} md={9}>
+            <Paper elevation={0} sx={{ p: 3, border: "1px solid #ddd", width: "100%" }}>
               <ListaRegistrosPonto funcionarioId={funcionario.id} />
             </Paper>
           </Grid>

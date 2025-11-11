@@ -1,6 +1,6 @@
 // src/Components/Layout/Sidebar.tsx
 import React from "react";
-import { NavLink } from "react-router-dom";
+import { NavLink, useLocation } from "react-router-dom";
 import { useAuth } from "../../contexts/AuthContext";
 import {
   FaClock,
@@ -8,22 +8,24 @@ import {
   FaSignOutAlt,
   FaHome,
   FaCheckCircle,
-  FaUserCircle, // NOVO: Ícone para o perfil
+  FaUserCircle,
+  FaBuilding,
+  FaBriefcase,
 } from "react-icons/fa";
-
-import "./Sidebar.css"; // Assumindo que este arquivo de estilos existe
+import { Box, Typography, Avatar, Divider, Tooltip } from "@mui/material";
+import "./Sidebar.css";
 
 const Sidebar: React.FC = () => {
   const { user, isAuthenticated, logout } = useAuth();
-  const userRole = user?.role; // 'ROLE_ADMIN' ou 'ROLE_FUNCIONARIO'
+  const location = useLocation();
+  const userRole = user?.role;
 
-  // Itens de navegação padrão
+  // Itens de navegação
   const navItems = [
-    // 🔑 ITEM ATUALIZADO: "Início" agora aponta para o Perfil
     {
       path: "/meu-perfil",
       label: "Meu Perfil",
-      icon: FaUserCircle, // Usamos o ícone de perfil
+      icon: FaUserCircle,
       roles: ["ROLE_ADMIN", "ROLE_FUNCIONARIO"],
     },
     {
@@ -32,7 +34,6 @@ const Sidebar: React.FC = () => {
       icon: FaClock,
       roles: ["ROLE_ADMIN", "ROLE_FUNCIONARIO"],
     },
-    // Apenas admins veem Aprovação de Pontos
     {
       path: "/aprovacao-pontos",
       label: "Aprovação de Pontos",
@@ -48,7 +49,19 @@ const Sidebar: React.FC = () => {
     {
       path: "/lista-funcionarios",
       label: "Funcionários",
-      icon: FaHome, // Mudando o ícone, já que FaUserPlus foi para cadastro
+      icon: FaHome,
+      roles: ["ROLE_ADMIN"],
+    },
+    {
+      path: "/sedes",
+      label: "Sedes",
+      icon: FaBuilding,
+      roles: ["ROLE_ADMIN"],
+    },
+    {
+      path: "/funcoes",
+      label: "Funções",
+      icon: FaBriefcase,
       roles: ["ROLE_ADMIN"],
     },
   ];
@@ -59,33 +72,80 @@ const Sidebar: React.FC = () => {
     return item.roles.includes(userRole);
   });
 
+  // Obtém iniciais do usuário para o avatar
+  const getUserInitials = () => {
+    if (user?.nome) {
+      const names = user.nome.split(" ");
+      if (names.length >= 2) {
+        return `${names[0][0]}${names[names.length - 1][0]}`.toUpperCase();
+      }
+      return user.nome.substring(0, 2).toUpperCase();
+    }
+    return "U";
+  };
+
   return (
     <nav className="sidebar-container">
-      <div className="sidebar-header">
-        <h2>Trackin</h2>
-      </div>
-      <ul className="sidebar-menu">
-        {filteredNavItems.map((item) => (
-          <li key={item.path} className="sidebar-menu-item">
-            <NavLink
-              to={item.path}
-              className={({ isActive }) =>
-                isActive ? "nav-link-active" : "nav-link"
-              }
-            >
-              <item.icon className="nav-icon" />
-              <span className="nav-label">{item.label}</span>
-            </NavLink>
-          </li>
-        ))}
-      </ul>
+      {/* Header com Logo */}
+      <Box className="sidebar-header">
+        <Box className="logo-container">
+          <Box className="logo-icon">T</Box>
+          <Typography variant="h5" className="logo-text">
+            Trackin
+          </Typography>
+        </Box>
+      </Box>
 
-      <div className="sidebar-footer">
-        <button onClick={logout} className="logout-button">
-          <FaSignOutAlt className="nav-icon" />
-          <span className="nav-label">Sair</span>
-        </button>
-      </div>
+      <Divider className="sidebar-divider" />
+
+      {/* Informações do Usuário */}
+      <Box className="sidebar-user-info">
+        <Avatar className="user-avatar" sx={{ bgcolor: "#1abc9c" }}>
+          {getUserInitials()}
+        </Avatar>
+        <Box className="user-details">
+          <Typography variant="body2" className="user-name" noWrap>
+            {user?.nome || "Usuário"}
+          </Typography>
+          <Typography variant="caption" className="user-role" noWrap>
+            {userRole === "ROLE_ADMIN" ? "Administrador" : "Funcionário"}
+          </Typography>
+        </Box>
+      </Box>
+
+      <Divider className="sidebar-divider" />
+
+      {/* Menu de Navegação */}
+      <Box className="sidebar-menu" component="ul">
+        {filteredNavItems.map((item) => {
+          const isActive = location.pathname === item.path;
+          return (
+            <li key={item.path} className="sidebar-menu-item">
+              <Tooltip title={item.label} placement="right" arrow>
+                <NavLink
+                  to={item.path}
+                  className={`nav-link ${isActive ? "nav-link-active" : ""}`}
+                >
+                  <item.icon className="nav-icon" />
+                  <span className="nav-label">{item.label}</span>
+                  {isActive && <span className="active-indicator" />}
+                </NavLink>
+              </Tooltip>
+            </li>
+          );
+        })}
+      </Box>
+
+      {/* Footer com Botão de Logout */}
+      <Box className="sidebar-footer">
+        <Divider className="sidebar-divider" />
+        <Tooltip title="Sair" placement="right" arrow>
+          <button onClick={logout} className="logout-button">
+            <FaSignOutAlt className="nav-icon" />
+            <span className="nav-label">Sair</span>
+          </button>
+        </Tooltip>
+      </Box>
     </nav>
   );
 };
