@@ -21,6 +21,7 @@ import AprovacaoPontoPage from "./Components/Ponto/AprovacaoPontoPage";
 import Sidebar from "./Components/Layout/Sidebar";
 import FuncionarioDetalhesScreen from "./Components/funcionario/FuncionarioDetalhesScreen";
 import HomeRedirector from "./Components/HomeRedirector"; // 🔑 IMPORTANDO O NOVO COMPONENTE
+import ListaSedes from "./Components/sede/ListaSedes";
 
 // Estilos Globais
 import "./App.css";
@@ -84,6 +85,14 @@ const appRouter = createBrowserRouter(
             element={
               <PrivateRoute roles={["ROLE_ADMIN"]}>
                 <AprovacaoPontoPage />
+              </PrivateRoute>
+            }
+          />
+          <Route
+            path="/sedes"
+            element={
+              <PrivateRoute roles={["ROLE_ADMIN"]}>
+                <ListaSedes />
               </PrivateRoute>
             }
           />
