@@ -193,7 +193,7 @@ const RegistroPonto: React.FC = () => {
         <form onSubmit={handleSubmit(onSubmit)}>
           <Grid container spacing={3}>
             {/* Sede - Linha separada com label estático */}
-            <Grid item xs={12}>
+            <Grid xs={12}>
               <Controller
                 name="sedeId"
                 control={control}
@@ -277,7 +277,7 @@ const RegistroPonto: React.FC = () => {
             </Grid>
 
             {/* Tipo de Registro - Linha separada com label estático */}
-            <Grid item xs={12}>
+            <Grid xs={12}>
               <Controller
                 name="tipo"
                 control={control}
@@ -355,7 +355,7 @@ const RegistroPonto: React.FC = () => {
             </Grid>
 
             {/* Data e Hora da Batida */}
-            <Grid item xs={12} md={6}>
+            <Grid xs={12} md={6}>
               <TextField
                 label="Data da Batida"
                 type="date"
@@ -375,7 +375,7 @@ const RegistroPonto: React.FC = () => {
               />
             </Grid>
 
-            <Grid item xs={12} md={6}>
+            <Grid xs={12} md={6}>
               <TextField
                 label="Hora da Batida"
                 type="time"
@@ -396,7 +396,7 @@ const RegistroPonto: React.FC = () => {
             </Grid>
 
             {/* Matrícula e Senha do Funcionário */}
-            <Grid item xs={12} md={6}>
+            <Grid xs={12} md={6}>
               <TextField
                 label="Matrícula do Funcionário"
                 type="text"
@@ -416,7 +416,7 @@ const RegistroPonto: React.FC = () => {
               />
             </Grid>
 
-            <Grid item xs={12} md={6}>
+            <Grid xs={12} md={6}>
               <TextField
                 label="Senha do Funcionário"
                 type="password"
@@ -435,7 +435,7 @@ const RegistroPonto: React.FC = () => {
             </Grid>
 
             {/* Justificativa */}
-            <Grid item xs={12}>
+            <Grid xs={12}>
               <TextField
                 label="Justificativa (Observação)"
                 multiline
@@ -457,7 +457,7 @@ const RegistroPonto: React.FC = () => {
             </Grid>
 
             {/* Botão de Submit */}
-            <Grid item xs={12}>
+            <Grid xs={12}>
               <Box sx={{ display: "flex", justifyContent: "center", mt: 2 }}>
                 <Button
                   type="submit"

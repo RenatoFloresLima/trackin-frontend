@@ -116,7 +116,7 @@ const FiltroFuncionarios: React.FC<FiltroFuncionariosProps> = ({
     <Paper elevation={1} sx={{ p: 2, mb: 2 }}>
       <Grid container spacing={2} alignItems="center">
         {/* 1. Campo de Pesquisa Geral (Nome, Matrícula) */}
-        <Grid item xs={12} sm={6} md={4}>
+        <Grid xs={12} sm={6} md={4}>
           <TextField
             fullWidth
             label="Pesquisar por Nome, Matrícula ou E-mail"
@@ -136,7 +136,7 @@ const FiltroFuncionarios: React.FC<FiltroFuncionariosProps> = ({
         </Grid>
 
         {/* 2. SELECT FUNÇÃO (Filtro por nome da função) */}
-        <Grid item xs={12} sm={6} md={4}>
+        <Grid xs={12} sm={6} md={4}>
           <FormControl fullWidth size="small">
             <InputLabel>Filtrar por Função</InputLabel>
             <Select
@@ -157,7 +157,7 @@ const FiltroFuncionarios: React.FC<FiltroFuncionariosProps> = ({
         </Grid>
 
         {/* 3. SELECT SEDE (Filtro por ID da sede) */}
-        <Grid item xs={12} sm={6} md={4}>
+        <Grid xs={12} sm={6} md={4}>
           <FormControl fullWidth size="small">
             <InputLabel>Filtrar por Sede</InputLabel>
             <Select
