@@ -86,10 +86,10 @@ export const FuncionarioAPIService = {
    * O backend resolve o Login do User logado via token.
    */
   getFuncionarioIdDoUsuarioLogado: async (): Promise<{
-    funcionarioId: number;
+    funcionarioId: number | null;
   }> => {
     // 🔑 NOVO ENDPOINT: /api/funcionarios/perfil-logado/id-funcionario
-    const response = await api.get<{ funcionarioId: number }>(
+    const response = await api.get<{ funcionarioId: number | null }>(
       `/api/funcionarios/perfil-logado/id-funcionario`
     );
     return response.data;

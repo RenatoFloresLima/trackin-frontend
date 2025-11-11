@@ -13,18 +13,22 @@ export interface FiltroPontoFuncionarioDTO {
 
 /**
  * DTO de Resposta de Detalhes do Registro de Ponto para o Perfil.
- * Corresponde ao RegistroPontoDetalheResponse.java
+ * Corresponde ao RegistroPontoFullDTO.java
  */
 export interface RegistroPontoDetalheResponse {
   id: number;
-
-  // 🔑 CAMPOS CORRIGIDOS PARA O BACKEND
-  dataRegistro: string; // Ex: 2025-11-04
-  horaRegistro: string; // Ex: 01:17
-  horaSaida: string | null; // Novo campo
-  status: "PENDENTE" | "APROVADO_AUTOMATICO" | "APROVADO_MANUAL" | "REPROVADO";
-  tipoRegistro: string; // Ex: INICIO_INTERVALO
-
-  // Outros campos
-  temSolicitacaoAjuste: boolean;
+  horario: string; // LocalDateTime no formato ISO
+  tipo: string; // TipoRegistro enum
+  status: string; // StatusPontoEnum
+  observacao: string | null;
+  funcionarioId: number;
+  funcionarioNome: string;
+  matricula: string;
+  sedeId: number | null;
+  sedeNome: string | null;
+  usuarioAprovadorId: number | null;
+  usuarioAprovadorLogin: string | null;
+  horarioCriacao: string | null; // LocalDateTime no formato ISO
+  usuarioOperadorId: number | null;
+  usuarioOperadorLogin: string | null;
 }

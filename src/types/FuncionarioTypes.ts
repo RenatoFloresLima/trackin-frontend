@@ -2,7 +2,7 @@
 
 /**
  * 1. DTO de Resposta para a tela "Meu Perfil" (GET /api/funcionarios/{id})
- * Corresponde ao FuncionarioDetalheResponse do backend.
+ * Corresponde ao FuncionarioResponse do backend.
  */
 export interface FuncionarioDetalheResponse {
   id: number;
@@ -10,20 +10,25 @@ export interface FuncionarioDetalheResponse {
   nome: string;
   email: string;
   cpf: string;
-  dataNascimento: string; // Formato yyyy-MM-dd
   dataContratacao: string; // Formato yyyy-MM-dd
+  dataUltimoDia: string | null; // Formato yyyy-MM-dd (apenas se DESLIGADO)
 
   // Campos Mutáveis
   telefone: string | null;
   endereco: string | null;
 
   // Detalhes da Função e Sede
+  funcaoId: number;
   funcaoNome: string;
-  sedeNome: string; // Assumindo que o DTO do backend tem 'sedeNome'
+  sedePrincipalId: number;
+  sedePrincipalNome: string; // Nome da sede principal
 
   // Detalhes de Acesso
   role: string;
-  status: "ATIVO" | "DESLIGADO" | "INATIVO" | "AFASTADO";
+  status: string; // Status do funcionário (ATIVO, DESLIGADO, etc.)
+  login: string;
+  usuarioAssociado: boolean;
+  templateDigitalCadastrado: boolean;
 }
 
 /**

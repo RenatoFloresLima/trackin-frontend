@@ -12,13 +12,17 @@ import {
   TableBody,
   TableRow,
   TableCell,
+  CircularProgress,
+  Alert,
+  Stack,
 } from "@mui/material";
 import { Navigate, useNavigate } from "react-router-dom";
+import PageContainer from "../../UI/PageContainer";
 
 // Componentes da lista
 import FiltroFuncionarios from "./FiltroFuncionarios";
 import LinhaFuncionario from "./LinhaFuncionario";
-import DesligamentoModal from "./DesligamentoModal"; // 🔑 Importado o Modal
+import DesligamentoModal from "./DesligamentoModal";
 
 // Tipagens
 import {
@@ -27,7 +31,6 @@ import {
 } from "../../../interfaces/funcionarioInterfaces";
 import api from "../../../services/api";
 import { useAuth } from "../../../contexts/AuthContext";
-import "./Lista.css";
 
 // ----------------------------------------------------
 // VARIÁVEIS DE ROTA
@@ -55,10 +58,10 @@ const ListaFuncionarios: React.FC = () => {
 
   const [funcionarios, setFuncionarios] = useState<FuncionarioAPI[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
+  const [error, setError] = useState<string | null>(null);
   const [filtros, setFiltros] =
     useState<FiltrosFuncionario>(estadoInicialFiltros);
 
-  // 🔑 Estado do Modal
   const [funcionarioADesligar, setFuncionarioADesligar] =
     useState<FuncionarioAPI | null>(null);
 
@@ -70,6 +73,7 @@ const ListaFuncionarios: React.FC = () => {
       if (!isAuthenticated) return;
 
       setLoading(true);
+      setError(null);
 
       const params = new URLSearchParams();
 
@@ -88,11 +92,6 @@ const ListaFuncionarios: React.FC = () => {
         params.append("sedeId", String(currentFiltros.sedePrincipalId));
       }
 
-      console.log(
-        `-> [API] GET ${API_FUNCIONARIOS} com params:`,
-        Object.fromEntries(params.entries())
-      );
-
       try {
         const response = await api.get<FuncionarioAPI[]>(API_FUNCIONARIOS, {
           params: params,
@@ -110,7 +109,7 @@ const ListaFuncionarios: React.FC = () => {
               : error.response.data.message || "Falha na comunicação."
           }`;
         }
-        alert(`❌ ${errorMessage}`);
+        setError(errorMessage);
         setFuncionarios([]);
       } finally {
         setLoading(false);
@@ -122,7 +121,7 @@ const ListaFuncionarios: React.FC = () => {
   useEffect(() => {
     const handler = setTimeout(() => {
       carregarFuncionarios(filtros);
-    }, 300); // Debounce de 300ms
+    }, 300);
 
     return () => {
       clearTimeout(handler);
@@ -137,30 +136,20 @@ const ListaFuncionarios: React.FC = () => {
     setFiltros((prev) => ({ ...prev, ...novosFiltros }));
   };
 
-  // 🔑 HANDLER: Abre o modal de desligamento
   const handleDesligar = (funcionario: FuncionarioAPI) => {
-    // Abre o modal de desligamento com os dados do funcionário
     setFuncionarioADesligar(funcionario);
   };
 
-  // 🔑 HANDLER: Chamado pelo modal após sucesso na API
   const handleDesligamentoSucesso = () => {
-    alert(
-      `✅ Funcionário ${funcionarioADesligar?.nome} desligado com sucesso!`
-    );
-    setFuncionarioADesligar(null); // Fecha o modal
-    carregarFuncionarios(filtros); // Recarrega a lista
+    setFuncionarioADesligar(null);
+    carregarFuncionarios(filtros);
   };
 
-  // 🔑 HANDLER: Fecha o modal (chamado pelo botão Cancelar)
   const handleCloseModal = () => {
     setFuncionarioADesligar(null);
   };
 
   const handleInformacoes = (funcionarioId: number) => {
-    console.log(
-      `[Navegação] Redirecionar para /funcionarios/perfil/${funcionarioId}`
-    );
     navigate(`/funcionarios/perfil/${funcionarioId}`);
   };
 
@@ -173,70 +162,102 @@ const ListaFuncionarios: React.FC = () => {
   }
 
   return (
-    <Container className="container" maxWidth="xl" sx={{ mt: 5, mb: 5 }}>
-      <Typography variant="h4" gutterBottom>
-        Gestão de Funcionários
-      </Typography>
-
-      <FiltroFuncionarios
-        filtros={filtros}
-        onFiltroChange={handleFiltroChange}
-      />
-
-      <Box sx={{ mt: 3 }}>
-        <Paper elevation={3}>
-          <TableContainer>
-            <Table aria-label="lista de funcionários">
-              <TableHead>
-                <TableRow>
-                  <TableCell>Nome</TableCell>
-                  <TableCell>Matrícula</TableCell>
-                  <TableCell>Sede</TableCell>
-                  <TableCell>Função</TableCell>
-                  <TableCell>Status</TableCell>
-                  <TableCell align="center">Ações</TableCell>
-                </TableRow>
-              </TableHead>
-              <TableBody>
-                {loading ? (
-                  <TableRow>
-                    <TableCell colSpan={6} align="center">
-                      Carregando...
-                    </TableCell>
-                  </TableRow>
-                ) : funcionarios.length > 0 ? (
-                  funcionarios.map((funcionario) => (
-                    <LinhaFuncionario
-                      key={funcionario.id}
-                      funcionario={funcionario}
-                      // Passa a função que abre o modal com o objeto correto
-                      onDesligar={() => handleDesligar(funcionario)}
-                      onInformacoes={handleInformacoes}
-                    />
-                  ))
-                ) : (
-                  // ✅ CORREÇÃO APLICADA: Bloco JSX válido para dados vazios
-                  <TableRow>
-                    <TableCell colSpan={6} align="center">
-                      Nenhum funcionário encontrado.
-                    </TableCell>
-                  </TableRow>
-                )}
-              </TableBody>
-            </Table>
-          </TableContainer>
-        </Paper>
-      </Box>
-
-      {/* 🔑 NOVO: Modal de Desligamento */}
-      {funcionarioADesligar && (
-        <DesligamentoModal
-          funcionario={funcionarioADesligar}
-          onClose={handleCloseModal}
-          onSuccess={handleDesligamentoSucesso}
+    <PageContainer
+      title="Gestão de Funcionários"
+      subtitle="Gerencie os funcionários da empresa"
+      breadcrumbs={[
+        { label: "Início", path: "/" },
+        { label: "Funcionários" },
+      ]}
+    >
+      <Box>
+        <FiltroFuncionarios
+          filtros={filtros}
+          onFiltroChange={handleFiltroChange}
         />
-      )}
-    </Container>
+
+        {error && (
+          <Alert severity="error" sx={{ mt: 2, mb: 2 }}>
+            {error}
+          </Alert>
+        )}
+
+        <Box sx={{ mt: 3 }}>
+          <Paper
+            elevation={2}
+            sx={{
+              borderRadius: 3,
+              overflow: "hidden",
+            }}
+          >
+            <TableContainer>
+              <Table aria-label="lista de funcionários">
+                <TableHead>
+                  <TableRow
+                    sx={{
+                      backgroundColor: "#f8f9fa",
+                      "& th": {
+                        fontWeight: 600,
+                        color: "#2c3e50",
+                        borderBottom: "2px solid #e9ecef",
+                      },
+                    }}
+                  >
+                    <TableCell>Nome</TableCell>
+                    <TableCell>Matrícula</TableCell>
+                    <TableCell>Sede</TableCell>
+                    <TableCell>Função</TableCell>
+                    <TableCell>Status</TableCell>
+                    <TableCell align="center" sx={{ width: "150px" }}>
+                      Ações
+                    </TableCell>
+                  </TableRow>
+                </TableHead>
+                <TableBody>
+                  {loading ? (
+                    <TableRow>
+                      <TableCell colSpan={6} align="center" sx={{ py: 4 }}>
+                        <Stack direction="row" spacing={2} alignItems="center" justifyContent="center">
+                          <CircularProgress size={24} />
+                          <Typography variant="body2" color="text.secondary">
+                            Carregando funcionários...
+                          </Typography>
+                        </Stack>
+                      </TableCell>
+                    </TableRow>
+                  ) : funcionarios.length > 0 ? (
+                    funcionarios.map((funcionario) => (
+                      <LinhaFuncionario
+                        key={funcionario.id}
+                        funcionario={funcionario}
+                        onDesligar={() => handleDesligar(funcionario)}
+                        onInformacoes={handleInformacoes}
+                      />
+                    ))
+                  ) : (
+                    <TableRow>
+                      <TableCell colSpan={6} align="center" sx={{ py: 4 }}>
+                        <Typography variant="body2" color="text.secondary">
+                          Nenhum funcionário encontrado.
+                        </Typography>
+                      </TableCell>
+                    </TableRow>
+                  )}
+                </TableBody>
+              </Table>
+            </TableContainer>
+          </Paper>
+        </Box>
+
+        {funcionarioADesligar && (
+          <DesligamentoModal
+            funcionario={funcionarioADesligar}
+            onClose={handleCloseModal}
+            onSuccess={handleDesligamentoSucesso}
+          />
+        )}
+      </Box>
+    </PageContainer>
   );
 };
 

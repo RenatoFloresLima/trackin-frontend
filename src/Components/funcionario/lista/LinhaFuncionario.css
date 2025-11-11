@@ -1,0 +1,85 @@
+/* LinhaFuncionario.css - Estilos modernos para botões de ação */
+
+.action-button {
+  width: 36px !important;
+  height: 36px !important;
+  padding: 0 !important;
+  border-radius: 8px !important;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1) !important;
+  border: 1px solid transparent !important;
+}
+
+.action-button svg {
+  font-size: 18px !important;
+  transition: all 0.2s ease !important;
+}
+
+/* Botão de Informações */
+.action-button-info {
+  color: #3498db !important;
+  background-color: rgba(52, 152, 219, 0.1) !important;
+}
+
+.action-button-info:hover {
+  background-color: rgba(52, 152, 219, 0.2) !important;
+  color: #2980b9 !important;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(52, 152, 219, 0.3);
+}
+
+.action-button-info:active {
+  transform: translateY(0);
+}
+
+/* Botão de Editar */
+.action-button-edit {
+  color: #1abc9c !important;
+  background-color: rgba(26, 188, 156, 0.1) !important;
+}
+
+.action-button-edit:hover {
+  background-color: rgba(26, 188, 156, 0.2) !important;
+  color: #16a085 !important;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(26, 188, 156, 0.3);
+}
+
+.action-button-edit:active {
+  transform: translateY(0);
+}
+
+/* Botão de Desligar */
+.action-button-delete {
+  color: #e74c3c !important;
+  background-color: rgba(231, 76, 60, 0.1) !important;
+}
+
+.action-button-delete:hover {
+  background-color: rgba(231, 76, 60, 0.2) !important;
+  color: #c0392b !important;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(231, 76, 60, 0.3);
+}
+
+.action-button-delete:active {
+  transform: translateY(0);
+}
+
+/* Melhorias de acessibilidade */
+.action-button:focus-visible {
+  outline: 2px solid currentColor;
+  outline-offset: 2px;
+}
+
+/* Responsividade */
+@media (max-width: 768px) {
+  .action-button {
+    width: 32px !important;
+    height: 32px !important;
+  }
+
+  .action-button svg {
+    font-size: 16px !important;
+  }
+}
+

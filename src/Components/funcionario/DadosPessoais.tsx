@@ -201,7 +201,7 @@ const DadosPessoais: React.FC<DadosPessoaisProps> = ({
           {renderField("Nome", "nome")}
         </Grid>
         <Grid item xs={12} sm={4}>
-          {renderField("Sede Principal", "sedeNome")}
+          {renderField("Sede Principal", "sedePrincipalNome")}
         </Grid>
 
         {/* 🔑 LINHA 2: Email (3 - AGORA EDITÁVEL), CPF (3), Função (3), Data Admissão (3) = Total 12 */}
