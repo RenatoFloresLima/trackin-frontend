@@ -1,7 +1,7 @@
 import React from "react";
 import { Box, Container, Typography, Breadcrumbs, Link } from "@mui/material";
 import { NavigateNext } from "@mui/icons-material";
-import { useNavigate, useLocation } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 
 interface PageContainerProps {
   title: string;
@@ -19,7 +19,6 @@ const PageContainer: React.FC<PageContainerProps> = ({
   maxWidth = "lg",
 }) => {
   const navigate = useNavigate();
-  const location = useLocation();
 
   return (
     <Box

@@ -3,7 +3,7 @@
 import { useForm } from "react-hook-form";
 import type { SubmitHandler } from "react-hook-form";
 import React, { useState, useEffect, useCallback } from "react";
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams } from "react-router-dom";
 import api from "../../services/api";
 import { useAuth } from "../../contexts/AuthContext";
 
@@ -60,10 +60,9 @@ interface IFormInput {
 const EdicaoFuncionario: React.FC = () => {
   const { isAdmin } = useAuth();
   const { id } = useParams<{ id: string }>();
-  const navigate = useNavigate();
   const funcionarioId = Number(id);
 
-  const { register, handleSubmit, reset, watch, setValue } =
+  const { register, handleSubmit, reset } =
     useForm<IFormInput>();
 
   const [sedes, setSedes] = useState<Sede[]>([]);

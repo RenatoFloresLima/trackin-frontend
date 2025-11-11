@@ -62,8 +62,8 @@ const AprovacaoPontoPage: React.FC = () => {
       const data = await buscarPontos(params);
       console.log("Pontos buscados:", data);
       setPontos(data || []);
-    } catch (e: any) {
-      setErro(e.message || "Erro desconhecido ao buscar pontos.");
+    } catch (error) {
+      setErro((error instanceof Error ? error.message : undefined) || "Erro desconhecido ao buscar pontos.");
       setPontos([]);
     } finally {
       setLoading(false);
@@ -87,7 +87,7 @@ const AprovacaoPontoPage: React.FC = () => {
    * @returns String formatada ou "-"
    */
   const formatDate = (
-    isoString: string | undefined,
+    isoString: string | null | undefined,
     formatString: string
   ): string => {
     if (!isoString) return "-";
@@ -161,7 +161,7 @@ const AprovacaoPontoPage: React.FC = () => {
       {/* 🔹 Abas */}
       <Tabs
         value={abaAtiva}
-        onChange={(e, newValue) => setAbaAtiva(newValue as any)}
+                    onChange={(_, newValue) => setAbaAtiva(newValue as "dia" | "pendentes" | "todos")}
         sx={{ mb: 2 }}
       >
         <Tab label="Pontos do Dia" value="dia" />
@@ -213,7 +213,7 @@ const AprovacaoPontoPage: React.FC = () => {
                     <TableCell>{formatDate(p.horario, "dd/MM/yyyy")}</TableCell>
                     <TableCell>{formatDate(p.horario, "HH:mm:ss")}</TableCell>
                     <TableCell>
-                      {formatDate(p.horarioCriacao, "HH:mm:ss")}
+                      {p.horarioCriacao ? formatDate(p.horarioCriacao, "HH:mm:ss") : "-"}
                     </TableCell>
                     <TableCell
                       sx={{

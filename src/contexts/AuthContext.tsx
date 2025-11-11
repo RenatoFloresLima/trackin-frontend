@@ -3,7 +3,7 @@ import React, {
   useContext,
   useState,
   useEffect,
-  ReactNode,
+  type ReactNode,
 } from "react";
 import { AxiosError } from "axios"; // Importa o tipo de erro do Axios
 import api from "../services/api"; // O caminho de importação ajustado
@@ -26,6 +26,7 @@ interface AuthContextType {
   logout: () => void;
   isAuthenticated: boolean;
   isAdmin: boolean;
+  authLoading: boolean;
 }
 
 // -----------------------------------------------------
@@ -111,7 +112,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   // 3. Retorno do Provedor
   return (
     <AuthContext.Provider
-      value={{ user, token, login, logout, isAuthenticated, isAdmin }}
+      value={{ user, token, login, logout, isAuthenticated, isAdmin, authLoading: loading }}
     >
       {children}
     </AuthContext.Provider>

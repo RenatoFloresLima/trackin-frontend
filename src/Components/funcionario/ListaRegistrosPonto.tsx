@@ -23,14 +23,7 @@ interface ListaRegistrosPontoProps {
   funcionarioId: number;
 }
 
-const formatDateBR = (dateString: string): string => {
-  if (!dateString) return "";
-  const parts = dateString.split("-");
-  if (parts.length === 3) {
-    return `${parts[2]}/${parts[1]}/${parts[0]}`;
-  }
-  return dateString;
-};
+// formatDateBR removido - não usado
 
 const formatDateTime = (dateTimeString: string): { date: string; time: string } => {
   if (!dateTimeString) return { date: "", time: "" };
