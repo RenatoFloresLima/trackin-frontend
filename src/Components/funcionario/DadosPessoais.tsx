@@ -3,11 +3,11 @@ import {
   Box,
   Typography,
   TextField,
-  Grid,
   IconButton,
   CircularProgress,
   Alert,
 } from "@mui/material";
+import Grid from "@mui/material/Grid2";
 import EditIcon from "@mui/icons-material/Edit";
 import SaveIcon from "@mui/icons-material/Save";
 import CancelIcon from "@mui/icons-material/Cancel";
@@ -194,39 +194,39 @@ const DadosPessoais: React.FC<DadosPessoaisProps> = ({
       {/* 🔑 CORREÇÃO DO GRID: Ajustando spacing e garantindo a estrutura de 3 linhas */}
       <Grid container spacing={3}>
         {/* LINHA 1: Matrícula (4), Nome (4), Sede (4) = Total 12 */}
-        <Grid item xs={12} sm={4}>
+        <Grid xs={12} sm={4}>
           {renderField("Matrícula", "matricula")}
         </Grid>
-        <Grid item xs={12} sm={4}>
+        <Grid xs={12} sm={4}>
           {renderField("Nome", "nome")}
         </Grid>
-        <Grid item xs={12} sm={4}>
+        <Grid xs={12} sm={4}>
           {renderField("Sede Principal", "sedePrincipalNome")}
         </Grid>
 
         {/* 🔑 LINHA 2: Email (3 - AGORA EDITÁVEL), CPF (3), Função (3), Data Admissão (3) = Total 12 */}
-        <Grid item xs={12} sm={3}>
+        <Grid xs={12} sm={3}>
           {/* 🔑 EMAIL AGORA É MUTÁVEL/EDITÁVEL */}
           {renderField("Email", "email", true)}
         </Grid>
-        <Grid item xs={12} sm={3}>
+        <Grid xs={12} sm={3}>
           {renderField("CPF", "cpf")}
         </Grid>
-        <Grid item xs={12} sm={3}>
+        <Grid xs={12} sm={3}>
           {renderField("Função", "funcaoNome")}
         </Grid>
-        <Grid item xs={12} sm={3}>
+        <Grid xs={12} sm={3}>
           {renderField("Data Admissão", "dataContratacao")}
         </Grid>
 
         {/* 🔑 LINHA 3: Endereço (4), Telefone (4), Status (4 - Alinhado à Direita) = Total 12 */}
-        <Grid item xs={12} sm={4}>
+        <Grid xs={12} sm={4}>
           {renderField("Endereço", "endereco", true)}
         </Grid>
-        <Grid item xs={12} sm={4}>
+        <Grid xs={12} sm={4}>
           {renderField("Telefone", "telefone", true)}
         </Grid>
-        <Grid item xs={12} sm={4} sx={{ textAlign: "right" }}>
+        <Grid xs={12} sm={4} sx={{ textAlign: "right" }}>
           {renderField("Status", "status")}
         </Grid>
       </Grid>
