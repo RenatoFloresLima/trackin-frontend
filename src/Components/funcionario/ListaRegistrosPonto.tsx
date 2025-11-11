@@ -32,6 +32,18 @@ const formatDateBR = (dateString: string): string => {
   return dateString;
 };
 
+const formatDateTime = (dateTimeString: string): { date: string; time: string } => {
+  if (!dateTimeString) return { date: "", time: "" };
+  try {
+    const date = new Date(dateTimeString);
+    const dateStr = date.toLocaleDateString("pt-BR");
+    const timeStr = date.toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" });
+    return { date: dateStr, time: timeStr };
+  } catch {
+    return { date: dateTimeString, time: "" };
+  }
+};
+
 const ListaRegistrosPonto: React.FC<ListaRegistrosPontoProps> = ({
   funcionarioId,
 }) => {
@@ -153,46 +165,56 @@ const ListaRegistrosPonto: React.FC<ListaRegistrosPontoProps> = ({
         <TableContainer
           component={Paper}
           elevation={0}
-          sx={{ maxHeight: 400, border: "1px solid #eee" }}
+          sx={{ 
+            maxHeight: 400, 
+            border: "1px solid #eee",
+            width: "100%",
+            overflowX: "auto"
+          }}
         >
-          <Table stickyHeader size="small">
+          <Table stickyHeader size="small" sx={{ minWidth: 650 }}>
             <TableHead>
               <TableRow>
-                <TableCell>Data</TableCell>
-                <TableCell>Hora</TableCell>
-                <TableCell>Tipo</TableCell>
-                <TableCell>Status</TableCell>
+                <TableCell sx={{ minWidth: 100 }}>Data</TableCell>
+                <TableCell sx={{ minWidth: 150 }}>Hora</TableCell>
+                <TableCell sx={{ minWidth: 150 }}>Tipo</TableCell>
+                <TableCell sx={{ minWidth: 150 }}>Status</TableCell>
+                <TableCell sx={{ minWidth: 200 }}>Sede</TableCell>
+                <TableCell sx={{ minWidth: 200 }}>Observação</TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
               {registros.length === 0 ? (
                 <TableRow>
-                  <TableCell colSpan={4} align="center">
+                  <TableCell colSpan={6} align="center">
                     Nenhum registro encontrado no período.
                   </TableCell>
                 </TableRow>
               ) : (
-                registros.map((registro) => (
-                  <TableRow
-                    key={registro.id}
-                    sx={getRowStyle(registro.status || "")}
-                  >
-                    <TableCell>{formatDateBR(registro.dataRegistro)}</TableCell>
-
-                    <TableCell>
-                      {registro.horaRegistro}
-                      {registro.horaSaida && ` - ${registro.horaSaida}`}
-                    </TableCell>
-
-                    <TableCell>
-                      {(registro.tipoRegistro || "").replace(/_/g, " ")}
-                    </TableCell>
-
-                    <TableCell>
-                      {(registro.status || "").replace(/_/g, " ")}
-                    </TableCell>
-                  </TableRow>
-                ))
+                registros.map((registro) => {
+                  const { date, time } = formatDateTime(registro.horario);
+                  return (
+                    <TableRow
+                      key={registro.id}
+                      sx={getRowStyle(registro.status || "")}
+                    >
+                      <TableCell>{date}</TableCell>
+                      <TableCell>{time}</TableCell>
+                      <TableCell>
+                        {(registro.tipo || "").replace(/_/g, " ")}
+                      </TableCell>
+                      <TableCell>
+                        {(registro.status || "").replace(/_/g, " ")}
+                      </TableCell>
+                      <TableCell>
+                        {registro.sedeNome || "-"}
+                      </TableCell>
+                      <TableCell sx={{ maxWidth: 300, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }} title={registro.observacao || ""}>
+                        {registro.observacao || "-"}
+                      </TableCell>
+                    </TableRow>
+                  );
+                })
               )}
             </TableBody>
           </Table>

@@ -1,18 +1,16 @@
-import { useForm } from "react-hook-form";
+import { useForm, Controller } from "react-hook-form";
 import type { SubmitHandler } from "react-hook-form";
 import React, { useState, useEffect } from "react";
-// ⚠️ ATENÇÃO: Verifique o caminho real para o seu arquivo api.ts
 import api from "../../services/api";
 import { format } from "date-fns";
+import PageContainer from "../UI/PageContainer";
 
 // 🔑 IMPORTAÇÕES DO MUI
 import {
-  Container,
   Paper,
   Typography,
   Box,
   TextField,
-  Select,
   MenuItem,
   Button,
   Grid,
@@ -20,10 +18,10 @@ import {
   Alert,
   InputLabel,
   FormControl,
+  Select,
 } from "@mui/material";
 
 import SendIcon from "@mui/icons-material/Send";
-import AccessTimeIcon from "@mui/icons-material/AccessTime";
 
 // ------------------------------------------
 // Constantes e Interfaces de Tipagem
@@ -65,6 +63,7 @@ const RegistroPonto: React.FC = () => {
     reset,
     formState: { errors },
     setValue,
+    control,
   } = useForm<IFormInput>({
     defaultValues: {
       dataRegistro: format(new Date(), "yyyy-MM-dd"),
@@ -156,50 +155,34 @@ const RegistroPonto: React.FC = () => {
 
   if (dataLoading) {
     return (
-      <Container maxWidth="sm" sx={{ mt: 4, textAlign: "center" }}>
-        <CircularProgress />
-        <Typography variant="body1" sx={{ mt: 2 }}>
-          Carregando dados de Sedes...
-        </Typography>
-      </Container>
+      <PageContainer title="Registro de Ponto Manual">
+        <Box sx={{ display: "flex", justifyContent: "center", alignItems: "center", minHeight: "400px" }}>
+          <Box sx={{ textAlign: "center" }}>
+            <CircularProgress size={48} sx={{ mb: 2 }} />
+            <Typography variant="body1" color="text.secondary">
+              Carregando dados de Sedes...
+            </Typography>
+          </Box>
+        </Box>
+      </PageContainer>
     );
   }
 
   return (
-    <Container maxWidth="lg" sx={{ mt: 4 }}>
-      {/* BOX DO TÍTULO COM FUNDO BRANCO E SOMBRA */}
-      <Box
-        sx={{
-          backgroundColor: "#ffffff",
-          borderRadius: "8px",
-          boxShadow: "0 2px 4px rgba(0,0,0,0.1)",
-          p: 2,
-          mb: 3,
-          textAlign: "center",
-        }}
-      >
-        <Typography
-          variant="h4"
-          gutterBottom
-          component="h1"
-          sx={{
-            color: "#333",
-            textAlign: "center",
-            fontWeight: 600,
-            mb: 0,
-          }}
-        >
-          <AccessTimeIcon
-            fontSize="inherit"
-            sx={{ mr: 1, verticalAlign: "middle" }}
-          />
-          Registro de Ponto Manual
-        </Typography>
-      </Box>
-
+    <PageContainer
+      title="Registro de Ponto Manual"
+      subtitle="Registre um ponto manual para um funcionário"
+      breadcrumbs={[
+        { label: "Início", path: "/" },
+        { label: "Bater Ponto" },
+      ]}
+    >
       <Paper
-        elevation={0}
-        sx={{ p: 4, border: "1px solid #ddd", borderRadius: "8px" }}
+        elevation={2}
+        sx={{
+          p: 4,
+          borderRadius: 3,
+        }}
       >
         {status && (
           <Alert severity={isSuccess ? "success" : "error"} sx={{ mb: 3 }}>
@@ -208,108 +191,173 @@ const RegistroPonto: React.FC = () => {
         )}
 
         <form onSubmit={handleSubmit(onSubmit)}>
-          {/* O Grid PARENTAL DEVE TER APENAS a prop 'container' */}
           <Grid container spacing={3}>
-            {/* 1. LINHA FIXA 1: Sede(4), Tipo(2), Data(3), Hora(3) = 12 */}
-
-            {/* 1.1 Sede (sm=4) - ADICIONADO component="div" para tentar corrigir o erro de tipagem */}
-            <Grid component="div">
-              <FormControl fullWidth error={!!errors.sedeId}>
-                <InputLabel
-                  id="sede-label"
-                  sx={{
-                    maxWidth: "90%",
-                    overflow: "hidden",
-                    textOverflow: "ellipsis",
-                    whiteSpace: "nowrap",
-                  }}
-                >
-                  Sede
-                </InputLabel>
-                <Select
-                  labelId="sede-label"
-                  label="Sede"
-                  variant="outlined"
-                  fullWidth
-                  {...register("sedeId", {
-                    required: "A sede é obrigatória",
-                  })}
-                  disabled={loading}
-                  sx={{
-                    borderRadius: "8px",
-                    "& .MuiSelect-select": {
-                      paddingTop: "10px",
-                      paddingBottom: "10px",
-                      overflow: "hidden",
-                      whiteSpace: "nowrap",
-                      textOverflow: "ellipsis",
-                    },
-                  }}
-                >
-                  <MenuItem value="">Selecione a sede da batida</MenuItem>
-                  {sedes.map((sede) => (
-                    <MenuItem key={sede.id} value={sede.id.toString()}>
-                      <Box
-                        sx={{
-                          overflow: "hidden",
-                          textOverflow: "ellipsis",
-                          whiteSpace: "nowrap",
-                          width: "100%",
-                        }}
-                      >
-                        {sede.nome}
-                      </Box>
-                    </MenuItem>
-                  ))}
-                </Select>
-                {errors.sedeId && (
-                  <Typography variant="caption" color="error" sx={{ mt: 0.5 }}>
-                    {errors.sedeId.message}
-                  </Typography>
+            {/* Sede - Linha separada com label estático */}
+            <Grid item xs={12}>
+              <Controller
+                name="sedeId"
+                control={control}
+                rules={{ required: "A sede é obrigatória" }}
+                defaultValue=""
+                render={({ field }) => (
+                  <FormControl 
+                    fullWidth 
+                    error={!!errors.sedeId}
+                    sx={{ minHeight: '56px' }}
+                  >
+                    <InputLabel 
+                      id="sede-label" 
+                      shrink={false}
+                      sx={{ 
+                        fontSize: '1rem',
+                        transform: 'none',
+                        position: 'static',
+                        marginBottom: '8px',
+                        fontWeight: 500,
+                        color: 'text.primary',
+                      }}
+                    >
+                      Sede
+                    </InputLabel>
+                    <Select
+                      {...field}
+                      labelId="sede-label"
+                      displayEmpty
+                      disabled={loading}
+                      renderValue={(selected) => {
+                        if (!selected || selected === '') {
+                          return <span style={{ color: '#9e9e9e' }}>Selecione a sede da batida</span>;
+                        }
+                        const sede = sedes.find(s => s.id.toString() === selected);
+                        return sede ? sede.nome : '';
+                      }}
+                      sx={{
+                        minHeight: '56px',
+                        fontSize: '1rem',
+                        borderRadius: '10px',
+                        '& .MuiSelect-select': {
+                          padding: '14px 14px',
+                          fontSize: '1rem',
+                          minHeight: '56px',
+                          display: 'flex',
+                          alignItems: 'center',
+                        },
+                      }}
+                      MenuProps={{
+                        PaperProps: {
+                          sx: {
+                            maxHeight: 300,
+                            '& .MuiMenuItem-root': {
+                              fontSize: '1rem',
+                              padding: '12px 16px',
+                              minHeight: '48px',
+                            },
+                          },
+                        },
+                      }}
+                    >
+                      {sedes.map((sede) => (
+                        <MenuItem 
+                          key={sede.id} 
+                          value={sede.id.toString()}
+                          sx={{ fontSize: '1rem', minHeight: '48px' }}
+                        >
+                          {sede.nome}
+                        </MenuItem>
+                      ))}
+                    </Select>
+                    {errors.sedeId && (
+                      <Typography variant="caption" color="error" sx={{ mt: 0.5, ml: 1.75 }}>
+                        {errors.sedeId.message}
+                      </Typography>
+                    )}
+                  </FormControl>
                 )}
-              </FormControl>
+              />
             </Grid>
 
-            {/* 1.2 Tipo de Registro (sm=2) */}
-            <Grid>
-              <FormControl fullWidth error={!!errors.tipo}>
-                <InputLabel id="tipo-label">Tipo</InputLabel>
-                <Select
-                  labelId="tipo-label"
-                  label="Tipo"
-                  variant="outlined"
-                  fullWidth
-                  {...register("tipo", {
-                    required: "O tipo de registro é obrigatório",
-                  })}
-                  disabled={loading}
-                  sx={{
-                    borderRadius: "8px",
-                    "& .MuiSelect-select": {
-                      paddingTop: "10px",
-                      paddingBottom: "10px",
-                    },
-                  }}
-                >
-                  <MenuItem value="ENTRADA">Entrada</MenuItem>
-                  <MenuItem value="SAIDA">Saída</MenuItem>
-                  <MenuItem value="INICIO_INTERVALO">
-                    Intervalo (Início)
-                  </MenuItem>
-                  <MenuItem value="FIM_INTERVALO">Intervalo (Fim)</MenuItem>
-                </Select>
-                {errors.tipo && (
-                  <Typography variant="caption" color="error" sx={{ mt: 0.5 }}>
-                    {errors.tipo.message}
-                  </Typography>
+            {/* Tipo de Registro - Linha separada com label estático */}
+            <Grid item xs={12}>
+              <Controller
+                name="tipo"
+                control={control}
+                rules={{ required: "O tipo de registro é obrigatório" }}
+                defaultValue="ENTRADA"
+                render={({ field }) => (
+                  <FormControl 
+                    fullWidth 
+                    error={!!errors.tipo}
+                    sx={{ minHeight: '56px' }}
+                  >
+                    <InputLabel 
+                      id="tipo-label" 
+                      shrink={false}
+                      sx={{ 
+                        fontSize: '1rem',
+                        transform: 'none',
+                        position: 'static',
+                        marginBottom: '8px',
+                        fontWeight: 500,
+                        color: 'text.primary',
+                      }}
+                    >
+                      Tipo de Registro
+                    </InputLabel>
+                    <Select
+                      {...field}
+                      labelId="tipo-label"
+                      disabled={loading}
+                      sx={{
+                        minHeight: '56px',
+                        fontSize: '1rem',
+                        borderRadius: '10px',
+                        '& .MuiSelect-select': {
+                          padding: '14px 14px',
+                          fontSize: '1rem',
+                          minHeight: '56px',
+                          display: 'flex',
+                          alignItems: 'center',
+                        },
+                      }}
+                      MenuProps={{
+                        PaperProps: {
+                          sx: {
+                            '& .MuiMenuItem-root': {
+                              fontSize: '1rem',
+                              padding: '12px 16px',
+                              minHeight: '48px',
+                            },
+                          },
+                        },
+                      }}
+                    >
+                      <MenuItem value="ENTRADA" sx={{ fontSize: '1rem', minHeight: '48px' }}>
+                        Entrada
+                      </MenuItem>
+                      <MenuItem value="SAIDA" sx={{ fontSize: '1rem', minHeight: '48px' }}>
+                        Saída
+                      </MenuItem>
+                      <MenuItem value="INICIO_INTERVALO" sx={{ fontSize: '1rem', minHeight: '48px' }}>
+                        Intervalo (Início)
+                      </MenuItem>
+                      <MenuItem value="FIM_INTERVALO" sx={{ fontSize: '1rem', minHeight: '48px' }}>
+                        Intervalo (Fim)
+                      </MenuItem>
+                    </Select>
+                    {errors.tipo && (
+                      <Typography variant="caption" color="error" sx={{ mt: 0.5, ml: 1.75 }}>
+                        {errors.tipo.message}
+                      </Typography>
+                    )}
+                  </FormControl>
                 )}
-              </FormControl>
+              />
             </Grid>
 
-            {/* 1.3 Data da Batida (sm=3) */}
-            <Grid>
+            {/* Data e Hora da Batida */}
+            <Grid item xs={12} md={6}>
               <TextField
-                label="Data"
+                label="Data da Batida"
                 type="date"
                 fullWidth
                 error={!!errors.dataRegistro}
@@ -319,20 +367,17 @@ const RegistroPonto: React.FC = () => {
                   required: "A data é obrigatória",
                 })}
                 disabled={loading}
-                InputProps={{
-                  sx: {
-                    borderRadius: "8px",
-                    paddingTop: "3px",
-                    paddingBottom: "3px",
+                sx={{
+                  '& .MuiOutlinedInput-root': {
+                    borderRadius: '10px',
                   },
                 }}
               />
             </Grid>
 
-            {/* 1.4 Hora da Batida (sm=3) */}
-            <Grid>
+            <Grid item xs={12} md={6}>
               <TextField
-                label="Hora"
+                label="Hora da Batida"
                 type="time"
                 fullWidth
                 error={!!errors.horaRegistro}
@@ -342,19 +387,16 @@ const RegistroPonto: React.FC = () => {
                   required: "A hora é obrigatória",
                 })}
                 disabled={loading}
-                InputProps={{
-                  sx: {
-                    borderRadius: "8px",
-                    paddingTop: "3px",
-                    paddingBottom: "3px",
+                sx={{
+                  '& .MuiOutlinedInput-root': {
+                    borderRadius: '10px',
                   },
                 }}
               />
             </Grid>
 
-            {/* 2. LINHA FIXA 2: Matrícula(6) e Senha(6) = 12 */}
-
-            <Grid>
+            {/* Matrícula e Senha do Funcionário */}
+            <Grid item xs={12} md={6}>
               <TextField
                 label="Matrícula do Funcionário"
                 type="text"
@@ -366,17 +408,15 @@ const RegistroPonto: React.FC = () => {
                   required: "A matrícula é obrigatória",
                 })}
                 disabled={loading}
-                InputProps={{
-                  sx: {
-                    borderRadius: "8px",
-                    paddingTop: "3px",
-                    paddingBottom: "3px",
+                sx={{
+                  '& .MuiOutlinedInput-root': {
+                    borderRadius: '10px',
                   },
                 }}
               />
             </Grid>
 
-            <Grid>
+            <Grid item xs={12} md={6}>
               <TextField
                 label="Senha do Funcionário"
                 type="password"
@@ -386,22 +426,20 @@ const RegistroPonto: React.FC = () => {
                 helperText={errors.senha?.message}
                 {...register("senha", { required: "A senha é obrigatória" })}
                 disabled={loading}
-                InputProps={{
-                  sx: {
-                    borderRadius: "8px",
-                    paddingTop: "3px",
-                    paddingBottom: "3px",
+                sx={{
+                  '& .MuiOutlinedInput-root': {
+                    borderRadius: '10px',
                   },
                 }}
               />
             </Grid>
 
-            {/* 3. LINHA FIXA 3: Justificativa (12) */}
-            <Grid>
+            {/* Justificativa */}
+            <Grid item xs={12}>
               <TextField
                 label="Justificativa (Observação)"
                 multiline
-                rows={3}
+                rows={4}
                 fullWidth
                 placeholder="Justifique seu ponto (Obrigatório)"
                 error={!!errors.justificativa}
@@ -411,41 +449,43 @@ const RegistroPonto: React.FC = () => {
                 })}
                 disabled={loading}
                 sx={{
-                  borderRadius: "8px",
-                  "& .MuiOutlinedInput-root": { borderRadius: "8px" },
+                  '& .MuiOutlinedInput-root': {
+                    borderRadius: '10px',
+                  },
                 }}
               />
             </Grid>
 
-            {/* 4. LINHA FIXA 4: Botão (Centralizado) */}
-            <Grid sx={{ display: "flex", justifyContent: "center" }}>
-              <Button
-                type="submit"
-                variant="contained"
-                color="primary"
-                disabled={loading}
-                startIcon={
-                  loading ? (
-                    <CircularProgress size={20} color="inherit" />
-                  ) : (
-                    <SendIcon />
-                  )
-                }
-                sx={{
-                  mt: 2,
-                  borderRadius: "8px",
-                  py: 1.5,
-                  fontWeight: 600,
-                  width: { xs: "100%", sm: "400px" },
-                }}
-              >
-                {loading ? "Registrando..." : "Registrar Ponto Manual"}
-              </Button>
+            {/* Botão de Submit */}
+            <Grid item xs={12}>
+              <Box sx={{ display: "flex", justifyContent: "center", mt: 2 }}>
+                <Button
+                  type="submit"
+                  variant="contained"
+                  disabled={loading}
+                  startIcon={
+                    loading ? (
+                      <CircularProgress size={20} color="inherit" />
+                    ) : (
+                      <SendIcon />
+                    )
+                  }
+                  sx={{
+                    borderRadius: '10px',
+                    py: 1.5,
+                    px: 4,
+                    fontWeight: 600,
+                    minWidth: { xs: "100%", sm: "300px" },
+                  }}
+                >
+                  {loading ? "Registrando..." : "Registrar Ponto Manual"}
+                </Button>
+              </Box>
             </Grid>
           </Grid>
         </form>
       </Paper>
-    </Container>
+    </PageContainer>
   );
 };
 
