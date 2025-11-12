@@ -26,6 +26,7 @@ import ListaFuncoes from "./Components/funcao/ListaFuncoes";
 
 // Estilos Globais
 import "./App.css";
+import "./Components/Layout/Layout.css";
 
 // -----------------------------------------------------
 // Layout para rotas autenticadas com Sidebar
