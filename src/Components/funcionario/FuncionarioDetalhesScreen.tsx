@@ -152,37 +152,23 @@ const FuncionarioDetalhesScreen: React.FC = () => {
         </Typography>
 
         <Grid container spacing={3}>
-          <Grid size={{ xs: 12, md: 3 }}>
+          {/* Dados Pessoais - Fica acima, ocupando toda a largura */}
+          <Grid size={{ xs: 12 }}>
             <Paper
               elevation={0}
-              sx={{ p: 3, height: "100%", border: "1px solid #ddd" }}
+              sx={{ p: 3, border: "1px solid #ddd", mb: 3 }}
             >
-              {/* 🔑 ALTERAÇÃO PRINCIPAL: Passa a função para abrir o modal para o DadosPessoais */}
               <DadosPessoais
                 funcionario={funcionario}
                 onUpdate={handleUpdate}
                 onOpenSenhaModal={() => setIsSenhaModalOpen(true)}
               />
-
-              {/* ❌ REMOVIDO: O divisor e o botão de redefinição de senha da parte inferior */}
-              {/* <Divider sx={{ my: 3 }} /> */}
-              {/* <Box sx={{ display: "flex", justifyContent: "center" }}>
-                <Button
-                  variant="contained"
-                  color="primary"
-                  onClick={() => setIsSenhaModalOpen(true)}
-                  startIcon={<VpnKeyIcon />}
-                  fullWidth
-                  sx={{ borderRadius: "8px" }}
-                >
-                  Redefinir Senha
-                </Button>
-              </Box> */}
             </Paper>
           </Grid>
 
-          <Grid size={{ xs: 12, md: 9 }}>
-            <Paper elevation={0} sx={{ p: 3, border: "1px solid #ddd", width: "100%" }}>
+          {/* Tabela de Pontos - Fica abaixo dos dados pessoais, ocupando toda a largura */}
+          <Grid size={{ xs: 12 }}>
+            <Paper elevation={0} sx={{ p: 3, border: "1px solid #ddd" }}>
               <ListaRegistrosPonto funcionarioId={funcionario.id} />
             </Paper>
           </Grid>

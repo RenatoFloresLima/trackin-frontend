@@ -44,3 +44,4 @@
 3. Remover variáveis não usadas ou comentá-las
 4. Testar build local: `npm run build`
 
+
