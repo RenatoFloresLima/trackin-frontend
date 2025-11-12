@@ -1,11 +1,27 @@
-// src/Components/funcionario/EdicaoFuncionario.tsx (FINAL CORRIGIDO)
+// src/Components/funcionario/FuncionarioEdicaoPage.tsx
 
-import { useForm } from "react-hook-form";
+import { useForm, Controller } from "react-hook-form";
 import type { SubmitHandler } from "react-hook-form";
 import React, { useState, useEffect, useCallback } from "react";
 import { useParams } from "react-router-dom";
 import api from "../../services/api";
 import { useAuth } from "../../contexts/AuthContext";
+import {
+  Paper,
+  Typography,
+  TextField,
+  Button,
+  Box,
+  Grid,
+  MenuItem,
+  Alert,
+  CircularProgress,
+  FormControl,
+  InputLabel,
+  Select,
+} from "@mui/material";
+import { Save as SaveIcon } from "@mui/icons-material";
+import PageContainer from "../UI/PageContainer";
 
 // ------------------------------------------
 // Constantes de API
@@ -39,9 +55,7 @@ interface FuncionarioResponse {
   cpf: string;
   sedePrincipalId: number;
   funcaoId: number;
-  // 🔑 Campo correto vindo da API
   roleEnum: string;
-  // O backend também envia: funcaoNome, sedePrincipalNome, status, dataAdmissao
 }
 
 // Interface de Input (o que o formulário espera para registro/submissão)
@@ -53,23 +67,22 @@ interface IFormInput {
   email: string;
   sedePrincipalId: string;
   funcaoId: string;
-  // 🔑 Nome da propriedade de submissão
   role: "FUNCIONARIO" | "ADMIN";
 }
 
-const EdicaoFuncionario: React.FC = () => {
+const FuncionarioEdicaoPage: React.FC = () => {
   const { isAdmin } = useAuth();
   const { id } = useParams<{ id: string }>();
   const funcionarioId = Number(id);
 
-  const { register, handleSubmit, reset } =
+  const { register, handleSubmit, reset, formState: { errors }, control } =
     useForm<IFormInput>();
 
   const [sedes, setSedes] = useState<Sede[]>([]);
   const [funcoes, setFuncoes] = useState<Funcao[]>([]);
   const [matricula, setMatricula] = useState<string>("");
   const [cpf, setCpf] = useState<string>("");
-  const [status, setStatus] = useState("");
+  const [status, setStatus] = useState<{ type: "success" | "error"; message: string } | null>(null);
   const [loading, setLoading] = useState(false);
   const [dataLoading, setDataLoading] = useState(true);
 
@@ -78,7 +91,10 @@ const EdicaoFuncionario: React.FC = () => {
   // ------------------------------------------
   const fetchInitialData = useCallback(async () => {
     if (isNaN(funcionarioId)) {
-      setStatus("ID de funcionário inválido para edição.");
+      setStatus({
+        type: "error",
+        message: "ID de funcionário inválido para edição."
+      });
       setDataLoading(false);
       return;
     }
@@ -97,7 +113,6 @@ const EdicaoFuncionario: React.FC = () => {
       setFuncoes(funcoesResponse.data);
 
       const funcionario = funcionarioResponse.data;
-      console.log("ROLE Vindo da API:", funcionario.roleEnum);
 
       // 3. Preencher o Formulário e Matrícula
       setMatricula(funcionario.matricula);
@@ -112,17 +127,19 @@ const EdicaoFuncionario: React.FC = () => {
         email: funcionario.email,
         sedePrincipalId: funcionario.sedePrincipalId.toString(),
         funcaoId: funcionario.funcaoId.toString(),
-        // 🔑 CORREÇÃO CRÍTICA AQUI: Usar 'roleEnum' da API e mapear para 'role' do FormInput
         role: funcionario.roleEnum as "FUNCIONARIO" | "ADMIN",
       });
 
-      setStatus("");
+      setStatus(null);
     } catch (error: any) {
       console.error("Erro ao carregar dados iniciais:", error);
       const msg =
         error.response?.data?.message ||
         "Erro ao carregar dados. Verifique a permissão.";
-      setStatus(`❌ Falha na Carga: ${msg}`);
+      setStatus({
+        type: "error",
+        message: `Falha na Carga: ${msg}`
+      });
     } finally {
       setDataLoading(false);
     }
@@ -136,7 +153,7 @@ const EdicaoFuncionario: React.FC = () => {
   // Lógica de Submissão do Formulário (PUT)
   // ------------------------------------------
   const onSubmit: SubmitHandler<IFormInput> = async (data) => {
-    setStatus("");
+    setStatus(null);
     setLoading(true);
 
     try {
@@ -146,27 +163,25 @@ const EdicaoFuncionario: React.FC = () => {
         // Os IDs devem ser passados como number para o DTO do backend
         sedePrincipalId: parseInt(data.sedePrincipalId),
         funcaoId: parseInt(data.funcaoId),
-        // 🔑 'role' já está correto com 'ADMIN'/'FUNCIONARIO'
         role: data.role,
       };
-
-      console.log("Payload de atualização sendo enviado:", payload);
 
       const response = await api.put(
         `${API_FUNCIONARIOS}/${funcionarioId}`,
         payload
       );
 
-      setStatus(
-        `✅ Sucesso! Funcionário ${response.data.nome} (ID: ${funcionarioId}) atualizado.`
-      );
+      setStatus({
+        type: "success",
+        message: `Funcionário ${response.data.nome} (ID: ${funcionarioId}) atualizado com sucesso!`
+      });
     } catch (error: any) {
       console.error("Erro na atualização:", error);
       let errorMessage = "Erro desconhecido.";
       if (error.response) {
         errorMessage = `Erro ${error.response.status}: ${
           error.response.status === 403
-            ? "Permissão negada (403). Você precisa ser ROLE_ADMIN para editar."
+            ? "Permissão negada. Você precisa ser ROLE_ADMIN para editar."
             : error.response.data.message || "Dados inválidos."
         }`;
       } else if (error.request) {
@@ -174,7 +189,10 @@ const EdicaoFuncionario: React.FC = () => {
           "Erro de rede: O servidor backend pode estar offline ou inacessível.";
       }
 
-      setStatus(`❌ Falha na Atualização: ${errorMessage}`);
+      setStatus({
+        type: "error",
+        message: `Falha na Atualização: ${errorMessage}`
+      });
     } finally {
       setLoading(false);
     }
@@ -183,149 +201,410 @@ const EdicaoFuncionario: React.FC = () => {
   // Renderiza uma mensagem de loading enquanto busca os dados
   if (dataLoading) {
     return (
-      <div className="container">
-        <h1>Carregando...</h1>
-        <p>Buscando dados do funcionário, Sedes e Funções...</p>
-      </div>
+      <PageContainer title="Editar Funcionário">
+        <Box sx={{ display: "flex", justifyContent: "center", alignItems: "center", minHeight: "400px" }}>
+          <Box sx={{ textAlign: "center" }}>
+            <CircularProgress size={48} sx={{ mb: 2 }} />
+            <Typography variant="body1" color="text.secondary">
+              Carregando dados...
+            </Typography>
+          </Box>
+        </Box>
+      </PageContainer>
     );
   }
 
   return (
-    <div className="container">
-      <h1>Editar Cadastro de Funcionário</h1>
+    <PageContainer
+      title="Editar Funcionário"
+      subtitle="Atualize os dados do funcionário"
+      breadcrumbs={[
+        { label: "Início", path: "/" },
+        { label: "Funcionários", path: "/lista-funcionarios" },
+        { label: "Editar" },
+      ]}
+    >
+      <Paper
+        elevation={2}
+        sx={{
+          p: 4,
+          borderRadius: 3,
+        }}
+      >
+        {status && (
+          <Alert severity={status.type} sx={{ mb: 3 }}>
+            {status.message}
+          </Alert>
+        )}
 
-      {/* Feedback de Status */}
-      {status && (
-        <div
-          style={{
-            padding: "10px",
-            margin: "15px 0",
-            borderRadius: "4px",
-            backgroundColor: status.includes("Sucesso") ? "#d4edda" : "#f8d7da",
-            color: status.includes("Sucesso") ? "#155724" : "#721c24",
-          }}
-        >
-          {status}
-        </div>
-      )}
+        <form onSubmit={handleSubmit(onSubmit)}>
+          <Grid container spacing={3}>
+            {/* Matrícula - Readonly */}
+            <Grid size={{ xs: 12, md: 6 }}>
+              <TextField
+                fullWidth
+                label="Matrícula"
+                value={matricula}
+                InputProps={{
+                  readOnly: true,
+                }}
+                variant="outlined"
+                sx={{
+                  "& .MuiInputBase-root": {
+                    backgroundColor: "#f5f5f5",
+                  },
+                }}
+              />
+            </Grid>
 
-      <form onSubmit={handleSubmit(onSubmit)}>
-        {/* ... (Matrícula e campos de texto) ... */}
+            {/* Nome */}
+            <Grid size={{ xs: 12, md: 6 }}>
+              <TextField
+                fullWidth
+                label="Nome Completo"
+                placeholder="Digite o nome completo"
+                {...register("nome", { required: "Nome é obrigatório" })}
+                error={!!errors.nome}
+                helperText={errors.nome?.message}
+                variant="outlined"
+              />
+            </Grid>
 
-        <div className="form-group">
-          <label>Matrícula:</label>
-          <input
-            type="text"
-            className="form-control"
-            value={matricula}
-            readOnly
-            style={{ backgroundColor: "#f0f0f0" }}
-          />
-        </div>
+            {/* CPF - Readonly */}
+            <Grid size={{ xs: 12, md: 6 }}>
+              <TextField
+                fullWidth
+                label="CPF"
+                value={cpf}
+                InputProps={{
+                  readOnly: true,
+                }}
+                variant="outlined"
+                sx={{
+                  "& .MuiInputBase-root": {
+                    backgroundColor: "#f5f5f5",
+                  },
+                }}
+              />
+            </Grid>
 
-        <div className="form-group">
-          <label>Nome:</label>
-          <input
-            type="text"
-            className="form-control"
-            placeholder="Digite o nome"
-            {...register("nome", { required: true })}
-          />
-        </div>
-        <div className="form-group">
-          <label>Endereço:</label>
-          <input
-            type="text"
-            className="form-control"
-            placeholder="Digite a endereço"
-            {...register("endereco", { required: true })}
-          />
-        </div>
-        <div className="form-group">
-          <label>Telefone:</label>
-          <input
-            type="text"
-            className="form-control"
-            placeholder="Digite o telefone"
-            {...register("telefone", { required: true })}
-          />
-        </div>
-        <div className="form-group">
-          <label>CPF:</label>
-          <input
-            type="text"
-            className="form-control"
-            value={cpf}
-            readOnly
-            style={{ backgroundColor: "#f0f0f0" }}
-          />
-        </div>
-        <div className="form-group">
-          <label>Email:</label>
-          <input
-            type="email"
-            className="form-control"
-            placeholder="Digite o email"
-            {...register("email", { required: true })}
-          />
-        </div>
+            {/* Email */}
+            <Grid size={{ xs: 12, md: 6 }}>
+              <TextField
+                fullWidth
+                type="email"
+                label="Email"
+                placeholder="email@exemplo.com"
+                {...register("email", { 
+                  required: "Email é obrigatório",
+                  pattern: {
+                    value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
+                    message: "Email inválido"
+                  }
+                })}
+                error={!!errors.email}
+                helperText={errors.email?.message}
+                variant="outlined"
+              />
+            </Grid>
 
-        {/* SELECT SEDE */}
-        <div className="form-group">
-          <label>Sede:</label>
-          <select
-            {...register("sedePrincipalId", { required: true })}
-            className="form-control"
-          >
-            <option value="">Selecione uma Sede</option>
-            {sedes.map((sede) => (
-              <option key={sede.id} value={sede.id.toString()}>
-                {sede.nome}
-              </option>
-            ))}
-          </select>
-        </div>
+            {/* Telefone */}
+            <Grid size={{ xs: 12, md: 6 }}>
+              <TextField
+                fullWidth
+                label="Telefone"
+                placeholder="(00) 00000-0000"
+                {...register("telefone", { required: "Telefone é obrigatório" })}
+                error={!!errors.telefone}
+                helperText={errors.telefone?.message}
+                variant="outlined"
+              />
+            </Grid>
 
-        {/* SELECT FUNÇÃO */}
-        <div className="form-group">
-          <label>Função:</label>
-          <select
-            {...register("funcaoId", { required: true })}
-            className="form-control"
-          >
-            <option value="">Selecione uma Função</option>
-            {funcoes.map((funcao) => (
-              <option key={funcao.id} value={funcao.id.toString()}>
-                {funcao.nome}
-              </option>
-            ))}
-          </select>
-        </div>
+            {/* Endereço */}
+            <Grid size={12}>
+              <TextField
+                fullWidth
+                label="Endereço"
+                placeholder="Digite o endereço completo"
+                {...register("endereco", { required: "Endereço é obrigatório" })}
+                error={!!errors.endereco}
+                helperText={errors.endereco?.message}
+                variant="outlined"
+              />
+            </Grid>
 
-        {/* SELECT ROLE (Perfil de Acesso) */}
-        <div className="form-group">
-          <label>Perfil de Acesso:</label>
-          <select
-            {...register("role", { required: true })}
-            className="form-control"
-            disabled={!isAdmin}
-          >
-            {/* ✅ Valores correspondem ao retorno da API (ADMIN/FUNCIONARIO) */}
-            <option value="FUNCIONARIO">Funcionário Comum</option>
-            <option value="ADMIN">Administrador</option>
-          </select>
-        </div>
+            {/* Data de Contratação - Readonly (se disponível) */}
+            {/* <Grid size={{ xs: 12, md: 6 }}>
+              <TextField
+                fullWidth
+                label="Data de Contratação"
+                value={dataContratacao || ""}
+                InputProps={{
+                  readOnly: true,
+                }}
+                variant="outlined"
+                sx={{
+                  "& .MuiInputBase-root": {
+                    backgroundColor: "#f5f5f5",
+                  },
+                }}
+              />
+            </Grid> */}
 
-        <button
-          type="submit"
-          disabled={loading || dataLoading}
-          className="btn btn-success"
-        >
-          {loading ? "Salvando..." : "Salvar Alterações"}
-        </button>
-      </form>
-    </div>
+            {/* Perfil de Acesso */}
+            <Grid size={{ xs: 12, md: 6 }}>
+              <Controller
+                name="role"
+                control={control}
+                rules={{ required: "Perfil de acesso é obrigatório" }}
+                render={({ field }) => (
+                  <FormControl 
+                    fullWidth 
+                    error={!!errors.role}
+                    disabled={!isAdmin}
+                    sx={{ minHeight: '56px' }}
+                  >
+                    <InputLabel id="role-label" sx={{ fontSize: '1rem' }}>
+                      Perfil de Acesso
+                    </InputLabel>
+                    <Select
+                      {...field}
+                      labelId="role-label"
+                      label="Perfil de Acesso"
+                      sx={{
+                        minHeight: '56px',
+                        fontSize: '1rem',
+                        '& .MuiSelect-select': {
+                          padding: '14px 14px',
+                          fontSize: '1rem',
+                          minHeight: '56px',
+                          display: 'flex',
+                          alignItems: 'center',
+                        },
+                      }}
+                      MenuProps={{
+                        PaperProps: {
+                          sx: {
+                            '& .MuiMenuItem-root': {
+                              fontSize: '1rem',
+                              padding: '12px 16px',
+                              minHeight: '48px',
+                            },
+                          },
+                        },
+                      }}
+                    >
+                      <MenuItem value="FUNCIONARIO" sx={{ fontSize: '1rem', minHeight: '48px' }}>
+                        Funcionário Comum
+                      </MenuItem>
+                      <MenuItem value="ADMIN" sx={{ fontSize: '1rem', minHeight: '48px' }}>
+                        Administrador
+                      </MenuItem>
+                    </Select>
+                    {errors.role && (
+                      <Typography variant="caption" color="error" sx={{ mt: 0.5, ml: 1.75 }}>
+                        {errors.role.message}
+                      </Typography>
+                    )}
+                  </FormControl>
+                )}
+              />
+            </Grid>
+
+            {/* Sede - Linha separada com mais espaço */}
+            <Grid size={12}>
+              <Controller
+                name="sedePrincipalId"
+                control={control}
+                rules={{ required: "Sede é obrigatória" }}
+                render={({ field }) => (
+                  <FormControl 
+                    fullWidth 
+                    error={!!errors.sedePrincipalId}
+                    sx={{ 
+                      minHeight: '56px',
+                    }}
+                  >
+                    <InputLabel 
+                      id="sede-label" 
+                      shrink={false}
+                      sx={{ 
+                        fontSize: '1rem',
+                        transform: 'none',
+                        position: 'static',
+                        marginBottom: '8px',
+                        fontWeight: 500,
+                        color: 'text.primary',
+                      }}
+                    >
+                      Sede Principal
+                    </InputLabel>
+                    <Select
+                      {...field}
+                      labelId="sede-label"
+                      displayEmpty
+                      renderValue={(selected) => {
+                        if (!selected || selected === '') {
+                          return <span style={{ color: '#9e9e9e' }}>Selecione uma Sede</span>;
+                        }
+                        const sede = sedes.find(s => s.id.toString() === selected);
+                        return sede ? sede.nome : '';
+                      }}
+                      sx={{
+                        minHeight: '56px',
+                        fontSize: '1rem',
+                        '& .MuiSelect-select': {
+                          padding: '14px 14px',
+                          fontSize: '1rem',
+                          minHeight: '56px',
+                          display: 'flex',
+                          alignItems: 'center',
+                        },
+                      }}
+                      MenuProps={{
+                        PaperProps: {
+                          sx: {
+                            maxHeight: 300,
+                            '& .MuiMenuItem-root': {
+                              fontSize: '1rem',
+                              padding: '12px 16px',
+                              minHeight: '48px',
+                            },
+                          },
+                        },
+                      }}
+                    >
+                      {sedes.map((sede) => (
+                        <MenuItem 
+                          key={sede.id} 
+                          value={sede.id.toString()}
+                          sx={{ fontSize: '1rem', minHeight: '48px' }}
+                        >
+                          {sede.nome}
+                        </MenuItem>
+                      ))}
+                    </Select>
+                    {errors.sedePrincipalId && (
+                      <Typography variant="caption" color="error" sx={{ mt: 0.5, ml: 1.75 }}>
+                        {errors.sedePrincipalId.message}
+                      </Typography>
+                    )}
+                  </FormControl>
+                )}
+              />
+            </Grid>
+
+            {/* Função - Linha separada com mais espaço */}
+            <Grid size={12}>
+              <Controller
+                name="funcaoId"
+                control={control}
+                rules={{ required: "Função é obrigatória" }}
+                render={({ field }) => (
+                  <FormControl 
+                    fullWidth 
+                    error={!!errors.funcaoId}
+                    sx={{ 
+                      minHeight: '56px',
+                    }}
+                  >
+                    <InputLabel 
+                      id="funcao-label" 
+                      shrink={false}
+                      sx={{ 
+                        fontSize: '1rem',
+                        transform: 'none',
+                        position: 'static',
+                        marginBottom: '8px',
+                        fontWeight: 500,
+                        color: 'text.primary',
+                      }}
+                    >
+                      Função
+                    </InputLabel>
+                    <Select
+                      {...field}
+                      labelId="funcao-label"
+                      displayEmpty
+                      renderValue={(selected) => {
+                        if (!selected || selected === '') {
+                          return <span style={{ color: '#9e9e9e' }}>Selecione uma Função</span>;
+                        }
+                        const funcao = funcoes.find(f => f.id.toString() === selected);
+                        return funcao ? funcao.nome : '';
+                      }}
+                      sx={{
+                        minHeight: '56px',
+                        fontSize: '1rem',
+                        '& .MuiSelect-select': {
+                          padding: '14px 14px',
+                          fontSize: '1rem',
+                          minHeight: '56px',
+                          display: 'flex',
+                          alignItems: 'center',
+                        },
+                      }}
+                      MenuProps={{
+                        PaperProps: {
+                          sx: {
+                            maxHeight: 300,
+                            '& .MuiMenuItem-root': {
+                              fontSize: '1rem',
+                              padding: '12px 16px',
+                              minHeight: '48px',
+                            },
+                          },
+                        },
+                      }}
+                    >
+                      {funcoes.map((funcao) => (
+                        <MenuItem 
+                          key={funcao.id} 
+                          value={funcao.id.toString()}
+                          sx={{ fontSize: '1rem', minHeight: '48px' }}
+                        >
+                          {funcao.nome}
+                        </MenuItem>
+                      ))}
+                    </Select>
+                    {errors.funcaoId && (
+                      <Typography variant="caption" color="error" sx={{ mt: 0.5, ml: 1.75 }}>
+                        {errors.funcaoId.message}
+                      </Typography>
+                    )}
+                  </FormControl>
+                )}
+              />
+            </Grid>
+
+            {/* Botões - Abaixo dos campos Sede e Função */}
+            <Grid size={12}>
+              <Box sx={{ display: "flex", justifyContent: "flex-end", gap: 2, mt: 2 }}>
+                <Button
+                  variant="outlined"
+                  onClick={() => fetchInitialData()}
+                  disabled={loading}
+                  sx={{ minWidth: 120 }}
+                >
+                  Cancelar
+                </Button>
+                <Button
+                  type="submit"
+                  variant="contained"
+                  disabled={loading || dataLoading}
+                  startIcon={loading ? <CircularProgress size={20} /> : <SaveIcon />}
+                  sx={{ minWidth: 150 }}
+                >
+                  {loading ? "Salvando..." : "Salvar Alterações"}
+                </Button>
+              </Box>
+            </Grid>
+          </Grid>
+        </form>
+      </Paper>
+    </PageContainer>
   );
 };
 
-export default EdicaoFuncionario;
+export default FuncionarioEdicaoPage;
