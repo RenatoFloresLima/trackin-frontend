@@ -50,6 +50,11 @@ export interface FuncionarioDetalheDTO {
 export interface Sede {
   id: number;
   nome: string;
+  endereco?: string | null;
+  identificadorUnico?: string | null;
+  latitude?: number | null;
+  longitude?: number | null;
+  raioPermitido?: number | null;
 }
 
 export interface Funcao {

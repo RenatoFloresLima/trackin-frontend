@@ -1,7 +1,6 @@
 import { useForm } from "react-hook-form";
 import type { SubmitHandler } from "react-hook-form";
 import { useState, useEffect } from "react";
-// ⚠️ ATENÇÃO: Verifique o caminho real para o seu arquivo api.ts
 import api from "../../services/api";
 import { format } from "date-fns";
 
@@ -24,6 +23,7 @@ import Grid from "@mui/material/Grid";
 
 import SendIcon from "@mui/icons-material/Send";
 import AccessTimeIcon from "@mui/icons-material/AccessTime";
+import type { SedeDTO } from "../../types/SedeTypes";
 
 // ------------------------------------------
 // Constantes e Interfaces de Tipagem
@@ -33,11 +33,6 @@ const API_REGISTROS = "/api/registros-ponto/manual";
 const API_SEDES = "/api/sedes";
 
 type TipoRegistro = "ENTRADA" | "SAIDA" | "INICIO_INTERVALO" | "FIM_INTERVALO";
-
-interface Sede {
-  id: number;
-  nome: string;
-}
 
 interface IFormInput {
   // Campos de Autenticação da Batida
@@ -74,7 +69,7 @@ const RegistroPonto: React.FC = () => {
     },
   });
 
-  const [sedes, setSedes] = useState<Sede[]>([]);
+  const [sedes, setSedes] = useState<SedeDTO[]>([]);
   const [status, setStatus] = useState("");
   const [isSuccess, setIsSuccess] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -86,8 +81,8 @@ const RegistroPonto: React.FC = () => {
   useEffect(() => {
     const fetchSedes = async () => {
       try {
-        const response = await api.get<Sede[]>(API_SEDES);
-        setSedes(response.data);
+        const response = await api.get<SedeDTO[]>(API_SEDES);
+        setSedes(response.data ?? []);
       } catch (error) {
         console.error("Erro ao carregar sedes:", error);
         setStatus("Erro ao carregar sedes. Verifique se você está logado.");
