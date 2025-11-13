@@ -1,8 +1,7 @@
 import { FaUser, FaLock } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../contexts/AuthContext";
-import { useState } from "react";
-import type { FormEvent } from "react";
+import { useState, type FormEvent } from "react";
 import "./Login.css";
 
 const Login = () => {
@@ -27,11 +26,11 @@ const Login = () => {
         // FUNCIONÁRIO COMUM: Redireciona para a tela de perfil
         navigate("/meu-perfil", { replace: true });
       }
-    } catch (error) {
+    } catch (e) {
       // Tratar e exibir erros da função login (API)
-      // Usamos error.message se for um erro de exceção lançado pelo useAuth/API
+      // Usamos e.message se for um erro de exceção lançado pelo useAuth/API
       const errorMessage =
-        (error instanceof Error ? error.message : undefined) || "Erro de conexão. Verifique o servidor.";
+        (e instanceof Error ? e.message : undefined) || "Erro de conexão. Verifique o servidor.";
       setError(errorMessage);
     }
   };
