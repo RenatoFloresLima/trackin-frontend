@@ -39,7 +39,7 @@ const API_FUNCIONARIOS = `${API_BASE_URL}/funcionarios`;
 // LÓGICA DO COMPONENTE PRINCIPAL
 // ----------------------------------------------------
 const ListaFuncionarios: React.FC = () => {
-  const { user, isAuthenticated, isAdmin } = useAuth();
+  const { isAuthenticated, isAdmin } = useAuth();
   const navigate = useNavigate();
 
   // ----------------------------------------------------

@@ -1,0 +1,50 @@
+.container {
+  max-width: 960px;
+  margin: 0 auto;
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.form-group label {
+  font-weight: 600;
+  color: #1f2933;
+}
+
+.form-group .form-control {
+  padding: 10px 12px;
+  border-radius: 8px;
+  border: 1px solid #cbd5e0;
+  font-size: 0.95rem;
+}
+
+.btn {
+  padding: 12px 18px;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 600;
+}
+
+.btn-primary {
+  background-color: #1976d2;
+  color: #fff;
+  transition: background-color 0.2s ease;
+}
+
+.btn-primary:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.btn-primary:not(:disabled):hover {
+  background-color: #115293;
+}
+

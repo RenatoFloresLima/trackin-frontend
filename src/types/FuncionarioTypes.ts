@@ -53,14 +53,17 @@ export interface SenhaUpdateFuncionarioRequest {
 // -----------------------------------------------------
 
 /**
- * Enum para Status de Ponto
+ * Enum-like objeto para Status de Ponto
  */
-export enum StatusPontoEnum {
-  APROVADO_AUTOMATICO = "APROVADO_AUTOMATICO",
-  APROVADO_MANUAL = "APROVADO_MANUAL",
-  PENDENTE_APROVACAO = "PENDENTE_APROVACAO",
-  REJEITADO = "REJEITADO",
-}
+export const StatusPontoEnum = {
+  APROVADO_AUTOMATICO: "APROVADO_AUTOMATICO",
+  APROVADO_MANUAL: "APROVADO_MANUAL",
+  PENDENTE_APROVACAO: "PENDENTE_APROVACAO",
+  REJEITADO: "REJEITADO",
+} as const;
+
+export type StatusPontoEnum =
+  (typeof StatusPontoEnum)[keyof typeof StatusPontoEnum];
 
 /**
  * DTO de Resposta para a lista de pontos

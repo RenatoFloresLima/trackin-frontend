@@ -6,7 +6,7 @@ import api from "./api";
 export type FiltrosPonto = {
   nome?: string;
   matricula?: string;
-  status?: "AMBOS" | "PENDENTE" | "APROVADO";
+  status?: "AMBOS" | "PENDENTE_APROVACAO" | "APROVADO" | "REJEITADO";
   dataInicio?: string;
   dataFim?: string;
   aba?: "dia" | "pendentes" | "todos";
@@ -14,13 +14,17 @@ export type FiltrosPonto = {
 
 export type RegistroPonto = {
   id: number;
+  funcionarioId: number;
   funcionarioNome: string;
   matricula: string;
-  horario: string;
-  entrada: string;
-  saida: string;
-  status: "PENDENTE" | "APROVADO";
-  sedeId: number;
+  tipo: string;
+  status: "PENDENTE_APROVACAO" | "APROVADO" | "REJEITADO" | string;
+  horario: string | null;
+  horarioCriacao: string | null;
+  sedeId: number | null;
+  sedeNome: string | null;
+  entrada?: string | null;
+  saida?: string | null;
 };
 
 /* ------------------------- Funções ------------------------- */
