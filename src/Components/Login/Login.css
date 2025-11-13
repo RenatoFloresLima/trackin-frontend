@@ -5,8 +5,8 @@
   --primary-hover: #16a085;
   --text-light: #ffffff;
   --text-dark: #2c3e50;
-  --bg-blur: rgba(255, 255, 255, 0.95);
-  --border-blur: rgba(255, 255, 255, 0.5);
+  --bg-blur: #ffffff;
+  --border-blur: rgba(0, 0, 0, 0.08);
   --error-color: #e74c3c;
   --shadow-lg: 0 20px 60px rgba(0, 0, 0, 0.3);
 }
@@ -15,8 +15,6 @@
   width: 420px;
   max-width: 90vw;
   background: var(--bg-blur);
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
   border: 1px solid var(--border-blur);
   border-radius: 20px;
   padding: 48px 40px;
@@ -87,9 +85,9 @@
   width: 100%;
   height: 100%;
   padding: 0 50px 0 20px;
-  border: 2px solid rgba(255, 255, 255, 0.4);
+  border: 2px solid rgba(0, 0, 0, 0.08);
   border-radius: 12px;
-  background: rgba(255, 255, 255, 0.9);
+  background: #ffffff;
   color: var(--text-dark);
   font-size: 16px;
   outline: none;
@@ -104,7 +102,7 @@
 
 .input-field input:focus {
   border-color: var(--primary-color);
-  background: rgba(255, 255, 255, 1);
+  background: #ffffff;
   box-shadow: 0 0 0 4px rgba(26, 188, 156, 0.2);
   transform: translateY(-2px);
 }
@@ -237,9 +235,8 @@
 /* Mensagem de Erro */
 .error-message {
   color: #ffffff;
-  background: rgba(231, 76, 60, 0.9);
-  backdrop-filter: blur(10px);
-  border: 2px solid rgba(231, 76, 60, 0.8);
+  background: rgba(231, 76, 60, 0.95);
+  border: 2px solid rgba(231, 76, 60, 0.85);
   padding: 14px 18px;
   border-radius: 10px;
   text-align: center;
