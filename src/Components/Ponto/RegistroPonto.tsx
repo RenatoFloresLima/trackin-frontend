@@ -1,6 +1,6 @@
 import { useForm } from "react-hook-form";
 import type { SubmitHandler } from "react-hook-form";
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 // ⚠️ ATENÇÃO: Verifique o caminho real para o seu arquivo api.ts
 import api from "../../services/api";
 import { format } from "date-fns";
@@ -15,12 +15,12 @@ import {
   Select,
   MenuItem,
   Button,
-  Grid,
   CircularProgress,
   Alert,
   InputLabel,
   FormControl,
 } from "@mui/material";
+import Grid from "@mui/material/Grid";
 
 import SendIcon from "@mui/icons-material/Send";
 import AccessTimeIcon from "@mui/icons-material/AccessTime";
@@ -213,7 +213,7 @@ const RegistroPonto: React.FC = () => {
             {/* 1. LINHA FIXA 1: Sede(4), Tipo(2), Data(3), Hora(3) = 12 */}
 
             {/* 1.1 Sede (sm=4) - ADICIONADO component="div" para tentar corrigir o erro de tipagem */}
-            <Grid component="div">
+            <Grid size={{ xs: 12, sm: 6, md: 4 }}>
               <FormControl fullWidth error={!!errors.sedeId}>
                 <InputLabel
                   id="sede-label"
@@ -271,7 +271,7 @@ const RegistroPonto: React.FC = () => {
             </Grid>
 
             {/* 1.2 Tipo de Registro (sm=2) */}
-            <Grid>
+            <Grid size={{ xs: 12, sm: 6, md: 2 }}>
               <FormControl fullWidth error={!!errors.tipo}>
                 <InputLabel id="tipo-label">Tipo</InputLabel>
                 <Select
@@ -307,7 +307,7 @@ const RegistroPonto: React.FC = () => {
             </Grid>
 
             {/* 1.3 Data da Batida (sm=3) */}
-            <Grid>
+            <Grid size={{ xs: 12, sm: 6, md: 3 }}>
               <TextField
                 label="Data"
                 type="date"
@@ -330,7 +330,7 @@ const RegistroPonto: React.FC = () => {
             </Grid>
 
             {/* 1.4 Hora da Batida (sm=3) */}
-            <Grid>
+            <Grid size={{ xs: 12, sm: 6, md: 3 }}>
               <TextField
                 label="Hora"
                 type="time"
@@ -354,7 +354,7 @@ const RegistroPonto: React.FC = () => {
 
             {/* 2. LINHA FIXA 2: Matrícula(6) e Senha(6) = 12 */}
 
-            <Grid>
+            <Grid size={{ xs: 12, md: 6 }}>
               <TextField
                 label="Matrícula do Funcionário"
                 type="text"
@@ -376,7 +376,7 @@ const RegistroPonto: React.FC = () => {
               />
             </Grid>
 
-            <Grid>
+            <Grid size={{ xs: 12, md: 6 }}>
               <TextField
                 label="Senha do Funcionário"
                 type="password"
@@ -397,7 +397,7 @@ const RegistroPonto: React.FC = () => {
             </Grid>
 
             {/* 3. LINHA FIXA 3: Justificativa (12) */}
-            <Grid>
+            <Grid size={{ xs: 12 }}>
               <TextField
                 label="Justificativa (Observação)"
                 multiline
@@ -418,7 +418,7 @@ const RegistroPonto: React.FC = () => {
             </Grid>
 
             {/* 4. LINHA FIXA 4: Botão (Centralizado) */}
-            <Grid sx={{ display: "flex", justifyContent: "center" }}>
+            <Grid size={{ xs: 12 }} sx={{ display: "flex", justifyContent: "center" }}>
               <Button
                 type="submit"
                 variant="contained"

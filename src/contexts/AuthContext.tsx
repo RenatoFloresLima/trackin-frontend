@@ -1,10 +1,5 @@
-import React, {
-  createContext,
-  useContext,
-  useState,
-  useEffect,
-  ReactNode,
-} from "react";
+import React, { createContext, useContext, useState, useEffect } from "react";
+import type { ReactNode } from "react";
 import { AxiosError } from "axios"; // Importa o tipo de erro do Axios
 import api from "../services/api"; // O caminho de importação ajustado
 
@@ -25,6 +20,7 @@ interface AuthContextType {
   logout: () => void;
   isAuthenticated: boolean;
   isAdmin: boolean;
+  authLoading: boolean;
 }
 
 // -----------------------------------------------------
@@ -43,7 +39,7 @@ interface AuthProviderProps {
 export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
   const [token, setToken] = useState<string | null>(null);
-  const [loading, setLoading] = useState(true);
+  const [authLoading, setAuthLoading] = useState(true);
 
   useEffect(() => {
     const storedToken = localStorage.getItem("authToken");
@@ -53,7 +49,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       setToken(storedToken);
       setUser(JSON.parse(storedUser));
     }
-    setLoading(false);
+    setAuthLoading(false);
   }, []);
 
   // 1. Função de Login
@@ -103,14 +99,22 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const isAuthenticated = !!user;
   const isAdmin = user?.role === "ROLE_ADMIN";
 
-  if (loading) {
+  if (authLoading) {
     return <div>Carregando sessão...</div>;
   }
 
   // 3. Retorno do Provedor
   return (
     <AuthContext.Provider
-      value={{ user, token, login, logout, isAuthenticated, isAdmin }}
+      value={{
+        user,
+        token,
+        login,
+        logout,
+        isAuthenticated,
+        isAdmin,
+        authLoading,
+      }}
     >
       {children}
     </AuthContext.Provider>
