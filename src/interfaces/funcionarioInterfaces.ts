@@ -25,3 +25,25 @@ export interface FiltrosFuncionario {
   sedePrincipalId: number | null;
   apenasMinhaSede: boolean;
 }
+// Interface simulada para o Admin logado (substitua pelo seu Contexto real)
+export interface UserContext {
+  id: number;
+  perfil: "ADMIN" | "USER" | "SUPER_ADMIN";
+  sede_id: number;
+  nomeSede: string;
+}
+
+export interface FuncionarioDetalheDTO {
+  id: number;
+  nome: string;
+  matricula: string; // Imutável
+  email: string; // Imutável
+  cpf: string; // Imutável
+  endereco: string; // Mutável
+  telefone: string; // Mutável
+  funcaoNome: string; // Imutável (da entidade Funcao)
+  sedePrincipalNome: string; // Imutável (da entidade Sede)
+  status: "ATIVO" | "INATIVO" | "AFASTADO" | "DESLIGADO"; // Imutável
+  dataAdmissao: string; // 'yyyy-mm-dd' - Imutável
+}
+

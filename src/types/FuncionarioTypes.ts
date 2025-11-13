@@ -2,7 +2,7 @@
 
 /**
  * 1. DTO de Resposta para a tela "Meu Perfil" (GET /api/funcionarios/{id})
- * Corresponde ao FuncionarioResponse do backend.
+ * Corresponde ao FuncionarioDetalheResponse do backend.
  */
 export interface FuncionarioDetalheResponse {
   id: number;
@@ -10,25 +10,20 @@ export interface FuncionarioDetalheResponse {
   nome: string;
   email: string;
   cpf: string;
+  dataNascimento: string; // Formato yyyy-MM-dd
   dataContratacao: string; // Formato yyyy-MM-dd
-  dataUltimoDia: string | null; // Formato yyyy-MM-dd (apenas se DESLIGADO)
 
   // Campos Mutáveis
   telefone: string | null;
   endereco: string | null;
 
   // Detalhes da Função e Sede
-  funcaoId: number;
   funcaoNome: string;
-  sedePrincipalId: number;
-  sedePrincipalNome: string; // Nome da sede principal
+  sedeNome: string; // Assumindo que o DTO do backend tem 'sedeNome'
 
   // Detalhes de Acesso
   role: string;
-  status: string; // Status do funcionário (ATIVO, DESLIGADO, etc.)
-  login: string;
-  usuarioAssociado: boolean;
-  templateDigitalCadastrado: boolean;
+  status: "ATIVO" | "DESLIGADO" | "INATIVO" | "AFASTADO";
 }
 
 /**
@@ -60,12 +55,12 @@ export interface SenhaUpdateFuncionarioRequest {
 /**
  * Enum para Status de Ponto
  */
-export const StatusPontoEnum = {
-  APROVADO_AUTOMATICO: "APROVADO_AUTOMATICO",
-  APROVADO_MANUAL: "APROVADO_MANUAL",
-  PENDENTE_APROVACAO: "PENDENTE_APROVACAO",
-  REJEITADO: "REJEITADO",
-} as const;
+export enum StatusPontoEnum {
+  APROVADO_AUTOMATICO = "APROVADO_AUTOMATICO",
+  APROVADO_MANUAL = "APROVADO_MANUAL",
+  PENDENTE_APROVACAO = "PENDENTE_APROVACAO",
+  REJEITADO = "REJEITADO",
+}
 
 /**
  * DTO de Resposta para a lista de pontos
@@ -75,7 +70,7 @@ export interface RegistroPontoDetalheResponse {
   dataRegistro: string; // yyyy-MM-dd
   horaRegistro: string; // HH:mm:ss
   horaSaida: string | null; // HH:mm:ss
-  status: typeof StatusPontoEnum[keyof typeof StatusPontoEnum];
+  status: StatusPontoEnum;
   temSolicitacaoAjuste: boolean;
 }
 

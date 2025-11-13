@@ -3,7 +3,7 @@ import React, {
   useContext,
   useState,
   useEffect,
-  type ReactNode,
+  ReactNode,
 } from "react";
 import { AxiosError } from "axios"; // Importa o tipo de erro do Axios
 import api from "../services/api"; // O caminho de importação ajustado
@@ -16,7 +16,6 @@ interface User {
   login: string;
   // É comum que a role no front-end seja simplificada, mas 'ROLE_' é padrão Spring Security
   role: "ROLE_ADMIN" | "ROLE_FUNCIONARIO" | string;
-  nome?: string; // Primeiro nome do funcionário
 }
 
 interface AuthContextType {
@@ -26,7 +25,6 @@ interface AuthContextType {
   logout: () => void;
   isAuthenticated: boolean;
   isAdmin: boolean;
-  authLoading: boolean;
 }
 
 // -----------------------------------------------------
@@ -66,9 +64,9 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         senha,
       });
 
-      const { token, login: userLogin, role, nome } = response.data;
+      const { token, login: userLogin, role } = response.data;
 
-      const newUser: User = { login: userLogin, role, nome };
+      const newUser: User = { login: userLogin, role };
 
       // Armazenar no estado e no localStorage
       setToken(token);
@@ -112,7 +110,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   // 3. Retorno do Provedor
   return (
     <AuthContext.Provider
-      value={{ user, token, login, logout, isAuthenticated, isAdmin, authLoading: loading }}
+      value={{ user, token, login, logout, isAuthenticated, isAdmin }}
     >
       {children}
     </AuthContext.Provider>

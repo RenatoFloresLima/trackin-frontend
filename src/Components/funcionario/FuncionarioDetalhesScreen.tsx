@@ -57,15 +57,6 @@ const FuncionarioDetalhesScreen: React.FC = () => {
         const result =
           await FuncionarioAPIService.getFuncionarioIdDoUsuarioLogado();
         resolvedFuncId = result.funcionarioId;
-        
-        if (!resolvedFuncId) {
-          setError(
-            "Funcionário não encontrado. Verifique se o usuário está associado a um funcionário."
-          );
-          setLoading(false);
-          return;
-        }
-        
         setFuncionarioId(resolvedFuncId);
       }
 
@@ -75,10 +66,11 @@ const FuncionarioDetalhesScreen: React.FC = () => {
       setFuncionario(data);
     } catch (err: any) {
       console.error("Erro ao buscar perfil:", err);
-      const errorMessage = err.response?.data?.message || 
-                          err.message || 
-                          "Ocorreu um erro inesperado. Por favor, tente novamente mais tarde.";
-      setError(`Falha ao carregar perfil: ${errorMessage}`);
+      setError(
+        "Falha ao carregar perfil: " +
+          (err.response?.data?.message ||
+            "Verifique se o usuário está associado a um funcionário ou o status do servidor.")
+      );
     } finally {
       setLoading(false);
     }
@@ -137,7 +129,7 @@ const FuncionarioDetalhesScreen: React.FC = () => {
   // 2. Renderização da Tela
   return (
     <Box sx={{ p: 4, minHeight: "100vh", bgcolor: "#f4f6f8" }}>
-      <Container maxWidth="xl">
+      <Container maxWidth="lg">
         <Typography
           variant="h4"
           gutterBottom
@@ -152,22 +144,36 @@ const FuncionarioDetalhesScreen: React.FC = () => {
         </Typography>
 
         <Grid container spacing={3}>
-          {/* Dados Pessoais - Fica acima, ocupando toda a largura */}
-          <Grid size={{ xs: 12 }}>
+          <Grid item xs={12} md={4}>
             <Paper
               elevation={0}
-              sx={{ p: 3, border: "1px solid #ddd", mb: 3 }}
+              sx={{ p: 3, height: "100%", border: "1px solid #ddd" }}
             >
+              {/* 🔑 ALTERAÇÃO PRINCIPAL: Passa a função para abrir o modal para o DadosPessoais */}
               <DadosPessoais
                 funcionario={funcionario}
                 onUpdate={handleUpdate}
                 onOpenSenhaModal={() => setIsSenhaModalOpen(true)}
               />
+
+              {/* ❌ REMOVIDO: O divisor e o botão de redefinição de senha da parte inferior */}
+              {/* <Divider sx={{ my: 3 }} /> */}
+              {/* <Box sx={{ display: "flex", justifyContent: "center" }}>
+                <Button
+                  variant="contained"
+                  color="primary"
+                  onClick={() => setIsSenhaModalOpen(true)}
+                  startIcon={<VpnKeyIcon />}
+                  fullWidth
+                  sx={{ borderRadius: "8px" }}
+                >
+                  Redefinir Senha
+                </Button>
+              </Box> */}
             </Paper>
           </Grid>
 
-          {/* Tabela de Pontos - Fica abaixo dos dados pessoais, ocupando toda a largura */}
-          <Grid size={{ xs: 12 }}>
+          <Grid item xs={12} md={8}>
             <Paper elevation={0} sx={{ p: 3, border: "1px solid #ddd" }}>
               <ListaRegistrosPonto funcionarioId={funcionario.id} />
             </Paper>

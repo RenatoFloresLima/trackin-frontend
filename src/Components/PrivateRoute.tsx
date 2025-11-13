@@ -1,7 +1,6 @@
 // src/Components/PrivateRoute.tsx (CÓDIGO COMPLETO A SER UTILIZADO)
 
-import React from "react";
-import type { ReactNode } from "react";
+import React, { type ReactNode } from "react"; // 🔑 ADICIONE ReactNode
 import { Navigate, Outlet, useLocation } from "react-router-dom";
 import { useAuth } from "../contexts/AuthContext";
 
