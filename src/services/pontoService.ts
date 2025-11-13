@@ -17,10 +17,10 @@ export type RegistroPonto = {
   funcionarioNome: string;
   matricula: string;
   horario: string;
-  tipo: string;
-  status: "PENDENTE" | "APROVADO" | "PENDENTE_APROVACAO";
+  entrada: string;
+  saida: string;
+  status: "PENDENTE" | "APROVADO";
   sedeId: number;
-  horarioCriacao: string | null;
 };
 
 /* ------------------------- Funções ------------------------- */
