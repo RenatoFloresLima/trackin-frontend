@@ -9,6 +9,8 @@ import {
   RouterProvider,
   Outlet,
 } from "react-router-dom";
+import { ThemeProvider, CssBaseline, GlobalStyles } from "@mui/material";
+import Box from "@mui/material/Box";
 
 // 🔑 Páginas
 import Login from "./Components/Login/Login";
@@ -20,24 +22,24 @@ import EditarFuncionario from "./Components/funcionario/FuncionarioEdicaoPage";
 import AprovacaoPontoPage from "./Components/Ponto/AprovacaoPontoPage";
 import Sidebar from "./Components/Layout/Sidebar";
 import FuncionarioDetalhesScreen from "./Components/funcionario/FuncionarioDetalhesScreen";
-import HomeRedirector from "./Components/HomeRedirector"; // 🔑 IMPORTANDO O NOVO COMPONENTE
+import HomeRedirector from "./Components/HomeRedirector";
 import SedesListPage from "./Components/sede/SedesListPage";
 import SedeFormPage from "./Components/sede/SedeFormPage";
 
 // Estilos Globais
 import "./App.css";
+import theme from "./theme/theme";
 
 // -----------------------------------------------------
 // Layout para rotas autenticadas com Sidebar
 // -----------------------------------------------------
 const AppLayout: React.FC = () => (
-  // Classe principal para rotas autenticadas (com sidebar)
-  <div className="main-app-layout">
+  <Box className="main-app-layout">
     <Sidebar />
-    <main className="main-content">
+    <Box component="main" className="main-content">
       <Outlet />
-    </main>
-  </div>
+    </Box>
+  </Box>
 );
 
 // -----------------------------------------------------
@@ -59,10 +61,7 @@ const appRouter = createBrowserRouter(
           {/* Rotas gerais (funcionário/admin) */}
           <Route path="/meu-perfil" element={<FuncionarioDetalhesScreen />} />
           <Route path="/ponto" element={<RegistroPonto />} />
-          <Route
-            path="/funcionarios/editar/:id"
-            element={<EditarFuncionario />}
-          />
+          <Route path="/funcionarios/editar/:id" element={<EditarFuncionario />} />
 
           {/* Rotas Admin (Proteção Dupla via PrivateRoute aninhada) */}
           <Route
@@ -127,9 +126,13 @@ const appRouter = createBrowserRouter(
 // -----------------------------------------------------
 function App() {
   return (
-    <AuthProvider>
-      <RouterProvider router={appRouter} />
-    </AuthProvider>
+    <ThemeProvider theme={theme}>
+      <CssBaseline />
+      <GlobalStyles styles={{ body: { backgroundColor: "#f4f6f8" } }} />
+      <AuthProvider>
+        <RouterProvider router={appRouter} />
+      </AuthProvider>
+    </ThemeProvider>
   );
 }
 
