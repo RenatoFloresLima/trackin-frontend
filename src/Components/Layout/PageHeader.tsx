@@ -1,4 +1,4 @@
-import { ReactNode } from "react";
+import type { ReactNode } from "react";
 import { Box, Stack, Typography } from "@mui/material";
 
 interface PageHeaderProps {

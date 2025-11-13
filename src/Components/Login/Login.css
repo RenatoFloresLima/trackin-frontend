@@ -11,10 +11,11 @@
   --shadow-lg: 0 20px 60px rgba(0, 0, 0, 0.3);
 }
 
-.container {
+.App-login-background .container {
   width: 420px;
   max-width: 90vw;
-  background: var(--bg-card);
+  background: #ffffff !important;
+  background-color: #ffffff !important;
   border: 1px solid var(--border-card);
   border-radius: 20px;
   padding: 48px 40px;
@@ -23,6 +24,8 @@
   position: relative;
   z-index: 1;
   animation: slideUp 0.6s ease-out;
+  opacity: 1 !important;
+  backdrop-filter: none !important;
 }
 
 @keyframes slideUp {
@@ -36,12 +39,12 @@
   }
 }
 
-.container:hover {
+.App-login-background .container:hover {
   transform: translateY(-5px);
   box-shadow: 0 25px 70px rgba(0, 0, 0, 0.35);
 }
 
-.container form {
+.App-login-background .container form {
   display: flex;
   flex-direction: column;
 }
@@ -181,11 +184,11 @@
 }
 
 /* Botão de Entrar */
-.container button {
+.App-login-background .container button {
   width: 100%;
   height: 52px;
   background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-hover) 100%);
-  color: var(--text-light);
+  color: #ffffff !important;
   border: none;
   outline: none;
   border-radius: 12px;
@@ -197,9 +200,10 @@
   transition: all 0.3s ease;
   position: relative;
   overflow: hidden;
+  opacity: 1 !important;
 }
 
-.container button::before {
+.App-login-background .container button::before {
   content: "";
   position: absolute;
   top: 50%;
@@ -212,32 +216,40 @@
   transition: width 0.6s, height 0.6s;
 }
 
-.container button:hover::before {
+.App-login-background .container button:hover::before {
   width: 300px;
   height: 300px;
 }
 
-.container button:hover {
+.App-login-background .container button:hover {
   transform: translateY(-2px);
   box-shadow: 0 12px 30px rgba(26, 188, 156, 0.5);
+  color: #ffffff !important;
 }
 
-.container button:active {
+.App-login-background .container button:active {
   transform: translateY(0);
+  color: #ffffff !important;
 }
 
-.container button:disabled {
+.App-login-background .container button:disabled {
   opacity: 0.6;
   cursor: not-allowed;
   transform: none;
+  color: #ffffff !important;
+}
+
+/* Garantir que o texto do botão seja branco em todos os casos */
+.App-login-background .container button,
+.App-login-background .container button * {
+  color: #ffffff !important;
 }
 
 /* Mensagem de Erro */
 .error-message {
   color: #ffffff;
-  background: rgba(231, 76, 60, 0.9);
-  backdrop-filter: blur(10px);
-  border: 2px solid rgba(231, 76, 60, 0.8);
+  background: #e74c3c;
+  border: 2px solid #c0392b;
   padding: 14px 18px;
   border-radius: 10px;
   text-align: center;
@@ -245,6 +257,8 @@
   font-size: 14px;
   font-weight: 500;
   animation: shake 0.5s ease;
+  opacity: 1;
+  backdrop-filter: none !important;
 }
 
 @keyframes shake {
@@ -261,7 +275,7 @@
 
 /* Responsividade */
 @media (max-width: 480px) {
-  .container {
+  .App-login-background .container {
     width: 95%;
     padding: 36px 28px;
   }
@@ -274,19 +288,19 @@
     height: 50px;
   }
 
-  .container button {
+  .App-login-background .container button {
     height: 48px;
     font-size: 16px;
   }
 }
 
 /* Efeito de loading no botão */
-.container button.loading {
+.App-login-background .container button.loading {
   pointer-events: none;
   opacity: 0.8;
 }
 
-.container button.loading::after {
+.App-login-background .container button.loading::after {
   content: "";
   position: absolute;
   width: 20px;
