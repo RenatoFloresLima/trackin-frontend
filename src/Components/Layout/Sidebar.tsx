@@ -10,7 +10,6 @@ import {
   FaCheckCircle,
   FaUserCircle,
   FaBuilding,
-  FaBriefcase,
 } from "react-icons/fa";
 import { Box, Typography, Avatar, Divider, Tooltip } from "@mui/material";
 import "./Sidebar.css";
@@ -20,7 +19,6 @@ const Sidebar: React.FC = () => {
   const location = useLocation();
   const userRole = user?.role;
 
-  // Itens de navegação
   const navItems = [
     {
       path: "/meu-perfil",
@@ -58,35 +56,26 @@ const Sidebar: React.FC = () => {
       icon: FaBuilding,
       roles: ["ROLE_ADMIN"],
     },
-    {
-      path: "/funcoes",
-      label: "Funções",
-      icon: FaBriefcase,
-      roles: ["ROLE_ADMIN"],
-    },
   ];
 
-  // Filtra itens com base na role do usuário
   const filteredNavItems = navItems.filter((item) => {
     if (!isAuthenticated || !userRole) return false;
     return item.roles.includes(userRole);
   });
 
-  // Obtém iniciais do usuário para o avatar
+  const userDisplayName = user?.login ?? "Usuário";
+
   const getUserInitials = () => {
-    if (user?.nome) {
-      const names = user.nome.split(" ");
-      if (names.length >= 2) {
-        return `${names[0][0]}${names[names.length - 1][0]}`.toUpperCase();
-      }
-      return user.nome.substring(0, 2).toUpperCase();
+    if (!userDisplayName) return "U";
+    const parts = userDisplayName.split(/[\s.@_-]+/).filter(Boolean);
+    if (parts.length >= 2) {
+      return `${parts[0][0]}${parts[parts.length - 1][0]}`.toUpperCase();
     }
-    return "U";
+    return userDisplayName.substring(0, 2).toUpperCase();
   };
 
   return (
     <nav className="sidebar-container">
-      {/* Header com Logo */}
       <Box className="sidebar-header">
         <Box className="logo-container">
           <Box className="logo-icon">T</Box>
@@ -98,14 +87,13 @@ const Sidebar: React.FC = () => {
 
       <Divider className="sidebar-divider" />
 
-      {/* Informações do Usuário */}
       <Box className="sidebar-user-info">
         <Avatar className="user-avatar" sx={{ bgcolor: "#1abc9c" }}>
           {getUserInitials()}
         </Avatar>
         <Box className="user-details">
           <Typography variant="body2" className="user-name" noWrap>
-            {user?.nome || "Usuário"}
+            {userDisplayName}
           </Typography>
           <Typography variant="caption" className="user-role" noWrap>
             {userRole === "ROLE_ADMIN" ? "Administrador" : "Funcionário"}
@@ -115,10 +103,9 @@ const Sidebar: React.FC = () => {
 
       <Divider className="sidebar-divider" />
 
-      {/* Menu de Navegação */}
       <Box className="sidebar-menu" component="ul">
         {filteredNavItems.map((item) => {
-          const isActive = location.pathname === item.path;
+          const isActive = location.pathname.startsWith(item.path);
           return (
             <li key={item.path} className="sidebar-menu-item">
               <Tooltip title={item.label} placement="right" arrow>
@@ -136,7 +123,6 @@ const Sidebar: React.FC = () => {
         })}
       </Box>
 
-      {/* Footer com Botão de Logout */}
       <Box className="sidebar-footer">
         <Divider className="sidebar-divider" />
         <Tooltip title="Sair" placement="right" arrow>
