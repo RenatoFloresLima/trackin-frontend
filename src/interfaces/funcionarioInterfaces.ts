@@ -21,7 +21,7 @@ export interface FuncionarioAPI {
 
 export interface FiltrosFuncionario {
   termoBusca: string; // Para pesquisa por nome, matrícula, e-mail (geral)
-  funcaoNome: string;
+  funcaoNome: string | null;
   sedePrincipalId: number | null;
   apenasMinhaSede: boolean;
 }
@@ -45,5 +45,15 @@ export interface FuncionarioDetalheDTO {
   sedePrincipalNome: string; // Imutável (da entidade Sede)
   status: "ATIVO" | "INATIVO" | "AFASTADO" | "DESLIGADO"; // Imutável
   dataAdmissao: string; // 'yyyy-mm-dd' - Imutável
+}
+
+export interface Sede {
+  id: number;
+  nome: string;
+}
+
+export interface Funcao {
+  id: number;
+  nome: string;
 }
 

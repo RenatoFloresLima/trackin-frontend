@@ -1,15 +1,14 @@
 // src/Components/funcionario/lista/FiltroFuncionarios.tsx
 import React, { type ChangeEvent, useState, useEffect } from "react";
-import {
-  TextField,
-  Grid,
-  InputAdornment,
-  Paper,
-  FormControl,
-  InputLabel,
-  Select,
-  MenuItem,
-} from "@mui/material";
+import Grid from "@mui/material/Grid";
+import TextField from "@mui/material/TextField";
+import InputAdornment from "@mui/material/InputAdornment";
+import Paper from "@mui/material/Paper";
+import FormControl from "@mui/material/FormControl";
+import InputLabel from "@mui/material/InputLabel";
+import Select from "@mui/material/Select";
+import type { SelectChangeEvent } from "@mui/material/Select";
+import MenuItem from "@mui/material/MenuItem";
 import SearchIcon from "@mui/icons-material/Search";
 
 // ✅ Importa a API e as tipagens
@@ -73,38 +72,28 @@ const FiltroFuncionarios: React.FC<FiltroFuncionariosProps> = ({
   // ------------------------------------------
   // HANDLER DE MUDANÇA (Genérico e CORRIGIDO para Select e Text)
   // ------------------------------------------
-  const handleChange = (
-    // Tipagem que cobre TextFields e Selects do MUI
-    event: React.ChangeEvent<
-      | HTMLInputElement
-      | HTMLTextAreaElement
-      | { name?: string | undefined; value: unknown }
-    >
+  const handleTextChange = (
+    event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
   ) => {
-    const target = event.target as { name: string; value: unknown };
-    const name = target.name;
-    const value = target.value;
+    const { name, value } = event.target;
+    if (!name) return;
 
-    if (name) {
-      const valueAsString = String(value);
-      let finalValue: string | number | null = null;
+    onFiltroChange({ [name]: value } as Partial<FiltrosFuncionario>);
+  };
 
-      if (name === "sedePrincipalId") {
-        // ID numérico ou null (para "Todas as Sedes")
-        // O valor do select é o ID numérico, ou "" para 'Todas as Sedes'
-        finalValue = valueAsString === "" ? null : Number(valueAsString);
-      } else if (name === "funcaoNome") {
-        // String do nome da função ou null (para "Todas as Funções")
-        // O valor do select é o nome da função, ou "" para 'Todas as Funções'
-        finalValue = valueAsString === "" ? null : valueAsString;
-      } else if (name === "termoBusca") {
-        // String do termo de busca
-        finalValue = valueAsString;
-      }
+  const handleSelectChange = (event: SelectChangeEvent<string>) => {
+    const { name, value } = event.target;
+    if (!name) return;
 
-      // Atualiza o estado de filtros no componente pai
-      onFiltroChange({ [name]: finalValue } as Partial<FiltrosFuncionario>);
+    let finalValue: string | number | null = null;
+
+    if (name === "sedePrincipalId") {
+      finalValue = value === "" ? null : Number(value);
+    } else if (name === "funcaoNome") {
+      finalValue = value === "" ? null : value;
     }
+
+    onFiltroChange({ [name]: finalValue } as Partial<FiltrosFuncionario>);
   };
 
   // Renderiza uma mensagem de loading enquanto busca os dados
@@ -123,13 +112,13 @@ const FiltroFuncionarios: React.FC<FiltroFuncionariosProps> = ({
     <Paper elevation={1} sx={{ p: 2, mb: 2 }}>
       <Grid container spacing={2} alignItems="center">
         {/* 1. Campo de Pesquisa Geral (Nome, Matrícula) */}
-        <Grid item xs={12} sm={6} md={4}>
+        <Grid size={{ xs: 12, sm: 6, md: 4 }}>
           <TextField
             fullWidth
             label="Pesquisar por Nome, Matrícula ou E-mail"
             name="termoBusca"
             value={filtros.termoBusca}
-            onChange={handleChange}
+            onChange={handleTextChange}
             variant="outlined"
             size="small"
             InputProps={{
@@ -143,15 +132,15 @@ const FiltroFuncionarios: React.FC<FiltroFuncionariosProps> = ({
         </Grid>
 
         {/* 2. SELECT FUNÇÃO (Filtro por nome da função) */}
-        <Grid item xs={12} sm={6} md={4}>
+        <Grid size={{ xs: 12, sm: 6, md: 4 }}>
           <FormControl fullWidth size="small">
             <InputLabel>Filtrar por Função</InputLabel>
             <Select
               label="Filtrar por Função"
               name="funcaoNome"
               // O valor do filtro é a string do nome da função, ou '' se for null
-              value={filtros.funcaoNome || ""}
-              onChange={handleChange}
+              value={filtros.funcaoNome ?? ""}
+              onChange={handleSelectChange}
             >
               <MenuItem value="">Todas as Funções</MenuItem>
               {funcoes.map((funcao) => (
@@ -164,7 +153,7 @@ const FiltroFuncionarios: React.FC<FiltroFuncionariosProps> = ({
         </Grid>
 
         {/* 3. SELECT SEDE (Filtro por ID da sede) */}
-        <Grid item xs={12} sm={6} md={4}>
+        <Grid size={{ xs: 12, sm: 6, md: 4 }}>
           <FormControl fullWidth size="small">
             <InputLabel>Filtrar por Sede</InputLabel>
             <Select
@@ -172,14 +161,16 @@ const FiltroFuncionarios: React.FC<FiltroFuncionariosProps> = ({
               name="sedePrincipalId"
               // Se o valor for null, o Select deve receber a string vazia ''
               value={
-                filtros.sedePrincipalId === null ? "" : filtros.sedePrincipalId
+                filtros.sedePrincipalId === null
+                  ? ""
+                  : String(filtros.sedePrincipalId)
               }
-              onChange={handleChange}
+              onChange={handleSelectChange}
             >
               <MenuItem value="">Todas as Sedes</MenuItem>
               {sedes.map((sede) => (
                 // O valor é o ID numérico da sede
-                <MenuItem key={sede.id} value={sede.id}>
+                <MenuItem key={sede.id} value={String(sede.id)}>
                   {sede.nome}
                 </MenuItem>
               ))}

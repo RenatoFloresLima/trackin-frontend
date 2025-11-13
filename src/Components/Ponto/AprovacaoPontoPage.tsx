@@ -87,7 +87,7 @@ const AprovacaoPontoPage: React.FC = () => {
    * @returns String formatada ou "-"
    */
   const formatDate = (
-    isoString: string | undefined,
+    isoString: string | null | undefined,
     formatString: string
   ): string => {
     if (!isoString) return "-";
@@ -161,7 +161,10 @@ const AprovacaoPontoPage: React.FC = () => {
       {/* 🔹 Abas */}
       <Tabs
         value={abaAtiva}
-        onChange={(e, newValue) => setAbaAtiva(newValue as any)}
+        onChange={(
+          _,
+          newValue: "dia" | "pendentes" | "todos"
+        ) => setAbaAtiva(newValue)}
         sx={{ mb: 2 }}
       >
         <Tab label="Pontos do Dia" value="dia" />

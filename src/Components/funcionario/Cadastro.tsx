@@ -1,6 +1,6 @@
 import { useForm } from "react-hook-form";
 import type { SubmitHandler } from "react-hook-form";
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 // ❌ REMOVA: import axios from "axios";
 // ✅ ADICIONE: Importa a instância configurada com o token JWT
 import api from "../../services/api";
