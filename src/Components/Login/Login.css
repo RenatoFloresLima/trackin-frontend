@@ -1,66 +1,112 @@
-/* src/Components/Login/Login.css - Layout Profissional */
+/* src/Components/Login/Login.css - Design Moderno e Profissional */
 
 :root {
-  --primary-color: #1abc9c; /* Cor de destaque (do seu sidebar) */
-  --text-light: #ecf0f1;
-  --text-dark: #34495e;
-  --bg-blur: rgba(255, 255, 255, 0.1); /* Menos opaco para mais elegância */
-  --border-blur: rgba(255, 255, 255, 0.3);
+  --primary-color: #1abc9c;
+  --primary-hover: #16a085;
+  --text-light: #ffffff;
+  --text-dark: #2c3e50;
+  --bg-blur: rgba(255, 255, 255, 0.95);
+  --border-blur: rgba(255, 255, 255, 0.5);
+  --error-color: #e74c3c;
+  --shadow-lg: 0 20px 60px rgba(0, 0, 0, 0.3);
 }
 
 .container {
-  width: 400px; /* Levemente mais estreito */
-  background-color: var(--bg-blur);
-  backdrop-filter: blur(12px); /* Blur mais forte */
-  border: 1px solid var(--border-blur); /* Borda mais fina */
-  border-radius: 12px;
-  padding: 40px;
-  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3); /* Sombra suave para profundidade */
-  transition: transform 0.3s ease;
+  width: 420px;
+  max-width: 90vw;
+  background: var(--bg-blur);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid var(--border-blur);
+  border-radius: 20px;
+  padding: 48px 40px;
+  box-shadow: var(--shadow-lg);
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  z-index: 1;
+  animation: slideUp 0.6s ease-out;
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .container:hover {
-  transform: translateY(-5px); /* Efeito de elevação sutil */
+  transform: translateY(-5px);
+  box-shadow: 0 25px 70px rgba(0, 0, 0, 0.35);
 }
 
-.container h1 {
+.container form {
+  display: flex;
+  flex-direction: column;
+}
+
+.logo-text {
   text-align: center;
-  margin-bottom: 35px;
-  color: var(--text-light);
-  font-size: 2.2rem;
-  font-weight: 300; /* Título mais leve */
-  letter-spacing: 1px; /* Espaçamento para o título */
+  margin-bottom: 40px;
+  color: var(--text-dark);
+  font-size: 2.5rem;
+  font-weight: 700;
+  letter-spacing: 2px;
+  text-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-hover) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  position: relative;
 }
 
-/* Campo de Input e Ícone */
-.container .input-field {
+.logo-text::after {
+  content: "";
+  position: absolute;
+  bottom: -10px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 60px;
+  height: 4px;
+  background: linear-gradient(90deg, transparent, var(--primary-color), transparent);
+  border-radius: 2px;
+}
+
+/* Campo de Input */
+.input-field {
   position: relative;
   width: 100%;
-  height: 55px; /* Mais alto */
-  margin: 25px auto;
+  height: 56px;
+  margin: 20px 0;
 }
 
 .input-field input {
   width: 100%;
   height: 100%;
-  padding: 0 15px 0 20px; /* Ajusta o padding para melhor alinhamento */
-  border: 1px solid var(--border-blur);
-  border-radius: 8px; /* Cantos menos arredondados (mais corporativo) */
-  background-color: rgba(255, 255, 255, 0.05); /* Fundo sutil no campo */
-  color: var(--text-light);
+  padding: 0 50px 0 20px;
+  border: 2px solid rgba(255, 255, 255, 0.4);
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.9);
+  color: var(--text-dark);
   font-size: 16px;
   outline: none;
   transition: all 0.3s ease;
-}
-
-/* Destaque ao Foco */
-.input-field input:focus {
-  border-color: var(--primary-color);
-  box-shadow: 0 0 8px rgba(26, 188, 156, 0.5); /* Sombra de foco */
+  font-weight: 500;
 }
 
 .input-field input::placeholder {
-  color: rgba(255, 255, 255, 0.7); /* Placeholder mais suave */
+  color: rgba(44, 62, 80, 0.6);
+  font-weight: 400;
+}
+
+.input-field input:focus {
+  border-color: var(--primary-color);
+  background: rgba(255, 255, 255, 1);
+  box-shadow: 0 0 0 4px rgba(26, 188, 156, 0.2);
+  transform: translateY(-2px);
 }
 
 .input-field .icon {
@@ -68,80 +114,197 @@
   right: 20px;
   top: 50%;
   transform: translateY(-50%);
-  font-size: 1.1rem;
-  color: rgba(255, 255, 255, 0.8);
-  pointer-events: none; /* Garante que o ícone não interfira no clique */
+  font-size: 1.2rem;
+  color: rgba(44, 62, 80, 0.7);
+  pointer-events: none;
+  transition: all 0.3s ease;
+}
+
+.input-field input:focus + .icon {
+  color: var(--primary-color);
+  transform: translateY(-50%) scale(1.1);
 }
 
 /* Lembrete e Esqueci a Senha */
-.container .recall-forget {
+.recall-forget {
   display: flex;
   justify-content: space-between;
-  font-size: 14px;
-  margin: 5px 0 25px; /* Mais espaçamento */
   align-items: center;
+  font-size: 14px;
+  margin: 10px 0 30px;
 }
 
 .recall-forget label {
-  color: var(--text-light);
+  color: var(--text-dark);
   cursor: pointer;
   display: flex;
   align-items: center;
-}
-
-.recall-forget input {
-  margin-right: 8px;
-  /* Estilo para checkbox */
-  accent-color: var(--primary-color);
-}
-
-.recall-forget a {
-  color: var(--text-light);
-  text-decoration: none;
   font-weight: 500;
   transition: color 0.2s;
 }
 
+.recall-forget label:hover {
+  color: var(--primary-color);
+}
+
+.recall-forget input[type="checkbox"] {
+  margin-right: 8px;
+  width: 18px;
+  height: 18px;
+  accent-color: var(--primary-color);
+  cursor: pointer;
+}
+
+.recall-forget a {
+  color: var(--text-dark);
+  text-decoration: none;
+  font-weight: 600;
+  transition: all 0.2s;
+  position: relative;
+}
+
+.recall-forget a::after {
+  content: "";
+  position: absolute;
+  bottom: -2px;
+  left: 0;
+  width: 0;
+  height: 2px;
+  background: var(--primary-color);
+  transition: width 0.3s ease;
+}
+
 .recall-forget a:hover {
-  color: var(--primary-color); /* Destaque no hover */
-  text-decoration: underline;
+  color: var(--primary-color);
+}
+
+.recall-forget a:hover::after {
+  width: 100%;
 }
 
 /* Botão de Entrar */
 .container button {
   width: 100%;
-  height: 50px;
-  background-color: var(--primary-color); /* Usa a cor de destaque */
-  color: var(--text-dark); /* Texto escuro no botão claro para contraste */
+  height: 52px;
+  background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-hover) 100%);
+  color: var(--text-light);
   border: none;
   outline: none;
-  border-radius: 8px;
+  border-radius: 12px;
   cursor: pointer;
   font-size: 17px;
-  font-weight: bold;
+  font-weight: 600;
   letter-spacing: 0.5px;
-  box-shadow: 0 4px 10px rgba(26, 188, 156, 0.4); /* Sombra para destacar o botão */
-  transition: background-color 0.2s, box-shadow 0.2s;
+  box-shadow: 0 8px 20px rgba(26, 188, 156, 0.4);
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.container button::before {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 0;
+  height: 0;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.3);
+  transform: translate(-50%, -50%);
+  transition: width 0.6s, height 0.6s;
+}
+
+.container button:hover::before {
+  width: 300px;
+  height: 300px;
 }
 
 .container button:hover {
-  background-color: #16a085; /* Cor um pouco mais escura no hover */
-  box-shadow: 0 6px 15px rgba(26, 188, 156, 0.6);
+  transform: translateY(-2px);
+  box-shadow: 0 12px 30px rgba(26, 188, 156, 0.5);
+}
+
+.container button:active {
+  transform: translateY(0);
 }
 
 .container button:disabled {
-  opacity: 0.7;
+  opacity: 0.6;
   cursor: not-allowed;
+  transform: none;
 }
 
 /* Mensagem de Erro */
 .error-message {
-  color: #e74c3c; /* Vermelho padrão para erros */
-  background-color: rgba(231, 76, 60, 0.1);
-  border: 1px solid #e74c3c;
-  padding: 10px;
-  border-radius: 5px;
+  color: #ffffff;
+  background: rgba(231, 76, 60, 0.9);
+  backdrop-filter: blur(10px);
+  border: 2px solid rgba(231, 76, 60, 0.8);
+  padding: 14px 18px;
+  border-radius: 10px;
   text-align: center;
-  margin-bottom: 15px;
+  margin-bottom: 20px;
   font-size: 14px;
+  font-weight: 500;
+  animation: shake 0.5s ease;
+}
+
+@keyframes shake {
+  0%, 100% {
+    transform: translateX(0);
+  }
+  25% {
+    transform: translateX(-10px);
+  }
+  75% {
+    transform: translateX(10px);
+  }
+}
+
+/* Responsividade */
+@media (max-width: 480px) {
+  .container {
+    width: 95%;
+    padding: 36px 28px;
+  }
+
+  .logo-text {
+    font-size: 2rem;
+  }
+
+  .input-field {
+    height: 50px;
+  }
+
+  .container button {
+    height: 48px;
+    font-size: 16px;
+  }
+}
+
+/* Efeito de loading no botão */
+.container button.loading {
+  pointer-events: none;
+  opacity: 0.8;
+}
+
+.container button.loading::after {
+  content: "";
+  position: absolute;
+  width: 20px;
+  height: 20px;
+  top: 50%;
+  left: 50%;
+  margin-left: -10px;
+  margin-top: -10px;
+  border: 3px solid rgba(255, 255, 255, 0.3);
+  border-top-color: white;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
 }
