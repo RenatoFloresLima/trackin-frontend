@@ -1,30 +1,14 @@
 import { useForm } from "react-hook-form";
 import type { SubmitHandler } from "react-hook-form";
 import { useState, useEffect } from "react";
-// ❌ REMOVA: import axios from "axios";
-// ✅ ADICIONE: Importa a instância configurada com o token JWT
 import api from "../../services/api";
 import "./Cadastro.css";
+import type { SedeDTO } from "../../types/SedeTypes";
 
-// ------------------------------------------
-// Constantes de API
-// ------------------------------------------
-// Usamos apenas o path relativo, pois o baseURL (http://localhost:8080) já está no api.ts
 const API_BASE_URL = "/api";
 const API_FUNCIONARIOS = `${API_BASE_URL}/funcionarios`;
 const API_SEDES = `${API_BASE_URL}/sedes`;
 const API_FUNCOES = `${API_BASE_URL}/funcoes`;
-
-// ------------------------------------------
-// Interfaces de Tipagem
-// ------------------------------------------
-
-interface Sede {
-  id: number;
-  nome: string;
-  endereco: string;
-  identificadorUnico: string;
-}
 
 interface Funcao {
   id: number;
@@ -49,7 +33,7 @@ const Cadastro = () => {
   const { register, handleSubmit, reset } = useForm<IFormInput>();
 
   // Estados para Dados Dinâmicos
-  const [sedes, setSedes] = useState<Sede[]>([]);
+  const [sedes, setSedes] = useState<SedeDTO[]>([]);
   const [funcoes, setFuncoes] = useState<Funcao[]>([]);
 
   // Estados para Feedback
@@ -65,11 +49,11 @@ const Cadastro = () => {
       try {
         // 🎯 CORREÇÃO 1: Usando 'api' para buscar dados
         const [sedesResponse, funcoesResponse] = await Promise.all([
-          api.get<Sede[]>(API_SEDES),
+          api.get<SedeDTO[]>(API_SEDES),
           api.get<Funcao[]>(API_FUNCOES),
         ]);
 
-        setSedes(sedesResponse.data);
+        setSedes(sedesResponse.data ?? []);
         setFuncoes(funcoesResponse.data);
 
         setStatus("");

@@ -7,22 +7,12 @@ import type { FC } from "react";
 import { useParams } from "react-router-dom";
 import api from "../../services/api";
 import { useAuth } from "../../contexts/AuthContext";
+import type { SedeDTO } from "../../types/SedeTypes";
 
-// ------------------------------------------
-// Constantes de API
-// ------------------------------------------
 const API_BASE_URL = "/api";
 const API_FUNCIONARIOS = `${API_BASE_URL}/funcionarios`;
 const API_SEDES = `${API_BASE_URL}/sedes`;
 const API_FUNCOES = `${API_BASE_URL}/funcoes`;
-
-// ------------------------------------------
-// Interfaces de Tipagem
-// ------------------------------------------
-interface Sede {
-  id: number;
-  nome: string;
-}
 
 interface Funcao {
   id: number;
@@ -65,7 +55,7 @@ const EdicaoFuncionario: FC = () => {
 
   const { register, handleSubmit, reset } = useForm<IFormInput>();
 
-  const [sedes, setSedes] = useState<Sede[]>([]);
+  const [sedes, setSedes] = useState<SedeDTO[]>([]);
   const [funcoes, setFuncoes] = useState<Funcao[]>([]);
   const [matricula, setMatricula] = useState<string>("");
   const [cpf, setCpf] = useState<string>("");
@@ -87,13 +77,13 @@ const EdicaoFuncionario: FC = () => {
       // 1. Carregar Dados Auxiliares (Sedes e Funções)
       const [sedesResponse, funcoesResponse, funcionarioResponse] =
         await Promise.all([
-          api.get<Sede[]>(API_SEDES),
+          api.get<SedeDTO[]>(API_SEDES),
           api.get<Funcao[]>(API_FUNCOES),
           // 2. Carregar Dados do Funcionário por ID
           api.get<FuncionarioResponse>(`${API_FUNCIONARIOS}/${funcionarioId}`),
         ]);
 
-      setSedes(sedesResponse.data);
+      setSedes(sedesResponse.data ?? []);
       setFuncoes(funcoesResponse.data);
 
       const funcionario = funcionarioResponse.data;

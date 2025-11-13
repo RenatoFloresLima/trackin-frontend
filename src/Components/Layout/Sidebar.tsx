@@ -8,7 +8,8 @@ import {
   FaSignOutAlt,
   FaHome,
   FaCheckCircle,
-  FaUserCircle, // NOVO: Ícone para o perfil
+  FaUserCircle,
+  FaMapMarkerAlt,
 } from "react-icons/fa";
 
 import "./Sidebar.css"; // Assumindo que este arquivo de estilos existe
@@ -49,6 +50,12 @@ const Sidebar: React.FC = () => {
       path: "/lista-funcionarios",
       label: "Funcionários",
       icon: FaHome, // Mudando o ícone, já que FaUserPlus foi para cadastro
+      roles: ["ROLE_ADMIN"],
+    },
+    {
+      path: "/sedes",
+      label: "Sedes",
+      icon: FaMapMarkerAlt,
       roles: ["ROLE_ADMIN"],
     },
   ];
