@@ -1,5 +1,16 @@
 /* src/App.css - Estilos Globais Modernos */
 
+:root {
+  --color-primary: #1abc9c;
+  --color-primary-dark: #16a085;
+  --color-surface: #ffffff;
+  --color-background: #f4f6f8;
+  --color-text: #2c3e50;
+  --shadow-md: 0 24px 45px rgba(15, 23, 42, 0.08);
+  --radius-lg: 20px;
+  --transition-base: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
 /* Reset e Base */
 html,
 body,
@@ -7,10 +18,12 @@ body,
   height: 100%;
   margin: 0;
   padding: 0;
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+    "Helvetica Neue", Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  background-color: #f5f7fa;
+  background-color: var(--color-background);
+  color: var(--color-text);
 }
 
 * {
@@ -19,6 +32,7 @@ body,
 
 /* Layout do Login */
 .App-login-background {
+  position: relative;
   min-height: 100vh;
   width: 100%;
   display: flex;
@@ -28,18 +42,21 @@ body,
   background-size: cover;
   background-position: center;
   background-attachment: fixed;
-  position: relative;
+  padding: 32px 16px;
 }
 
 .App-login-background::before {
   content: "";
   position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: linear-gradient(135deg, rgba(26, 188, 156, 0.9) 0%, rgba(22, 160, 133, 0.85) 100%);
+  inset: 0;
+  background: linear-gradient(135deg, rgba(15, 125, 115, 0.78), rgba(2, 67, 84, 0.82));
+  backdrop-filter: blur(4px);
   z-index: 0;
+}
+
+.App-login-background > * {
+  position: relative;
+  z-index: 1;
 }
 
 /* Scrollbar personalizada */
