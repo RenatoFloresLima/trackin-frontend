@@ -5,7 +5,6 @@ import {
   Typography,
   CircularProgress,
   Alert,
-  Box, // Importado Box
 } from "@mui/material";
 import Grid from "@mui/material/Grid";
 import AccountCircleIcon from "@mui/icons-material/AccountCircle";
@@ -21,6 +20,7 @@ import type {
 import DadosPessoais from "../funcionario/DadosPessoais";
 import ListaRegistrosPonto from "../funcionario/ListaRegistrosPonto";
 import RedefinirSenhaModal from "../funcionario/RedefinirSenhaModal";
+import PageHeader from "../Layout/PageHeader";
 
 const FuncionarioDetalhesScreen: React.FC = () => {
   const { user } = useAuth();
@@ -128,65 +128,53 @@ const FuncionarioDetalhesScreen: React.FC = () => {
 
   // 2. Renderização da Tela
   return (
-    <Box sx={{ p: 4, minHeight: "100vh", bgcolor: "#f4f6f8" }}>
-      <Container maxWidth="lg">
-        <Typography
-          variant="h4"
-          gutterBottom
-          component="h1"
-          sx={{ color: "#333" }}
-        >
-          <AccountCircleIcon
-            fontSize="inherit"
-            sx={{ mr: 1, verticalAlign: "middle" }}
-          />
-          Meu Perfil
-        </Typography>
+    <Container maxWidth="lg" sx={{ py: 4 }}>
+      <PageHeader
+        title="Meu Perfil"
+        subtitle="Visualize e gerencie seus dados pessoais e registros de ponto"
+        leading={<AccountCircleIcon sx={{ fontSize: 32, color: "primary.main" }} />}
+      />
 
-        <Grid container spacing={3}>
-          <Grid size={{ xs: 12, md: 4 }}>
-            <Paper
-              elevation={0}
-              sx={{ p: 3, height: "100%", border: "1px solid #ddd" }}
-            >
-              {/* 🔑 ALTERAÇÃO PRINCIPAL: Passa a função para abrir o modal para o DadosPessoais */}
-              <DadosPessoais
-                funcionario={funcionario}
-                onUpdate={handleUpdate}
-                onOpenSenhaModal={() => setIsSenhaModalOpen(true)}
-              />
-
-              {/* ❌ REMOVIDO: O divisor e o botão de redefinição de senha da parte inferior */}
-              {/* <Divider sx={{ my: 3 }} /> */}
-              {/* <Box sx={{ display: "flex", justifyContent: "center" }}>
-                <Button
-                  variant="contained"
-                  color="primary"
-                  onClick={() => setIsSenhaModalOpen(true)}
-                  startIcon={<VpnKeyIcon />}
-                  fullWidth
-                  sx={{ borderRadius: "8px" }}
-                >
-                  Redefinir Senha
-                </Button>
-              </Box> */}
-            </Paper>
-          </Grid>
-
-          <Grid size={{ xs: 12, md: 8 }}>
-            <Paper elevation={0} sx={{ p: 3, border: "1px solid #ddd" }}>
-              <ListaRegistrosPonto funcionarioId={funcionario.id} />
-            </Paper>
-          </Grid>
+      <Grid container spacing={3}>
+        {/* Card de Dados Pessoais - Ocupa toda a largura */}
+        <Grid size={{ xs: 12 }}>
+          <Paper
+            elevation={0}
+            sx={{
+              p: 3,
+              borderRadius: 3,
+              border: "1px solid #e0e0e0",
+            }}
+          >
+            <DadosPessoais
+              funcionario={funcionario}
+              onUpdate={handleUpdate}
+              onOpenSenhaModal={() => setIsSenhaModalOpen(true)}
+            />
+          </Paper>
         </Grid>
 
-        <RedefinirSenhaModal
-          open={isSenhaModalOpen}
-          onClose={() => setIsSenhaModalOpen(false)}
-          funcionarioId={funcionario.id}
-        />
-      </Container>
-    </Box>
+        {/* Tabela de Registros de Ponto - Ocupa toda a largura */}
+        <Grid size={{ xs: 12 }}>
+          <Paper
+            elevation={0}
+            sx={{
+              p: 3,
+              borderRadius: 3,
+              border: "1px solid #e0e0e0",
+            }}
+          >
+            <ListaRegistrosPonto funcionarioId={funcionario.id} />
+          </Paper>
+        </Grid>
+      </Grid>
+
+      <RedefinirSenhaModal
+        open={isSenhaModalOpen}
+        onClose={() => setIsSenhaModalOpen(false)}
+        funcionarioId={funcionario.id}
+      />
+    </Container>
   );
 };
 
