@@ -19,7 +19,7 @@ export interface FuncionarioDetalheResponse {
 
   // Detalhes da Função e Sede
   funcaoNome: string;
-  sedeNome: string; // Assumindo que o DTO do backend tem 'sedeNome'
+  sedePrincipalNome: string; // Nome da sede principal do funcionário
 
   // Detalhes de Acesso
   role: string;
