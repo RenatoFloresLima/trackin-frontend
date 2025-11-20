@@ -25,6 +25,8 @@ import FuncionarioDetalhesScreen from "./Components/funcionario/FuncionarioDetal
 import HomeRedirector from "./Components/HomeRedirector";
 import SedesListPage from "./Components/sede/SedesListPage";
 import SedeFormPage from "./Components/sede/SedeFormPage";
+import FuncoesListPage from "./Components/funcao/FuncoesListPage";
+import FuncaoFormPage from "./Components/funcao/FuncaoFormPage";
 
 // Estilos Globais
 import "./App.css";
@@ -109,6 +111,30 @@ const appRouter = createBrowserRouter(
             element={
               <PrivateRoute roles={["ROLE_ADMIN"]}>
                 <SedeFormPage />
+              </PrivateRoute>
+            }
+          />
+          <Route
+            path="/funcoes"
+            element={
+              <PrivateRoute roles={["ROLE_ADMIN"]}>
+                <FuncoesListPage />
+              </PrivateRoute>
+            }
+          />
+          <Route
+            path="/funcoes/nova"
+            element={
+              <PrivateRoute roles={["ROLE_ADMIN"]}>
+                <FuncaoFormPage />
+              </PrivateRoute>
+            }
+          />
+          <Route
+            path="/funcoes/:id/editar"
+            element={
+              <PrivateRoute roles={["ROLE_ADMIN"]}>
+                <FuncaoFormPage />
               </PrivateRoute>
             }
           />
