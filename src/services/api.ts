@@ -1,7 +1,42 @@
 import axios from "axios";
 
-const API_BASE_URL =
-  import.meta.env.VITE_API_BASE_URL ?? "http://localhost:8080";
+/**
+ * Detecta o ambiente e define a URL base da API
+ * Prioridade:
+ * 1. Variável de ambiente VITE_API_BASE_URL (configurada no Vercel)
+ * 2. Detecção automática: se estiver em produção (não localhost), usa o backend em produção
+ * 3. Fallback: localhost para desenvolvimento local
+ */
+const getApiBaseUrl = (): string => {
+  // 1. Prioridade: variável de ambiente (configurada no Vercel ou .env)
+  if (import.meta.env.VITE_API_BASE_URL) {
+    return import.meta.env.VITE_API_BASE_URL;
+  }
+
+  // 2. Detecta se está em produção (Vercel ou outro servidor)
+  if (typeof window !== "undefined") {
+    const hostname = window.location.hostname;
+    const isProduction = 
+      hostname !== "localhost" && 
+      hostname !== "127.0.0.1" &&
+      !hostname.includes("localhost");
+
+    if (isProduction) {
+      // URL do backend em produção (Render)
+      return "https://trackin-4aao.onrender.com";
+    }
+  }
+
+  // 3. Desenvolvimento local
+  return "http://localhost:8080";
+};
+
+const API_BASE_URL = getApiBaseUrl();
+
+// Log para debug (apenas em desenvolvimento)
+if (import.meta.env.DEV) {
+  console.log("🔧 API Base URL configurada:", API_BASE_URL);
+}
 
 const api = axios.create({
   baseURL: API_BASE_URL,
