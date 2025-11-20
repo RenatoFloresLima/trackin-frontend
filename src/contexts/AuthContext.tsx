@@ -11,6 +11,8 @@ interface User {
   login: string;
   // É comum que a role no front-end seja simplificada, mas 'ROLE_' é padrão Spring Security
   role: "ROLE_ADMIN" | "ROLE_FUNCIONARIO" | string;
+  nome?: string | null; // Primeiro nome do funcionário
+  funcaoNome?: string | null; // Nome da função do funcionário
 }
 
 interface AuthContextType {
@@ -60,9 +62,14 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         senha,
       });
 
-      const { token, login: userLogin, role } = response.data;
+      const { token, login: userLogin, role, nome, funcaoNome } = response.data;
 
-      const newUser: User = { login: userLogin, role };
+      const newUser: User = { 
+        login: userLogin, 
+        role,
+        nome: nome || null,
+        funcaoNome: funcaoNome || null
+      };
 
       // Armazenar no estado e no localStorage
       setToken(token);
