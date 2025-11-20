@@ -119,20 +119,15 @@ const SedesListPage = () => {
                     <TableRow key={sede.id} hover>
                       <TableCell>
                         <Typography fontWeight={600}>{sede.nome}</Typography>
-                      </TableCell>
-                      <TableCell>{sede.endereco ?? "—"}</TableCell>
-                      <TableCell align="center">
+                      </TableCell><TableCell>{sede.endereco ?? "—"}</TableCell><TableCell align="center">
                         {sede.latitude?.toFixed(6) ?? "—"}
-                      </TableCell>
-                      <TableCell align="center">
+                      </TableCell><TableCell align="center">
                         {sede.longitude?.toFixed(6) ?? "—"}
-                      </TableCell>
-                      <TableCell align="center">
+                      </TableCell><TableCell align="center">
                         {sede.raioPermitido != null
                           ? sede.raioPermitido.toFixed(2)
                           : "—"}
-                      </TableCell>
-                      <TableCell align="center">
+                      </TableCell><TableCell align="center">
                         {comGeo ? (
                           <Chip
                             size="small"
@@ -149,8 +144,7 @@ const SedesListPage = () => {
                             />
                           </Tooltip>
                         )}
-                      </TableCell>
-                      <TableCell align="right">
+                      </TableCell><TableCell align="right">
                         <Tooltip title="Editar sede">
                           <IconButton
                             color="primary"
