@@ -70,7 +70,11 @@ const Sidebar: React.FC = () => {
     return item.roles.includes(userRole);
   });
 
-  const userDisplayName = user?.login ?? "Usuário";
+  // Exibe o primeiro nome do usuário, ou fallback para login
+  const userDisplayName = user?.nome ?? user?.login ?? "Usuário";
+  
+  // Exibe o nome da função, ou fallback para role traduzida
+  const userFuncao = user?.funcaoNome ?? (userRole === "ROLE_ADMIN" ? "Administrador" : "Funcionário");
 
   const getUserInitials = () => {
     if (!userDisplayName) return "U";
@@ -103,7 +107,7 @@ const Sidebar: React.FC = () => {
             {userDisplayName}
           </Typography>
           <Typography variant="caption" className="user-role" noWrap>
-            {userRole === "ROLE_ADMIN" ? "Administrador" : "Funcionário"}
+            {userFuncao}
           </Typography>
         </Box>
       </Box>
