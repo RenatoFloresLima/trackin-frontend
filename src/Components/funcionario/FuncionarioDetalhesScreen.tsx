@@ -27,8 +27,6 @@ const FuncionarioDetalhesScreen: React.FC = () => {
 
   const userLogado = user?.login;
 
-  const [funcionarioId, setFuncionarioId] = useState<number | null>(null);
-
   const [funcionario, setFuncionario] =
     useState<FuncionarioDetalheResponse | null>(null);
 
@@ -50,19 +48,9 @@ const FuncionarioDetalhesScreen: React.FC = () => {
       return;
     }
 
-    let resolvedFuncId = funcionarioId;
-
     try {
-      if (!resolvedFuncId) {
-        const result =
-          await FuncionarioAPIService.getFuncionarioIdDoUsuarioLogado();
-        resolvedFuncId = result.funcionarioId;
-        setFuncionarioId(resolvedFuncId);
-      }
-
-      const data = await FuncionarioAPIService.getDetalhesFuncionario(
-        resolvedFuncId
-      );
+      // Usa o novo endpoint que retorna os detalhes completos do funcionário logado
+      const data = await FuncionarioAPIService.getDetalhesFuncionarioLogado();
       setFuncionario(data);
     } catch (err: any) {
       console.error("Erro ao buscar perfil:", err);
@@ -74,7 +62,7 @@ const FuncionarioDetalhesScreen: React.FC = () => {
     } finally {
       setLoading(false);
     }
-  }, [userLogado, funcionarioId]);
+  }, [userLogado]);
 
   useEffect(() => {
     fetchFuncionarioData();
