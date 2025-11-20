@@ -94,4 +94,15 @@ export const FuncionarioAPIService = {
     );
     return response.data;
   },
+
+  /**
+   * Busca os detalhes completos do funcionário logado, incluindo registros de ponto.
+   * Usa o endpoint /api/funcionarios/perfil-logado/detalhes que não requer ROLE_ADMIN.
+   */
+  getDetalhesFuncionarioLogado: async (): Promise<FuncionarioDetalheResponse> => {
+    const response = await api.get<FuncionarioDetalheResponse>(
+      `/api/funcionarios/perfil-logado/detalhes`
+    );
+    return response.data;
+  },
 };

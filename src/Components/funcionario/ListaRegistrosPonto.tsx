@@ -276,21 +276,15 @@ const ListaRegistrosPonto: React.FC<ListaRegistrosPontoProps> = ({
                         <Typography variant="body2" fontWeight={pendente ? 600 : 400}>
                           {date || "-"}
                         </Typography>
-                      </TableCell>
-
-                      <TableCell>
+                      </TableCell><TableCell>
                         <Typography variant="body2">
                           {time || "-"}
                         </Typography>
-                      </TableCell>
-
-                      <TableCell>
+                      </TableCell><TableCell>
                         <Typography variant="body2">
                           {formatTipoRegistro(registro.tipo || "")}
                         </Typography>
-                      </TableCell>
-
-                      <TableCell>
+                      </TableCell><TableCell>
                         <Chip
                           label={getStatusLabel(registro.status || "")}
                           color={getStatusColor(registro.status || "")}
@@ -301,9 +295,7 @@ const ListaRegistrosPonto: React.FC<ListaRegistrosPontoProps> = ({
                             ) : undefined
                           }
                         />
-                      </TableCell>
-
-                      <TableCell>
+                      </TableCell><TableCell>
                         {pendente && registro.observacao ? (
                           <Tooltip title={registro.observacao} arrow>
                             <Box
