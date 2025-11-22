@@ -3,40 +3,46 @@ import axios from "axios";
 /**
  * Detecta o ambiente e define a URL base da API
  * Prioridade:
- * 1. Variável de ambiente VITE_API_BASE_URL (configurada no Vercel)
- * 2. Detecção automática: se estiver em produção (não localhost), usa o backend em produção
+ * 1. Variável de ambiente VITE_API_BASE_URL (configurada no build ou runtime)
+ * 2. Detecção automática: usa o mesmo hostname/porta do frontend com porta 8081 do backend
  * 3. Fallback: localhost para desenvolvimento local
  */
 const getApiBaseUrl = (): string => {
-  // 1. Prioridade: variável de ambiente (configurada no Vercel ou .env)
-  if (import.meta.env.VITE_API_BASE_URL) {
-    return import.meta.env.VITE_API_BASE_URL;
+  // 1. Prioridade: variável de ambiente (configurada no .env ou no momento do build)
+  const envUrl = import.meta.env.VITE_API_BASE_URL;
+  if (envUrl) {
+    console.log("🔧 Usando URL da API de variável de ambiente:", envUrl);
+    return envUrl;
   }
 
-  // 2. Detecta se está em produção (Vercel ou outro servidor)
+  // 2. Detecta automaticamente baseado no hostname atual
   if (typeof window !== "undefined") {
-    const hostname = window.location.hostname;
-    const isProduction = 
-      hostname !== "localhost" && 
-      hostname !== "127.0.0.1" &&
-      !hostname.includes("localhost");
+    const { hostname, protocol } = window.location;
+    const isLocalhost = 
+      hostname === "localhost" || 
+      hostname === "127.0.0.1" ||
+      hostname.includes("localhost");
 
-    if (isProduction) {
-      // URL do backend em produção (Render)
-      return "https://trackin-4aao.onrender.com";
+    if (!isLocalhost) {
+      // Em produção (VPS), usa o mesmo IP/domínio com a porta do backend (8081)
+      // Se estiver na mesma VPS, pode usar hostname, senão precisa do IP completo
+      const baseUrl = `${protocol}//${hostname}:8081`;
+      console.log("🔧 Detectada produção, usando URL da API:", baseUrl);
+      return baseUrl;
     }
   }
 
-  // 3. Desenvolvimento local
-  return "http://localhost:8080";
+  // 3. Desenvolvimento local - padrão
+  const localUrl = "http://localhost:8080";
+  console.log("🔧 Usando URL da API de desenvolvimento:", localUrl);
+  return localUrl;
 };
 
 const API_BASE_URL = getApiBaseUrl();
 
-// Log para debug (apenas em desenvolvimento)
-if (import.meta.env.DEV) {
-  console.log("🔧 API Base URL configurada:", API_BASE_URL);
-}
+// Log sempre visível para debug em produção
+console.log("🌐 API Base URL configurada:", API_BASE_URL);
+console.log("🌐 Variável de ambiente VITE_API_BASE_URL:", import.meta.env.VITE_API_BASE_URL || "não definida");
 
 const api = axios.create({
   baseURL: API_BASE_URL,
