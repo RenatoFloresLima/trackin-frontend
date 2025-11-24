@@ -32,6 +32,8 @@ import EmpresaFormPage from "./Components/empresa/EmpresaFormPage";
 import CompanyAdminsListPage from "./Components/empresa/CompanyAdminsListPage";
 import CompanyAdminFormPage from "./Components/empresa/CompanyAdminFormPage";
 import JornadaRegraFormPage from "./Components/empresa/JornadaRegraFormPage";
+import TurnosListPage from "./Components/turno/TurnosListPage";
+import TurnoFormPage from "./Components/turno/TurnoFormPage";
 
 // Estilos Globais
 import "./App.css";
@@ -202,6 +204,30 @@ const appRouter = createBrowserRouter(
             element={
               <PrivateRoute roles={["ROLE_ADMIN", "ROLE_COMPANY_ADMIN"]}>
                 <FuncaoFormPage />
+              </PrivateRoute>
+            }
+          />
+          <Route
+            path="/turnos"
+            element={
+              <PrivateRoute roles={["ROLE_ADMIN", "ROLE_COMPANY_ADMIN"]}>
+                <TurnosListPage />
+              </PrivateRoute>
+            }
+          />
+          <Route
+            path="/turnos/novo"
+            element={
+              <PrivateRoute roles={["ROLE_ADMIN", "ROLE_COMPANY_ADMIN"]}>
+                <TurnoFormPage />
+              </PrivateRoute>
+            }
+          />
+          <Route
+            path="/turnos/:id/editar"
+            element={
+              <PrivateRoute roles={["ROLE_ADMIN", "ROLE_COMPANY_ADMIN"]}>
+                <TurnoFormPage />
               </PrivateRoute>
             }
           />

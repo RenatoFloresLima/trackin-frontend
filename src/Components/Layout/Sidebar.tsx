@@ -13,6 +13,7 @@ import {
   FaBriefcase,
   FaIndustry,
   FaUserShield,
+  FaCalendarAlt,
 } from "react-icons/fa";
 import { Box, Typography, Avatar, Divider, Tooltip } from "@mui/material";
 import "./Sidebar.css";
@@ -85,6 +86,12 @@ const Sidebar: React.FC = () => {
       path: "/funcoes",
       label: "Funções",
       icon: FaBriefcase,
+      roles: ["ROLE_ADMIN", "ROLE_COMPANY_ADMIN"],
+    },
+    {
+      path: "/turnos",
+      label: "Turnos",
+      icon: FaCalendarAlt,
       roles: ["ROLE_ADMIN", "ROLE_COMPANY_ADMIN"],
     },
   ];
