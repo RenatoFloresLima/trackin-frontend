@@ -4,6 +4,16 @@
  * 1. DTO de Resposta para a tela "Meu Perfil" (GET /api/funcionarios/{id})
  * Corresponde ao FuncionarioDetalheResponse do backend.
  */
+export interface UsuarioPerfilResponse {
+  usuarioId: number;
+  login: string;
+  role: string;
+  empresaId?: number | null;
+  empresaNome?: string | null;
+  enabled: boolean;
+  nome: string;
+}
+
 export interface FuncionarioDetalheResponse {
   id: number;
   matricula: string;
