@@ -25,7 +25,7 @@ import { buscarPontos, aprovarPonto } from "@/services/pontoService";
 import { useAuth } from "@/contexts/AuthContext";
 
 const AprovacaoPontoPage: React.FC = () => {
-  const { isAdmin } = useAuth();
+  const { isAdmin, isCompanyAdmin } = useAuth();
 
   const [filtros, setFiltros] = useState<FiltrosPonto>({
     nome: "",
@@ -221,7 +221,11 @@ const AprovacaoPontoPage: React.FC = () => {
                     </TableCell>
                     <TableCell
                       sx={{
-                        color: p.status === "APROVADO" ? "green" : "orange",
+                        color: p.status === "PENDENTE_APROVACAO" 
+                          ? "warning.dark" // Laranja escuro para contraste com fundo laranja claro
+                          : p.status === "APROVADO" 
+                          ? "success.main" 
+                          : "text.primary",
                         fontWeight: "bold",
                       }}
                     >
@@ -230,10 +234,11 @@ const AprovacaoPontoPage: React.FC = () => {
                         : p.status}
                     </TableCell>
                     <TableCell>
-                      {isAdmin && p.status === "PENDENTE_APROVACAO" && (
+                      {(isAdmin || isCompanyAdmin) && p.status === "PENDENTE_APROVACAO" && (
                         <Button
                           size="small"
                           variant="contained"
+                          color="primary"
                           onClick={() => handleAprovarPonto(p.id)}
                         >
                           Aprovar
