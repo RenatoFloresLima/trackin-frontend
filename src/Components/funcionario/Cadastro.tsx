@@ -31,11 +31,19 @@ const API_BASE_URL = "/api";
 const API_FUNCIONARIOS = `${API_BASE_URL}/funcionarios`;
 const API_SEDES = `${API_BASE_URL}/sedes`;
 const API_FUNCOES = `${API_BASE_URL}/funcoes`;
+const API_TURNOS = `${API_BASE_URL}/turnos/ativos`;
 
 interface Funcao {
   id: number;
   nome: string;
   descricao: string;
+}
+
+interface Turno {
+  id: number;
+  nome: string;
+  horaInicio: string;
+  horaFim: string;
 }
 
 interface IFormInput {
@@ -48,6 +56,8 @@ interface IFormInput {
   funcaoId: string;
   dataContratacao: string;
   role: "ROLE_FUNCIONARIO" | "ROLE_ADMIN";
+  turnoId?: string;
+  cargaHoraria?: string;
 }
 
 const Cadastro = () => {
@@ -56,6 +66,7 @@ const Cadastro = () => {
 
   const [sedes, setSedes] = useState<SedeDTO[]>([]);
   const [funcoes, setFuncoes] = useState<Funcao[]>([]);
+  const [turnos, setTurnos] = useState<Turno[]>([]);
   const [loading, setLoading] = useState(false);
   const [dataLoading, setDataLoading] = useState(true);
   const [apiError, setApiError] = useState<string | null>(null);
@@ -68,16 +79,18 @@ const Cadastro = () => {
   useEffect(() => {
     const fetchDropdownData = async () => {
       try {
-        const [sedesResponse, funcoesResponse] = await Promise.all([
+        const [sedesResponse, funcoesResponse, turnosResponse] = await Promise.all([
           api.get<SedeDTO[]>(API_SEDES),
           api.get<Funcao[]>(API_FUNCOES),
+          api.get<Turno[]>(API_TURNOS),
         ]);
 
         setSedes(sedesResponse.data ?? []);
         setFuncoes(funcoesResponse.data ?? []);
+        setTurnos(turnosResponse.data ?? []);
         setApiError(null);
       } catch (error: any) {
-        console.error("Erro ao carregar dados de Sedes ou Funções:", error);
+        console.error("Erro ao carregar dados de Sedes, Funções ou Turnos:", error);
         const errorMessage = error.response?.data?.message || "Erro ao carregar dados essenciais. Verifique o backend ou sua permissão de acesso.";
         setApiError(errorMessage);
       } finally {
@@ -98,6 +111,8 @@ const Cadastro = () => {
         sedePrincipalId: parseInt(data.sedePrincipalId),
         funcaoId: parseInt(data.funcaoId),
         role: data.role,
+        turnoId: data.turnoId ? parseInt(data.turnoId) : null,
+        cargaHoraria: data.cargaHoraria ? parseFloat(data.cargaHoraria) : null,
       };
 
       const response = await api.post(API_FUNCIONARIOS, payload);
@@ -362,6 +377,52 @@ const Cadastro = () => {
                 </Typography>
               )}
             </FormControl>
+          </Box>
+
+          <Box sx={{ display: "flex", gap: 2, flexWrap: "wrap" }}>
+            {/* Turno */}
+            <FormControl fullWidth error={Boolean(errors.turnoId)} sx={{ flex: { xs: "1 1 100%", md: "1 1 calc(50% - 8px)" } }}>
+              <InputLabel>Turno (Opcional)</InputLabel>
+              <Select
+                label="Turno (Opcional)"
+                {...register("turnoId")}
+                defaultValue=""
+              >
+                <MenuItem value="">
+                  <em>Nenhum (usará turno da função ou empresa)</em>
+                </MenuItem>
+                {turnos.map((turno) => (
+                  <MenuItem key={turno.id} value={turno.id.toString()}>
+                    {turno.nome} ({turno.horaInicio} - {turno.horaFim})
+                  </MenuItem>
+                ))}
+              </Select>
+              {errors.turnoId && (
+                <Typography variant="caption" color="error" sx={{ mt: 0.5, ml: 1.75 }}>
+                  {errors.turnoId.message}
+                </Typography>
+              )}
+            </FormControl>
+
+            {/* Carga Horária */}
+            <TextField
+              label="Carga Horária (Opcional)"
+              type="number"
+              fullWidth
+              placeholder="Ex: 8.0, 6.0, 12.0"
+              inputProps={{ step: "0.5", min: "0", max: "24" }}
+              sx={{ flex: { xs: "1 1 100%", md: "1 1 calc(50% - 8px)" } }}
+              {...register("cargaHoraria", {
+                validate: (value) => {
+                  if (value && (parseFloat(value) < 0 || parseFloat(value) > 24)) {
+                    return "A carga horária deve estar entre 0 e 24 horas";
+                  }
+                  return true;
+                },
+              })}
+              error={Boolean(errors.cargaHoraria)}
+              helperText={errors.cargaHoraria?.message || "Horas trabalhadas por dia (ex: 8.0)"}
+            />
           </Box>
 
           {/* Botões de Ação */}

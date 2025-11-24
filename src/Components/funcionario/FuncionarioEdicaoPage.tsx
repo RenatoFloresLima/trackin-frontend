@@ -13,10 +13,18 @@ const API_BASE_URL = "/api";
 const API_FUNCIONARIOS = `${API_BASE_URL}/funcionarios`;
 const API_SEDES = `${API_BASE_URL}/sedes`;
 const API_FUNCOES = `${API_BASE_URL}/funcoes`;
+const API_TURNOS = `${API_BASE_URL}/turnos/ativos`;
 
 interface Funcao {
   id: number;
   nome: string;
+}
+
+interface Turno {
+  id: number;
+  nome: string;
+  horaInicio: string;
+  horaFim: string;
 }
 
 // Interface que reflete o DTO de resposta do GET /api/funcionarios/{id}
@@ -30,8 +38,13 @@ interface FuncionarioResponse {
   cpf: string;
   sedePrincipalId: number;
   funcaoId: number;
+  turnoId?: number;
+  turnoNome?: string;
+  turnoHoraInicio?: string;
+  turnoHoraFim?: string;
+  cargaHoraria?: number;
   // 🔑 Campo correto vindo da API
-  roleEnum: string;
+  role: string; // O backend retorna "role" (não "roleEnum")
   // O backend também envia: funcaoNome, sedePrincipalNome, status, dataAdmissao
 }
 
@@ -44,6 +57,8 @@ interface IFormInput {
   email: string;
   sedePrincipalId: string;
   funcaoId: string;
+  turnoId?: string;
+  cargaHoraria?: string;
   // 🔑 Nome da propriedade de submissão
   role: "FUNCIONARIO" | "ADMIN";
 }
@@ -57,6 +72,7 @@ const EdicaoFuncionario: FC = () => {
 
   const [sedes, setSedes] = useState<SedeDTO[]>([]);
   const [funcoes, setFuncoes] = useState<Funcao[]>([]);
+  const [turnos, setTurnos] = useState<Turno[]>([]);
   const [matricula, setMatricula] = useState<string>("");
   const [cpf, setCpf] = useState<string>("");
   const [status, setStatus] = useState("");
@@ -74,20 +90,22 @@ const EdicaoFuncionario: FC = () => {
     }
 
     try {
-      // 1. Carregar Dados Auxiliares (Sedes e Funções)
-      const [sedesResponse, funcoesResponse, funcionarioResponse] =
+      // 1. Carregar Dados Auxiliares (Sedes, Funções e Turnos)
+      const [sedesResponse, funcoesResponse, turnosResponse, funcionarioResponse] =
         await Promise.all([
           api.get<SedeDTO[]>(API_SEDES),
           api.get<Funcao[]>(API_FUNCOES),
+          api.get<Turno[]>(API_TURNOS),
           // 2. Carregar Dados do Funcionário por ID
           api.get<FuncionarioResponse>(`${API_FUNCIONARIOS}/${funcionarioId}`),
         ]);
 
       setSedes(sedesResponse.data ?? []);
       setFuncoes(funcoesResponse.data);
+      setTurnos(turnosResponse.data ?? []);
 
       const funcionario = funcionarioResponse.data;
-      console.log("ROLE Vindo da API:", funcionario.roleEnum);
+      console.log("ROLE Vindo da API:", funcionario.role);
 
       // 3. Preencher o Formulário e Matrícula
       setMatricula(funcionario.matricula);
@@ -102,8 +120,11 @@ const EdicaoFuncionario: FC = () => {
         email: funcionario.email,
         sedePrincipalId: funcionario.sedePrincipalId.toString(),
         funcaoId: funcionario.funcaoId.toString(),
-        // 🔑 CORREÇÃO CRÍTICA AQUI: Usar 'roleEnum' da API e mapear para 'role' do FormInput
-        role: funcionario.roleEnum as "FUNCIONARIO" | "ADMIN",
+        turnoId: funcionario.turnoId?.toString() || "",
+        cargaHoraria: funcionario.cargaHoraria?.toString() || "",
+        // 🔑 CORREÇÃO: O backend retorna "role" (ex: "ROLE_FUNCIONARIO", "ROLE_ADMIN")
+        // Precisamos mapear para "FUNCIONARIO" ou "ADMIN" para o formulário
+        role: funcionario.role?.replace("ROLE_", "") as "FUNCIONARIO" | "ADMIN" || "FUNCIONARIO",
       });
 
       setStatus("");
@@ -131,13 +152,18 @@ const EdicaoFuncionario: FC = () => {
 
     try {
       // Prepara o payload para o PUT (o DTO FuncionarioUpdateRequest no backend)
+      // Nota: FuncionarioUpdateRequest não inclui 'role', então não enviamos
       const payload = {
-        ...data,
+        nome: data.nome,
+        email: data.email,
+        endereco: data.endereco,
+        telefone: data.telefone,
+        cpf: data.cpf,
         // Os IDs devem ser passados como number para o DTO do backend
         sedePrincipalId: parseInt(data.sedePrincipalId),
         funcaoId: parseInt(data.funcaoId),
-        // 🔑 'role' já está correto com 'ADMIN'/'FUNCIONARIO'
-        role: data.role,
+        turnoId: data.turnoId ? parseInt(data.turnoId) : null,
+        cargaHoraria: data.cargaHoraria ? parseFloat(data.cargaHoraria) : null,
       };
 
       console.log("Payload de atualização sendo enviado:", payload);
@@ -304,6 +330,46 @@ const EdicaoFuncionario: FC = () => {
             <option value="FUNCIONARIO">Funcionário Comum</option>
             <option value="ADMIN">Administrador</option>
           </select>
+        </div>
+
+        {/* SELECT TURNO */}
+        <div className="form-group">
+          <label>Turno (Opcional):</label>
+          <select
+            {...register("turnoId")}
+            className="form-control"
+          >
+            <option value="">Nenhum (usará turno da função ou empresa)</option>
+            {turnos.map((turno) => (
+              <option key={turno.id} value={turno.id.toString()}>
+                {turno.nome} ({turno.horaInicio} - {turno.horaFim})
+              </option>
+            ))}
+          </select>
+        </div>
+
+        {/* CARGA HORÁRIA */}
+        <div className="form-group">
+          <label>Carga Horária (Opcional):</label>
+          <input
+            type="number"
+            step="0.5"
+            min="0"
+            max="24"
+            className="form-control"
+            placeholder="Ex: 8.0, 6.0, 12.0"
+            {...register("cargaHoraria", {
+              validate: (value) => {
+                if (value && (parseFloat(value) < 0 || parseFloat(value) > 24)) {
+                  return "A carga horária deve estar entre 0 e 24 horas";
+                }
+                return true;
+              },
+            })}
+          />
+          <small className="form-text text-muted">
+            Horas trabalhadas por dia (ex: 8.0). Se não informado, usará a carga horária da empresa.
+          </small>
         </div>
 
         <button
