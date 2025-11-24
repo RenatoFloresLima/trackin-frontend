@@ -17,6 +17,7 @@ import type {
   FuncionarioDadosMutaveisRequest,
   UsuarioPerfilResponse,
 } from "../../types/FuncionarioTypes";
+import RedefinirSenhaUsuarioModal from "./RedefinirSenhaUsuarioModal";
 
 // Componentes criados anteriormente
 import DadosPessoais from "../funcionario/DadosPessoais";
@@ -35,6 +36,7 @@ const FuncionarioDetalhesScreen: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [isSenhaModalOpen, setIsSenhaModalOpen] = useState(false);
+  const [isSenhaUsuarioModalOpen, setIsSenhaUsuarioModalOpen] = useState(false);
 
   // ------------------------------------------
   // LÓGICA DE FETCH DE DADOS
@@ -197,6 +199,14 @@ const FuncionarioDetalhesScreen: React.FC = () => {
                     </Typography>
                   </Grid>
                 </Grid>
+                <Box sx={{ mt: 3 }}>
+                  <Button
+                    variant="outlined"
+                    onClick={() => setIsSenhaUsuarioModalOpen(true)}
+                  >
+                    Alterar Senha
+                  </Button>
+                </Box>
               </Box>
             ) : (
               // Perfil de funcionário
@@ -234,6 +244,14 @@ const FuncionarioDetalhesScreen: React.FC = () => {
           open={isSenhaModalOpen}
           onClose={() => setIsSenhaModalOpen(false)}
           funcionarioId={funcionario.id}
+        />
+      )}
+
+      {/* Modal de redefinição de senha - Para usuários administrativos */}
+      {isUsuario && (
+        <RedefinirSenhaUsuarioModal
+          open={isSenhaUsuarioModalOpen}
+          onClose={() => setIsSenhaUsuarioModalOpen(false)}
         />
       )}
     </Container>

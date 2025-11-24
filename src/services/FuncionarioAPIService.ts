@@ -8,6 +8,7 @@ import type {
   RegistroPontoDetalheResponse,
   FiltroPontoFuncionarioDTO,
   UsuarioPerfilResponse,
+  UsuarioRedefinirSenhaRequest,
 } from "../types/FuncionarioTypes"; // Ajuste o caminho se necessário
 
 // ------------------------------------------
@@ -106,5 +107,14 @@ export const FuncionarioAPIService = {
       `/api/funcionarios/perfil-logado/detalhes`
     );
     return response.data;
+  },
+
+  /**
+   * Redefine a senha do usuário logado (para SYSTEM_ADMIN, COMPANY_ADMIN ou qualquer usuário).
+   */
+  redefinirSenhaUsuario: async (
+    dados: UsuarioRedefinirSenhaRequest
+  ): Promise<void> => {
+    await api.post(`/api/funcionarios/perfil-logado/redefinir-senha`, dados);
   },
 };

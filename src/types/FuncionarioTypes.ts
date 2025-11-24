@@ -14,6 +14,12 @@ export interface UsuarioPerfilResponse {
   nome: string;
 }
 
+export interface UsuarioRedefinirSenhaRequest {
+  senhaAtual: string;
+  novaSenha: string;
+  confirmacaoSenha: string;
+}
+
 export interface FuncionarioDetalheResponse {
   id: number;
   matricula: string;
