@@ -28,3 +28,4 @@ export async function ativarCompanyAdmin(id: number): Promise<void> {
   await api.patch(`/api/usuarios/company-admin/${id}/ativar`);
 }
 
+

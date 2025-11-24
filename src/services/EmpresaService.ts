@@ -32,3 +32,4 @@ export async function ativarEmpresa(id: number): Promise<void> {
   await api.patch(`/api/empresas/${id}/ativar`);
 }
 
+
