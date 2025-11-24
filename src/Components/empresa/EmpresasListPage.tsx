@@ -23,6 +23,7 @@ import AddBusinessIcon from "@mui/icons-material/AddBusiness";
 import EditIcon from "@mui/icons-material/Edit";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import CancelIcon from "@mui/icons-material/Cancel";
+import SettingsIcon from "@mui/icons-material/Settings";
 
 import type { EmpresaDTO } from "../../types/EmpresaTypes";
 import { listarEmpresas, ativarEmpresa, desativarEmpresa } from "../../services/EmpresaService";
@@ -162,6 +163,15 @@ const EmpresasListPage = () => {
                           onClick={() => navigate(`/empresas/${empresa.id}/editar`)}
                         >
                           <EditIcon fontSize="small" />
+                        </IconButton>
+                      </Tooltip>
+                      <Tooltip title="Regras de Jornada">
+                        <IconButton
+                          size="small"
+                          onClick={() => navigate(`/empresas/${empresa.id}/jornada-regras`)}
+                          color="primary"
+                        >
+                          <SettingsIcon fontSize="small" />
                         </IconButton>
                       </Tooltip>
                       <Tooltip title={empresa.status === "ATIVA" ? "Desativar" : "Ativar"}>

@@ -14,6 +14,7 @@ import {
   Typography,
 } from "@mui/material";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
+import SettingsIcon from "@mui/icons-material/Settings";
 import { useForm } from "react-hook-form";
 
 import type { EmpresaFormValues } from "../../types/EmpresaTypes";
@@ -165,6 +166,19 @@ const EmpresaFormPage = () => {
               error={!!errors.razaoSocial}
               helperText={errors.razaoSocial?.message || "Opcional"}
             />
+
+            {isEdit && empresaId && (
+              <Box sx={{ pt: 2 }}>
+                <Button
+                  variant="outlined"
+                  startIcon={<SettingsIcon />}
+                  onClick={() => navigate(`/empresas/${empresaId}/jornada-regras`)}
+                  fullWidth
+                >
+                  Configurar Regras de Jornada
+                </Button>
+              </Box>
+            )}
 
             <Stack direction="row" spacing={2} justifyContent="flex-end">
               <Button

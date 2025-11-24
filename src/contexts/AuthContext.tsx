@@ -13,6 +13,7 @@ interface User {
   role: "ROLE_ADMIN" | "ROLE_FUNCIONARIO" | "ROLE_SYSTEM_ADMIN" | "ROLE_COMPANY_ADMIN" | string;
   nome?: string | null; // Primeiro nome do funcionário
   funcaoNome?: string | null; // Nome da função do funcionário
+  empresaId?: number | null; // ID da empresa (para COMPANY_ADMIN)
 }
 
 interface AuthContextType {
@@ -64,13 +65,14 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         senha,
       });
 
-      const { token, login: userLogin, role, nome, funcaoNome } = response.data;
+      const { token, login: userLogin, role, nome, funcaoNome, empresaId } = response.data;
 
       const newUser: User = { 
         login: userLogin, 
         role,
         nome: nome || null,
-        funcaoNome: funcaoNome || null
+        funcaoNome: funcaoNome || null,
+        empresaId: empresaId || null
       };
 
       // Armazenar no estado e no localStorage

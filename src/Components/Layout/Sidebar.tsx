@@ -48,6 +48,14 @@ const Sidebar: React.FC = () => {
       icon: FaUserShield,
       roles: ["ROLE_SYSTEM_ADMIN"],
     },
+    // COMPANY_ADMIN: Acesso à sua empresa (path será calculado dinamicamente)
+    {
+      path: "/minha-empresa", // Placeholder, será substituído na renderização
+      label: "Minha Empresa",
+      icon: FaIndustry,
+      roles: ["ROLE_COMPANY_ADMIN"],
+      dynamicPath: true, // Flag para indicar que o path é dinâmico
+    },
     // ADMIN e COMPANY_ADMIN: Gestão de funcionários, sedes e funções
     {
       path: "/aprovacao-pontos",
@@ -138,12 +146,16 @@ const Sidebar: React.FC = () => {
 
       <Box className="sidebar-menu" component="ul">
         {filteredNavItems.map((item) => {
-          const isActive = location.pathname.startsWith(item.path);
+          // Calcula o path dinamicamente para "Minha Empresa" do COMPANY_ADMIN
+          const actualPath = item.path === "/minha-empresa" && user?.empresaId
+            ? `/empresas/${user.empresaId}/editar`
+            : item.path;
+          const isActive = location.pathname.startsWith(actualPath);
           return (
-            <li key={item.path} className="sidebar-menu-item">
+            <li key={actualPath} className="sidebar-menu-item">
               <Tooltip title={item.label} placement="right" arrow>
                 <NavLink
-                  to={item.path}
+                  to={actualPath}
                   className={`nav-link ${isActive ? "nav-link-active" : ""}`}
                 >
                   <item.icon className="nav-icon" />

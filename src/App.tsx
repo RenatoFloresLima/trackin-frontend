@@ -31,6 +31,7 @@ import EmpresasListPage from "./Components/empresa/EmpresasListPage";
 import EmpresaFormPage from "./Components/empresa/EmpresaFormPage";
 import CompanyAdminsListPage from "./Components/empresa/CompanyAdminsListPage";
 import CompanyAdminFormPage from "./Components/empresa/CompanyAdminFormPage";
+import JornadaRegraFormPage from "./Components/empresa/JornadaRegraFormPage";
 
 // Estilos Globais
 import "./App.css";
@@ -69,7 +70,8 @@ const appRouter = createBrowserRouter(
           <Route path="/ponto" element={<RegistroPonto />} />
           <Route path="/funcionarios/editar/:id" element={<EditarFuncionario />} />
 
-          {/* Rotas SYSTEM_ADMIN (Apenas Administrador do Sistema) */}
+          {/* Rotas de Empresas */}
+          {/* Listar todas e criar: apenas SYSTEM_ADMIN */}
           <Route
             path="/empresas"
             element={
@@ -86,11 +88,30 @@ const appRouter = createBrowserRouter(
               </PrivateRoute>
             }
           />
+          {/* Editar: SYSTEM_ADMIN (qualquer) ou COMPANY_ADMIN (apenas sua) */}
           <Route
             path="/empresas/:id/editar"
             element={
-              <PrivateRoute roles={["ROLE_SYSTEM_ADMIN"]}>
+              <PrivateRoute roles={["ROLE_SYSTEM_ADMIN", "ROLE_COMPANY_ADMIN"]}>
                 <EmpresaFormPage />
+              </PrivateRoute>
+            }
+          />
+          {/* Ver detalhes: SYSTEM_ADMIN (qualquer) ou COMPANY_ADMIN (apenas sua) */}
+          <Route
+            path="/empresas/:id"
+            element={
+              <PrivateRoute roles={["ROLE_SYSTEM_ADMIN", "ROLE_COMPANY_ADMIN"]}>
+                <EmpresaFormPage />
+              </PrivateRoute>
+            }
+          />
+          {/* Regras de Jornada: SYSTEM_ADMIN (qualquer) ou COMPANY_ADMIN (apenas sua) */}
+          <Route
+            path="/empresas/:empresaId/jornada-regras"
+            element={
+              <PrivateRoute roles={["ROLE_SYSTEM_ADMIN", "ROLE_COMPANY_ADMIN"]}>
+                <JornadaRegraFormPage />
               </PrivateRoute>
             }
           />
