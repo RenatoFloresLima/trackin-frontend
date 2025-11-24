@@ -40,7 +40,6 @@ const LinhaFuncionario: React.FC<LinhaFuncionarioProps> = ({
       <TableCell>{funcionario.sedePrincipalNome}</TableCell>
       <TableCell>{funcionario.funcaoNome}</TableCell>
       <TableCell>{statusFuncionario}</TableCell>
-
       <TableCell align="center">
         {/* Botão Informações */}
         <Tooltip title="Informações Detalhadas">
