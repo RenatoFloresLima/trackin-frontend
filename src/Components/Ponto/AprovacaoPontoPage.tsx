@@ -182,13 +182,12 @@ const AprovacaoPontoPage: React.FC = () => {
           <Table>
             <TableHead>
               <TableRow>
-                {/* Cabeçalho da Tabela (Nova Ordem) */}
                 <TableCell>Matrícula</TableCell>
                 <TableCell>Nome</TableCell>
                 <TableCell>Tipo</TableCell>
                 <TableCell>Data</TableCell>
                 <TableCell>Hora</TableCell>
-                <TableCell>Registro</TableCell> {/* Horário de Criação */}
+                <TableCell>Registro</TableCell>
                 <TableCell>Status</TableCell>
                 <TableCell>Ações</TableCell>
               </TableRow>
@@ -212,40 +211,24 @@ const AprovacaoPontoPage: React.FC = () => {
                           : "inherit",
                     }}
                   >
-                    {/* COLUNA: Matrícula */}
                     <TableCell>{p.matricula}</TableCell>
-
-                    {/* COLUNA: Nome */}
                     <TableCell>{p.funcionarioNome}</TableCell>
-
-                    {/* COLUNA: Tipo de Ponto */}
                     <TableCell>{p.tipo}</TableCell>
-
-                    {/* COLUNA: Data (horario) */}
                     <TableCell>{formatDate(p.horario, "dd/MM/yyyy")}</TableCell>
-
-                    {/* COLUNA: Hora (horario) */}
                     <TableCell>{formatDate(p.horario, "HH:mm:ss")}</TableCell>
-
-                    {/* COLUNA: Horário de Registro (horarioCriacao) */}
                     <TableCell>
                       {formatDate(p.horarioCriacao, "HH:mm:ss")}
                     </TableCell>
-
-                    {/* COLUNA: Status */}
                     <TableCell
                       sx={{
                         color: p.status === "APROVADO" ? "green" : "orange",
                         fontWeight: "bold",
                       }}
                     >
-                      {/* Formatação do status para exibição */}
                       {p.status === "PENDENTE_APROVACAO"
                         ? "Pendente"
                         : p.status}
                     </TableCell>
-
-                    {/* COLUNA: Ações */}
                     <TableCell>
                       {isAdmin && p.status === "PENDENTE_APROVACAO" && (
                         <Button
