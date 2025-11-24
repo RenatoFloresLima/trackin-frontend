@@ -145,14 +145,18 @@ const Sidebar: React.FC = () => {
       <Divider className="sidebar-divider" />
 
       <Box className="sidebar-menu" component="ul">
-        {filteredNavItems.map((item) => {
+        {filteredNavItems.map((item, index) => {
           // Calcula o path dinamicamente para "Minha Empresa" do COMPANY_ADMIN
           const actualPath = item.path === "/minha-empresa" && user?.empresaId
             ? `/empresas/${user.empresaId}/editar`
             : item.path;
-          const isActive = location.pathname.startsWith(actualPath);
+          // Melhora a lógica de isActive para evitar conflitos
+          // Para paths exatos, usa igualdade; para paths que podem ter subpaths, usa startsWith
+          const isActive = actualPath === "/ponto" 
+            ? location.pathname === actualPath // Path exato para /ponto
+            : location.pathname === actualPath || location.pathname.startsWith(actualPath + "/");
           return (
-            <li key={actualPath} className="sidebar-menu-item">
+            <li key={`${actualPath}-${index}`} className="sidebar-menu-item">
               <Tooltip title={item.label} placement="right" arrow>
                 <NavLink
                   to={actualPath}

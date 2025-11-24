@@ -39,7 +39,7 @@ const API_FUNCIONARIOS = `${API_BASE_URL}/funcionarios`;
 // LÓGICA DO COMPONENTE PRINCIPAL
 // ----------------------------------------------------
 const ListaFuncionarios: React.FC = () => {
-  const { isAuthenticated, isAdmin } = useAuth();
+  const { isAuthenticated, isAdmin, isCompanyAdmin } = useAuth();
   const navigate = useNavigate();
 
   // ----------------------------------------------------
@@ -168,7 +168,8 @@ const ListaFuncionarios: React.FC = () => {
   // RENDERIZAÇÃO
   // ----------------------------------------------------
 
-  if (!isAdmin) {
+  // Permite acesso para ADMIN e COMPANY_ADMIN
+  if (!isAdmin && !isCompanyAdmin) {
     return <Navigate to="/ponto" replace />;
   }
 
