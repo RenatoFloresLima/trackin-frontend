@@ -10,7 +10,7 @@ import api from "../services/api"; // O caminho de importação ajustado
 interface User {
   login: string;
   // É comum que a role no front-end seja simplificada, mas 'ROLE_' é padrão Spring Security
-  role: "ROLE_ADMIN" | "ROLE_FUNCIONARIO" | string;
+  role: "ROLE_ADMIN" | "ROLE_FUNCIONARIO" | "ROLE_SYSTEM_ADMIN" | "ROLE_COMPANY_ADMIN" | string;
   nome?: string | null; // Primeiro nome do funcionário
   funcaoNome?: string | null; // Nome da função do funcionário
 }
@@ -22,6 +22,8 @@ interface AuthContextType {
   logout: () => void;
   isAuthenticated: boolean;
   isAdmin: boolean;
+  isSystemAdmin: boolean;
+  isCompanyAdmin: boolean;
   authLoading: boolean;
 }
 
@@ -105,6 +107,8 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   // 🔑 Variáveis computadas
   const isAuthenticated = !!user;
   const isAdmin = user?.role === "ROLE_ADMIN";
+  const isSystemAdmin = user?.role === "ROLE_SYSTEM_ADMIN";
+  const isCompanyAdmin = user?.role === "ROLE_COMPANY_ADMIN";
 
   if (authLoading) {
     return <div>Carregando sessão...</div>;
@@ -120,6 +124,8 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         logout,
         isAuthenticated,
         isAdmin,
+        isSystemAdmin,
+        isCompanyAdmin,
         authLoading,
       }}
     >

@@ -11,6 +11,8 @@ import {
   FaUserCircle,
   FaBuilding,
   FaBriefcase,
+  FaIndustry,
+  FaUserShield,
 } from "react-icons/fa";
 import { Box, Typography, Avatar, Divider, Tooltip } from "@mui/material";
 import "./Sidebar.css";
@@ -25,7 +27,7 @@ const Sidebar: React.FC = () => {
       path: "/meu-perfil",
       label: "Meu Perfil",
       icon: FaUserCircle,
-      roles: ["ROLE_ADMIN", "ROLE_FUNCIONARIO"],
+      roles: ["ROLE_ADMIN", "ROLE_FUNCIONARIO", "ROLE_COMPANY_ADMIN", "ROLE_SYSTEM_ADMIN"],
     },
     {
       path: "/ponto",
@@ -33,35 +35,49 @@ const Sidebar: React.FC = () => {
       icon: FaClock,
       roles: ["ROLE_ADMIN", "ROLE_FUNCIONARIO"],
     },
+    // SYSTEM_ADMIN: Apenas empresas e administradores
+    {
+      path: "/empresas",
+      label: "Empresas",
+      icon: FaIndustry,
+      roles: ["ROLE_SYSTEM_ADMIN"],
+    },
+    {
+      path: "/company-admins",
+      label: "Adm. Empresas",
+      icon: FaUserShield,
+      roles: ["ROLE_SYSTEM_ADMIN"],
+    },
+    // ADMIN e COMPANY_ADMIN: Gestão de funcionários, sedes e funções
     {
       path: "/aprovacao-pontos",
       label: "Aprovação de Pontos",
       icon: FaCheckCircle,
-      roles: ["ROLE_ADMIN"],
+      roles: ["ROLE_ADMIN", "ROLE_COMPANY_ADMIN"],
     },
     {
       path: "/cadastro",
       label: "Cadastro Func.",
       icon: FaUserPlus,
-      roles: ["ROLE_ADMIN"],
+      roles: ["ROLE_ADMIN", "ROLE_COMPANY_ADMIN"],
     },
     {
       path: "/lista-funcionarios",
       label: "Funcionários",
       icon: FaHome,
-      roles: ["ROLE_ADMIN"],
+      roles: ["ROLE_ADMIN", "ROLE_COMPANY_ADMIN"],
     },
     {
       path: "/sedes",
       label: "Sedes",
       icon: FaBuilding,
-      roles: ["ROLE_ADMIN"],
+      roles: ["ROLE_ADMIN", "ROLE_COMPANY_ADMIN"],
     },
     {
       path: "/funcoes",
       label: "Funções",
       icon: FaBriefcase,
-      roles: ["ROLE_ADMIN"],
+      roles: ["ROLE_ADMIN", "ROLE_COMPANY_ADMIN"],
     },
   ];
 
@@ -74,7 +90,13 @@ const Sidebar: React.FC = () => {
   const userDisplayName = user?.nome ?? user?.login ?? "Usuário";
   
   // Exibe o nome da função, ou fallback para role traduzida
-  const userFuncao = user?.funcaoNome ?? (userRole === "ROLE_ADMIN" ? "Administrador" : "Funcionário");
+  const getRoleDisplay = () => {
+    if (userRole === "ROLE_SYSTEM_ADMIN") return "Adm. Sistema";
+    if (userRole === "ROLE_COMPANY_ADMIN") return "Adm. Empresa";
+    if (userRole === "ROLE_ADMIN") return "Administrador";
+    return user?.funcaoNome ?? "Funcionário";
+  };
+  const userFuncao = getRoleDisplay();
 
   const getUserInitials = () => {
     if (!userDisplayName) return "U";

@@ -6,6 +6,8 @@ export interface SedeDTO {
   latitude?: number | null;
   longitude?: number | null;
   raioPermitido?: number | null;
+  empresaId?: number | null;
+  empresaNome?: string | null;
 }
 
 export interface SedeFormValues {
@@ -15,5 +17,6 @@ export interface SedeFormValues {
   latitude: number;
   longitude: number;
   raioPermitido: number;
+  empresaId?: number | null; // Opcional: para ADMIN/SYSTEM_ADMIN especificarem
 }
 

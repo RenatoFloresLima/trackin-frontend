@@ -33,8 +33,11 @@ const HomeRedirector: React.FC = () => {
   // Assumindo que a role é uma string (ex: "ROLE_ADMIN")
   const userRole = user.role;
 
-  if (userRole === "ROLE_ADMIN") {
-    // Redireciona ADMIN para a tela de aprovação
+  if (userRole === "ROLE_SYSTEM_ADMIN") {
+    // Redireciona SYSTEM_ADMIN para empresas
+    return <Navigate to="/empresas" replace />;
+  } else if (userRole === "ROLE_ADMIN" || userRole === "ROLE_COMPANY_ADMIN") {
+    // Redireciona ADMIN e COMPANY_ADMIN para a tela de aprovação
     return <Navigate to="/aprovacao-pontos" replace />;
   } else {
     // Redireciona FUNCIONÁRIO (ou qualquer outro perfil) para Meu Perfil
