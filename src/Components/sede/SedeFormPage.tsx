@@ -48,7 +48,7 @@ const defaultValues: SedeFormValues = {
 const SedeFormPage = () => {
   const params = useParams<{ id?: string }>();
   const navigate = useNavigate();
-  const { user, isSystemAdmin, isAdmin } = useAuth();
+  const { isSystemAdmin, isAdmin } = useAuth();
 
   const isEdit = useMemo(() => Boolean(params.id), [params.id]);
   const sedeId = params.id ? Number(params.id) : null;

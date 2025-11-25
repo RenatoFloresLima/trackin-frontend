@@ -36,7 +36,6 @@ import type { SedeDTO } from "../../types/SedeTypes";
 // ------------------------------------------
 
 const API_REGISTROS = "/api/registros-ponto/manual";
-const API_SEDES = "/api/sedes";
 
 type TipoRegistro = "ENTRADA" | "SAIDA" | "INICIO_INTERVALO" | "FIM_INTERVALO";
 

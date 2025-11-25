@@ -169,7 +169,7 @@ const TurnoFormPage = () => {
       <Paper elevation={0} sx={{ borderRadius: 3, border: "1px solid #e0e0e0", p: 3 }}>
         <form onSubmit={handleSubmit(onSubmit)}>
           <Grid container spacing={3}>
-            <Grid item xs={12}>
+            <Grid size={{ xs: 12 }}>
               <TextField
                 fullWidth
                 label="Nome do Turno"
@@ -187,7 +187,7 @@ const TurnoFormPage = () => {
               />
             </Grid>
 
-            <Grid item xs={12} sm={6}>
+            <Grid size={{ xs: 12, sm: 6 }}>
               <TextField
                 fullWidth
                 label="Horário de Início"
@@ -202,7 +202,7 @@ const TurnoFormPage = () => {
               />
             </Grid>
 
-            <Grid item xs={12} sm={6}>
+            <Grid size={{ xs: 12, sm: 6 }}>
               <TextField
                 fullWidth
                 label="Horário de Fim"
@@ -224,7 +224,7 @@ const TurnoFormPage = () => {
               />
             </Grid>
 
-            <Grid item xs={12}>
+            <Grid size={{ xs: 12 }}>
               <FormControlLabel
                 control={
                   <Checkbox
@@ -237,7 +237,7 @@ const TurnoFormPage = () => {
               />
             </Grid>
 
-            <Grid item xs={12}>
+            <Grid size={{ xs: 12 }}>
               <Stack direction="row" spacing={2} justifyContent="flex-end">
                 <Button
                   variant="outlined"

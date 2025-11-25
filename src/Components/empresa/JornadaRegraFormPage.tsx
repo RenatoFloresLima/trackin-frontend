@@ -207,7 +207,7 @@ const JornadaRegraFormPage = () => {
         <form onSubmit={handleSubmit(onSubmit)}>
           <Grid container spacing={3}>
             {/* Tipo de Escala */}
-            <Grid item xs={12} md={6}>
+            <Grid size={{ xs: 12, md: 6 }}>
               <FormControl fullWidth error={!!errors.tipoEscala}>
                 <InputLabel>Tipo de Escala</InputLabel>
                 <Controller
@@ -231,7 +231,7 @@ const JornadaRegraFormPage = () => {
             </Grid>
 
             {/* Modo de Fechamento do Dia */}
-            <Grid item xs={12} md={6}>
+            <Grid size={{ xs: 12, md: 6 }}>
               <FormControl fullWidth error={!!errors.modoFechamentoDia}>
                 <InputLabel>Modo de Fechamento do Dia</InputLabel>
                 <Controller
@@ -254,7 +254,7 @@ const JornadaRegraFormPage = () => {
               </FormControl>
             </Grid>
 
-            <Grid item xs={12}>
+            <Grid size={{ xs: 12 }}>
               <Divider sx={{ my: 2 }} />
               <Typography variant="h6" gutterBottom>
                 Horas e Limites
@@ -262,7 +262,7 @@ const JornadaRegraFormPage = () => {
             </Grid>
 
             {/* Horas Previstas por Turno */}
-            <Grid item xs={12} md={6}>
+            <Grid size={{ xs: 12, md: 6 }}>
               <Controller
                 name="horasPrevistasPorTurno"
                 control={control}
@@ -285,7 +285,7 @@ const JornadaRegraFormPage = () => {
             </Grid>
 
             {/* Limite Total do Dia */}
-            <Grid item xs={12} md={6}>
+            <Grid size={{ xs: 12, md: 6 }}>
               <Controller
                 name="limiteTotalDia"
                 control={control}
@@ -308,7 +308,7 @@ const JornadaRegraFormPage = () => {
             </Grid>
 
             {/* Limite de Extra Diária */}
-            <Grid item xs={12} md={6}>
+            <Grid size={{ xs: 12, md: 6 }}>
               <Controller
                 name="limiteExtraDiaria"
                 control={control}
@@ -329,7 +329,7 @@ const JornadaRegraFormPage = () => {
               />
             </Grid>
 
-            <Grid item xs={12}>
+            <Grid size={{ xs: 12 }}>
               <Divider sx={{ my: 2 }} />
               <Typography variant="h6" gutterBottom>
                 Tolerâncias
@@ -337,7 +337,7 @@ const JornadaRegraFormPage = () => {
             </Grid>
 
             {/* Tolerância de Entrada */}
-            <Grid item xs={12} md={6}>
+            <Grid size={{ xs: 12, md: 6 }}>
               <Controller
                 name="toleranciaEntradaMin"
                 control={control}
@@ -360,7 +360,7 @@ const JornadaRegraFormPage = () => {
             </Grid>
 
             {/* Tolerância de Saída */}
-            <Grid item xs={12} md={6}>
+            <Grid size={{ xs: 12, md: 6 }}>
               <Controller
                 name="toleranciaSaidaMin"
                 control={control}
@@ -382,7 +382,7 @@ const JornadaRegraFormPage = () => {
               />
             </Grid>
 
-            <Grid item xs={12}>
+            <Grid size={{ xs: 12 }}>
               <Divider sx={{ my: 2 }} />
               <Typography variant="h6" gutterBottom>
                 Intervalo
@@ -390,7 +390,7 @@ const JornadaRegraFormPage = () => {
             </Grid>
 
             {/* Obrigatoriedade de Intervalo */}
-            <Grid item xs={12}>
+            <Grid size={{ xs: 12 }}>
               <Controller
                 name="obrigatoriedadeIntervalo"
                 control={control}
@@ -410,7 +410,7 @@ const JornadaRegraFormPage = () => {
 
             {/* Intervalo Mínimo */}
             {obrigatoriedadeIntervalo && (
-              <Grid item xs={12} md={6}>
+              <Grid size={{ xs: 12, md: 6 }}>
                 <Controller
                   name="intervaloMinimo"
                   control={control}
@@ -433,7 +433,7 @@ const JornadaRegraFormPage = () => {
             )}
 
             {/* Botões */}
-            <Grid item xs={12}>
+            <Grid size={{ xs: 12 }}>
               <Stack direction="row" spacing={2} justifyContent="flex-end" sx={{ mt: 2 }}>
                 <Button
                   variant="outlined"
