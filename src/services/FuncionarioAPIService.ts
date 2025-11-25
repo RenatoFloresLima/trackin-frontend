@@ -7,6 +7,8 @@ import type {
   SenhaUpdateFuncionarioRequest,
   RegistroPontoDetalheResponse,
   FiltroPontoFuncionarioDTO,
+  UsuarioPerfilResponse,
+  UsuarioRedefinirSenhaRequest,
 } from "../types/FuncionarioTypes"; // Ajuste o caminho se necessário
 
 // ------------------------------------------
@@ -96,13 +98,23 @@ export const FuncionarioAPIService = {
   },
 
   /**
-   * Busca os detalhes completos do funcionário logado, incluindo registros de ponto.
+   * Busca os detalhes completos do funcionário logado ou perfil de usuário.
+   * Retorna FuncionarioDetalheResponse se houver funcionarioId, ou UsuarioPerfilResponse caso contrário.
    * Usa o endpoint /api/funcionarios/perfil-logado/detalhes que não requer ROLE_ADMIN.
    */
-  getDetalhesFuncionarioLogado: async (): Promise<FuncionarioDetalheResponse> => {
-    const response = await api.get<FuncionarioDetalheResponse>(
+  getDetalhesFuncionarioLogado: async (): Promise<FuncionarioDetalheResponse | UsuarioPerfilResponse> => {
+    const response = await api.get<FuncionarioDetalheResponse | UsuarioPerfilResponse>(
       `/api/funcionarios/perfil-logado/detalhes`
     );
     return response.data;
+  },
+
+  /**
+   * Redefine a senha do usuário logado (para SYSTEM_ADMIN, COMPANY_ADMIN ou qualquer usuário).
+   */
+  redefinirSenhaUsuario: async (
+    dados: UsuarioRedefinirSenhaRequest
+  ): Promise<void> => {
+    await api.post(`/api/funcionarios/perfil-logado/redefinir-senha`, dados);
   },
 };

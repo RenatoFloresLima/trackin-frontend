@@ -17,54 +17,54 @@ import {
   TableRow,
   Tooltip,
   Typography,
+  Chip,
 } from "@mui/material";
-import WorkIcon from "@mui/icons-material/Work";
+import CalendarTodayIcon from "@mui/icons-material/CalendarToday";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
 
-import type { FuncaoDTO } from "../../types/FuncaoTypes";
-import { listarFuncoes, deletarFuncao } from "../../services/FuncaoService";
+import { TurnoAPIService, type TurnoResponse } from "../../services/TurnoAPIService";
 
-const FuncoesListPage = () => {
+const TurnosListPage = () => {
   const navigate = useNavigate();
-  const [funcoes, setFuncoes] = useState<FuncaoDTO[]>([]);
+  const [turnos, setTurnos] = useState<TurnoResponse[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [deletingId, setDeletingId] = useState<number | null>(null);
 
   useEffect(() => {
-    carregarFuncoes();
+    carregarTurnos();
   }, []);
 
-  const carregarFuncoes = async () => {
+  const carregarTurnos = async () => {
     try {
       setLoading(true);
       setError(null);
-      const data = await listarFuncoes();
-      setFuncoes(data);
+      const data = await TurnoAPIService.listarTodos();
+      setTurnos(data);
     } catch (err) {
-      console.error("[Funcoes] Erro ao carregar funções:", err);
-      setError("Não foi possível carregar as funções. Tente novamente.");
+      console.error("[Turnos] Erro ao carregar turnos:", err);
+      setError("Não foi possível carregar os turnos. Tente novamente.");
     } finally {
       setLoading(false);
     }
   };
 
   const handleDelete = async (id: number) => {
-    if (!window.confirm("Tem certeza que deseja excluir esta função?")) {
+    if (!window.confirm("Tem certeza que deseja excluir este turno?")) {
       return;
     }
 
     try {
       setDeletingId(id);
-      await deletarFuncao(id);
-      await carregarFuncoes();
+      await TurnoAPIService.deletar(id);
+      await carregarTurnos();
     } catch (err: any) {
-      console.error("[Funcoes] Erro ao deletar função:", err);
+      console.error("[Turnos] Erro ao deletar turno:", err);
       const message =
         err?.response?.data?.message ??
         err?.response?.data?.mensagem ??
-        "Não foi possível excluir a função. Verifique se não há funcionários vinculados.";
+        "Não foi possível excluir o turno. Verifique se não há funcionários ou funções vinculados.";
       alert(message);
     } finally {
       setDeletingId(null);
@@ -82,73 +82,81 @@ const FuncoesListPage = () => {
       >
         <Box>
           <Typography variant="h4" fontWeight={600}>
-            Funções
+            Turnos
           </Typography>
           <Typography variant="body2" color="text.secondary">
-            Gerencie as funções dos funcionários do sistema.
+            Gerencie os turnos de trabalho da empresa.
           </Typography>
         </Box>
         <Button
           variant="contained"
-          startIcon={<WorkIcon />}
-          onClick={() => navigate("/funcoes/nova")}
+          startIcon={<CalendarTodayIcon />}
+          onClick={() => navigate("/turnos/novo")}
         >
-          Nova função
+          Novo turno
         </Button>
       </Stack>
 
       <Paper elevation={0} sx={{ borderRadius: 3, border: "1px solid #e0e0e0" }}>
         {loading ? (
-          <Box display="flex" justifyContent="center" py={6}>
+          <Box display="flex" justifyContent="center" p={4}>
             <CircularProgress />
           </Box>
         ) : error ? (
-          <Box p={3}>
-            <Alert severity="error">{error}</Alert>
-          </Box>
-        ) : funcoes.length === 0 ? (
+          <Alert severity="error" sx={{ m: 2 }}>
+            {error}
+          </Alert>
+        ) : turnos.length === 0 ? (
           <Box p={4} textAlign="center">
-            <Typography variant="body1">
-              Nenhuma função cadastrada ainda. Clique em "Nova função" para
-              começar.
+            <Typography variant="body1" color="text.secondary">
+              Nenhum turno cadastrado.
             </Typography>
           </Box>
         ) : (
           <TableContainer>
-            <Table aria-label="Funções cadastradas">
+            <Table>
               <TableHead>
                 <TableRow>
                   <TableCell>Nome</TableCell>
-                  <TableCell>Descrição</TableCell>
+                  <TableCell>Horário de Início</TableCell>
+                  <TableCell>Horário de Fim</TableCell>
+                  <TableCell>Empresa</TableCell>
+                  <TableCell>Status</TableCell>
                   <TableCell align="right">Ações</TableCell>
                 </TableRow>
               </TableHead>
               <TableBody>
-                {funcoes.map((funcao) => (
-                  <TableRow key={funcao.id} hover>
+                {turnos.map((turno) => (
+                  <TableRow key={turno.id} hover>
+                    <TableCell>{turno.nome}</TableCell>
+                    <TableCell>{turno.horaInicio}</TableCell>
+                    <TableCell>{turno.horaFim}</TableCell>
+                    <TableCell>{turno.empresaNome}</TableCell>
                     <TableCell>
-                      <Typography fontWeight={600}>{funcao.nome}</Typography>
-                    </TableCell>
-                    <TableCell>
-                      {funcao.descricao ?? "—"}
+                      <Chip
+                        label={turno.ativo ? "Ativo" : "Inativo"}
+                        color={turno.ativo ? "success" : "default"}
+                        size="small"
+                      />
                     </TableCell>
                     <TableCell align="right">
                       <Stack direction="row" spacing={1} justifyContent="flex-end">
-                        <Tooltip title="Editar função">
+                        <Tooltip title="Editar">
                           <IconButton
-                            color="primary"
-                            onClick={() => navigate(`/funcoes/${funcao.id}/editar`)}
+                            size="small"
+                            onClick={() => navigate(`/turnos/${turno.id}/editar`)}
                           >
-                            <EditIcon />
+                            <EditIcon fontSize="small" />
                           </IconButton>
                         </Tooltip>
-                        <Tooltip title="Excluir função">
+                        <Tooltip title="Excluir">
                           <IconButton
+                            size="small"
                             color="error"
-                            onClick={() => handleDelete(funcao.id)}
-                            disabled={deletingId === funcao.id}
+                            onClick={() => handleDelete(turno.id)}
+                            disabled={deletingId === turno.id}
                           >
-                            <DeleteIcon />
+                            <DeleteIcon fontSize="small" />
                           </IconButton>
                         </Tooltip>
                       </Stack>
@@ -164,6 +172,5 @@ const FuncoesListPage = () => {
   );
 };
 
-export default FuncoesListPage;
-
+export default TurnosListPage;
 

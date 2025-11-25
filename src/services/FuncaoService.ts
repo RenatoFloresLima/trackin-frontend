@@ -28,3 +28,4 @@ export async function deletarFuncao(id: number): Promise<void> {
   await api.delete(`/api/funcoes/${id}`);
 }
 
+

@@ -27,6 +27,13 @@ import SedesListPage from "./Components/sede/SedesListPage";
 import SedeFormPage from "./Components/sede/SedeFormPage";
 import FuncoesListPage from "./Components/funcao/FuncoesListPage";
 import FuncaoFormPage from "./Components/funcao/FuncaoFormPage";
+import EmpresasListPage from "./Components/empresa/EmpresasListPage";
+import EmpresaFormPage from "./Components/empresa/EmpresaFormPage";
+import CompanyAdminsListPage from "./Components/empresa/CompanyAdminsListPage";
+import CompanyAdminFormPage from "./Components/empresa/CompanyAdminFormPage";
+import JornadaRegraFormPage from "./Components/empresa/JornadaRegraFormPage";
+import TurnosListPage from "./Components/turno/TurnosListPage";
+import TurnoFormPage from "./Components/turno/TurnoFormPage";
 
 // Estilos Globais
 import "./App.css";
@@ -65,11 +72,73 @@ const appRouter = createBrowserRouter(
           <Route path="/ponto" element={<RegistroPonto />} />
           <Route path="/funcionarios/editar/:id" element={<EditarFuncionario />} />
 
-          {/* Rotas Admin (Proteção Dupla via PrivateRoute aninhada) */}
+          {/* Rotas de Empresas */}
+          {/* Listar todas e criar: apenas SYSTEM_ADMIN */}
+          <Route
+            path="/empresas"
+            element={
+              <PrivateRoute roles={["ROLE_SYSTEM_ADMIN"]}>
+                <EmpresasListPage />
+              </PrivateRoute>
+            }
+          />
+          <Route
+            path="/empresas/nova"
+            element={
+              <PrivateRoute roles={["ROLE_SYSTEM_ADMIN"]}>
+                <EmpresaFormPage />
+              </PrivateRoute>
+            }
+          />
+          {/* Editar: SYSTEM_ADMIN (qualquer) ou COMPANY_ADMIN (apenas sua) */}
+          <Route
+            path="/empresas/:id/editar"
+            element={
+              <PrivateRoute roles={["ROLE_SYSTEM_ADMIN", "ROLE_COMPANY_ADMIN"]}>
+                <EmpresaFormPage />
+              </PrivateRoute>
+            }
+          />
+          {/* Ver detalhes: SYSTEM_ADMIN (qualquer) ou COMPANY_ADMIN (apenas sua) */}
+          <Route
+            path="/empresas/:id"
+            element={
+              <PrivateRoute roles={["ROLE_SYSTEM_ADMIN", "ROLE_COMPANY_ADMIN"]}>
+                <EmpresaFormPage />
+              </PrivateRoute>
+            }
+          />
+          {/* Regras de Jornada: SYSTEM_ADMIN (qualquer) ou COMPANY_ADMIN (apenas sua) */}
+          <Route
+            path="/empresas/:empresaId/jornada-regras"
+            element={
+              <PrivateRoute roles={["ROLE_SYSTEM_ADMIN", "ROLE_COMPANY_ADMIN"]}>
+                <JornadaRegraFormPage />
+              </PrivateRoute>
+            }
+          />
+          <Route
+            path="/company-admins"
+            element={
+              <PrivateRoute roles={["ROLE_SYSTEM_ADMIN"]}>
+                <CompanyAdminsListPage />
+              </PrivateRoute>
+            }
+          />
+          <Route
+            path="/company-admins/novo"
+            element={
+              <PrivateRoute roles={["ROLE_SYSTEM_ADMIN"]}>
+                <CompanyAdminFormPage />
+              </PrivateRoute>
+            }
+          />
+
+          {/* Rotas Admin e Company Admin (Proteção Dupla via PrivateRoute aninhada) */}
           <Route
             path="/cadastro"
             element={
-              <PrivateRoute roles={["ROLE_ADMIN"]}>
+              <PrivateRoute roles={["ROLE_ADMIN", "ROLE_COMPANY_ADMIN"]}>
                 <CadastroFuncionario />
               </PrivateRoute>
             }
@@ -77,7 +146,7 @@ const appRouter = createBrowserRouter(
           <Route
             path="/lista-funcionarios"
             element={
-              <PrivateRoute roles={["ROLE_ADMIN"]}>
+              <PrivateRoute roles={["ROLE_ADMIN", "ROLE_COMPANY_ADMIN"]}>
                 <ListaFuncionarios />
               </PrivateRoute>
             }
@@ -85,7 +154,7 @@ const appRouter = createBrowserRouter(
           <Route
             path="/aprovacao-pontos"
             element={
-              <PrivateRoute roles={["ROLE_ADMIN"]}>
+              <PrivateRoute roles={["ROLE_ADMIN", "ROLE_COMPANY_ADMIN"]}>
                 <AprovacaoPontoPage />
               </PrivateRoute>
             }
@@ -93,7 +162,7 @@ const appRouter = createBrowserRouter(
           <Route
             path="/sedes"
             element={
-              <PrivateRoute roles={["ROLE_ADMIN"]}>
+              <PrivateRoute roles={["ROLE_ADMIN", "ROLE_COMPANY_ADMIN"]}>
                 <SedesListPage />
               </PrivateRoute>
             }
@@ -101,7 +170,7 @@ const appRouter = createBrowserRouter(
           <Route
             path="/sedes/nova"
             element={
-              <PrivateRoute roles={["ROLE_ADMIN"]}>
+              <PrivateRoute roles={["ROLE_ADMIN", "ROLE_COMPANY_ADMIN"]}>
                 <SedeFormPage />
               </PrivateRoute>
             }
@@ -109,7 +178,7 @@ const appRouter = createBrowserRouter(
           <Route
             path="/sedes/:id/editar"
             element={
-              <PrivateRoute roles={["ROLE_ADMIN"]}>
+              <PrivateRoute roles={["ROLE_ADMIN", "ROLE_COMPANY_ADMIN"]}>
                 <SedeFormPage />
               </PrivateRoute>
             }
@@ -117,7 +186,7 @@ const appRouter = createBrowserRouter(
           <Route
             path="/funcoes"
             element={
-              <PrivateRoute roles={["ROLE_ADMIN"]}>
+              <PrivateRoute roles={["ROLE_ADMIN", "ROLE_COMPANY_ADMIN"]}>
                 <FuncoesListPage />
               </PrivateRoute>
             }
@@ -125,7 +194,7 @@ const appRouter = createBrowserRouter(
           <Route
             path="/funcoes/nova"
             element={
-              <PrivateRoute roles={["ROLE_ADMIN"]}>
+              <PrivateRoute roles={["ROLE_ADMIN", "ROLE_COMPANY_ADMIN"]}>
                 <FuncaoFormPage />
               </PrivateRoute>
             }
@@ -133,8 +202,32 @@ const appRouter = createBrowserRouter(
           <Route
             path="/funcoes/:id/editar"
             element={
-              <PrivateRoute roles={["ROLE_ADMIN"]}>
+              <PrivateRoute roles={["ROLE_ADMIN", "ROLE_COMPANY_ADMIN"]}>
                 <FuncaoFormPage />
+              </PrivateRoute>
+            }
+          />
+          <Route
+            path="/turnos"
+            element={
+              <PrivateRoute roles={["ROLE_ADMIN", "ROLE_COMPANY_ADMIN"]}>
+                <TurnosListPage />
+              </PrivateRoute>
+            }
+          />
+          <Route
+            path="/turnos/novo"
+            element={
+              <PrivateRoute roles={["ROLE_ADMIN", "ROLE_COMPANY_ADMIN"]}>
+                <TurnoFormPage />
+              </PrivateRoute>
+            }
+          />
+          <Route
+            path="/turnos/:id/editar"
+            element={
+              <PrivateRoute roles={["ROLE_ADMIN", "ROLE_COMPANY_ADMIN"]}>
+                <TurnoFormPage />
               </PrivateRoute>
             }
           />

@@ -19,6 +19,13 @@ import PlaceIcon from "@mui/icons-material/Place";
 import MyLocationIcon from "@mui/icons-material/MyLocation";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import { useForm } from "react-hook-form";
+import { useAuth } from "../../contexts/AuthContext";
+import {
+  FormControl,
+  InputLabel,
+  MenuItem,
+  Select,
+} from "@mui/material";
 
 import type { SedeFormValues } from "../../types/SedeTypes";
 import {
@@ -26,6 +33,8 @@ import {
   buscarSedePorId,
   criarSede,
 } from "../../services/SedeService";
+import { listarEmpresas } from "../../services/EmpresaService";
+import type { EmpresaDTO } from "../../types/EmpresaTypes";
 
 const defaultValues: SedeFormValues = {
   nome: "",
@@ -39,21 +48,28 @@ const defaultValues: SedeFormValues = {
 const SedeFormPage = () => {
   const params = useParams<{ id?: string }>();
   const navigate = useNavigate();
+  const { user, isSystemAdmin, isAdmin } = useAuth();
 
   const isEdit = useMemo(() => Boolean(params.id), [params.id]);
   const sedeId = params.id ? Number(params.id) : null;
+  
+  // Mostra seleção de empresa apenas para SYSTEM_ADMIN e ADMIN
+  const mostrarSelecaoEmpresa = isSystemAdmin || isAdmin;
+  const [empresas, setEmpresas] = useState<EmpresaDTO[]>([]);
 
   const {
     register,
     handleSubmit,
     setValue,
     reset,
+    watch,
     formState: { errors, isSubmitting },
   } = useForm<SedeFormValues>({
     defaultValues,
   });
 
   const [loading, setLoading] = useState(isEdit);
+  const [loadingEmpresas, setLoadingEmpresas] = useState(mostrarSelecaoEmpresa);
   const [apiError, setApiError] = useState<string | null>(null);
   const [feedback, setFeedback] = useState<{
     open: boolean;
@@ -62,6 +78,23 @@ const SedeFormPage = () => {
   }>({ open: false, message: "", severity: "success" });
 
   useEffect(() => {
+    // Carrega empresas se necessário
+    if (mostrarSelecaoEmpresa) {
+      const carregarEmpresas = async () => {
+        try {
+          setLoadingEmpresas(true);
+          const data = await listarEmpresas();
+          const empresasAtivas = data.filter((e) => e.status === "ATIVA");
+          setEmpresas(empresasAtivas);
+        } catch (err) {
+          console.error("[SedeForm] Erro ao carregar empresas:", err);
+        } finally {
+          setLoadingEmpresas(false);
+        }
+      };
+      carregarEmpresas();
+    }
+
     if (!isEdit || !sedeId) {
       reset(defaultValues);
       setLoading(false);
@@ -80,6 +113,7 @@ const SedeFormPage = () => {
           latitude: data.latitude ?? defaultValues.latitude,
           longitude: data.longitude ?? defaultValues.longitude,
           raioPermitido: data.raioPermitido ?? defaultValues.raioPermitido,
+          empresaId: data.empresaId ?? null,
         });
       } catch (err) {
         console.error("[SedeForm] Erro ao carregar sede:", err);
@@ -90,7 +124,7 @@ const SedeFormPage = () => {
     };
 
     carregar();
-  }, [isEdit, reset, sedeId]);
+  }, [isEdit, reset, sedeId, mostrarSelecaoEmpresa]);
 
   const onSubmit = async (values: SedeFormValues) => {
     if (isEdit && !sedeId) return;
@@ -220,6 +254,29 @@ const SedeFormPage = () => {
           </Box>
         ) : (
           <Grid container spacing={3}>
+            {mostrarSelecaoEmpresa && (
+              <Grid size={{ xs: 12 }}>
+                <FormControl fullWidth>
+                  <InputLabel>Empresa</InputLabel>
+                  <Select
+                    label="Empresa"
+                    value={watch("empresaId") || ""}
+                    {...register("empresaId", {
+                      setValueAs: (v) => (v === "" ? null : Number(v)),
+                    })}
+                    onChange={(e) => setValue("empresaId", e.target.value ? Number(e.target.value) : null)}
+                    disabled={loadingEmpresas}
+                  >
+                    {empresas.map((empresa) => (
+                      <MenuItem key={empresa.id} value={empresa.id}>
+                        {empresa.nome}
+                      </MenuItem>
+                    ))}
+                  </Select>
+                </FormControl>
+              </Grid>
+            )}
+
             <Grid size={{ xs: 12 }}>
               <TextField
                 label="Nome da sede"

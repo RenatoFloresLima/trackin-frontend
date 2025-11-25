@@ -11,6 +11,9 @@ import {
   FaUserCircle,
   FaBuilding,
   FaBriefcase,
+  FaIndustry,
+  FaUserShield,
+  FaCalendarAlt,
 } from "react-icons/fa";
 import { Box, Typography, Avatar, Divider, Tooltip } from "@mui/material";
 import "./Sidebar.css";
@@ -25,7 +28,7 @@ const Sidebar: React.FC = () => {
       path: "/meu-perfil",
       label: "Meu Perfil",
       icon: FaUserCircle,
-      roles: ["ROLE_ADMIN", "ROLE_FUNCIONARIO"],
+      roles: ["ROLE_ADMIN", "ROLE_FUNCIONARIO", "ROLE_COMPANY_ADMIN", "ROLE_SYSTEM_ADMIN"],
     },
     {
       path: "/ponto",
@@ -33,35 +36,63 @@ const Sidebar: React.FC = () => {
       icon: FaClock,
       roles: ["ROLE_ADMIN", "ROLE_FUNCIONARIO"],
     },
+    // SYSTEM_ADMIN: Apenas empresas e administradores
+    {
+      path: "/empresas",
+      label: "Empresas",
+      icon: FaIndustry,
+      roles: ["ROLE_SYSTEM_ADMIN"],
+    },
+    {
+      path: "/company-admins",
+      label: "Adm. Empresas",
+      icon: FaUserShield,
+      roles: ["ROLE_SYSTEM_ADMIN"],
+    },
+    // COMPANY_ADMIN: Acesso à sua empresa (path será calculado dinamicamente)
+    {
+      path: "/minha-empresa", // Placeholder, será substituído na renderização
+      label: "Minha Empresa",
+      icon: FaIndustry,
+      roles: ["ROLE_COMPANY_ADMIN"],
+      dynamicPath: true, // Flag para indicar que o path é dinâmico
+    },
+    // ADMIN e COMPANY_ADMIN: Gestão de funcionários, sedes e funções
     {
       path: "/aprovacao-pontos",
       label: "Aprovação de Pontos",
       icon: FaCheckCircle,
-      roles: ["ROLE_ADMIN"],
+      roles: ["ROLE_ADMIN", "ROLE_COMPANY_ADMIN"],
     },
     {
       path: "/cadastro",
       label: "Cadastro Func.",
       icon: FaUserPlus,
-      roles: ["ROLE_ADMIN"],
+      roles: ["ROLE_ADMIN", "ROLE_COMPANY_ADMIN"],
     },
     {
       path: "/lista-funcionarios",
       label: "Funcionários",
       icon: FaHome,
-      roles: ["ROLE_ADMIN"],
+      roles: ["ROLE_ADMIN", "ROLE_COMPANY_ADMIN"],
     },
     {
       path: "/sedes",
       label: "Sedes",
       icon: FaBuilding,
-      roles: ["ROLE_ADMIN"],
+      roles: ["ROLE_ADMIN", "ROLE_COMPANY_ADMIN"],
     },
     {
       path: "/funcoes",
       label: "Funções",
       icon: FaBriefcase,
-      roles: ["ROLE_ADMIN"],
+      roles: ["ROLE_ADMIN", "ROLE_COMPANY_ADMIN"],
+    },
+    {
+      path: "/turnos",
+      label: "Turnos",
+      icon: FaCalendarAlt,
+      roles: ["ROLE_ADMIN", "ROLE_COMPANY_ADMIN"],
     },
   ];
 
@@ -74,7 +105,13 @@ const Sidebar: React.FC = () => {
   const userDisplayName = user?.nome ?? user?.login ?? "Usuário";
   
   // Exibe o nome da função, ou fallback para role traduzida
-  const userFuncao = user?.funcaoNome ?? (userRole === "ROLE_ADMIN" ? "Administrador" : "Funcionário");
+  const getRoleDisplay = () => {
+    if (userRole === "ROLE_SYSTEM_ADMIN") return "Adm. Sistema";
+    if (userRole === "ROLE_COMPANY_ADMIN") return "Adm. Empresa";
+    if (userRole === "ROLE_ADMIN") return "Administrador";
+    return user?.funcaoNome ?? "Funcionário";
+  };
+  const userFuncao = getRoleDisplay();
 
   const getUserInitials = () => {
     if (!userDisplayName) return "U";
@@ -115,13 +152,21 @@ const Sidebar: React.FC = () => {
       <Divider className="sidebar-divider" />
 
       <Box className="sidebar-menu" component="ul">
-        {filteredNavItems.map((item) => {
-          const isActive = location.pathname.startsWith(item.path);
+        {filteredNavItems.map((item, index) => {
+          // Calcula o path dinamicamente para "Minha Empresa" do COMPANY_ADMIN
+          const actualPath = item.path === "/minha-empresa" && user?.empresaId
+            ? `/empresas/${user.empresaId}/editar`
+            : item.path;
+          // Melhora a lógica de isActive para evitar conflitos
+          // Para paths exatos, usa igualdade; para paths que podem ter subpaths, usa startsWith
+          const isActive = actualPath === "/ponto" 
+            ? location.pathname === actualPath // Path exato para /ponto
+            : location.pathname === actualPath || location.pathname.startsWith(actualPath + "/");
           return (
-            <li key={item.path} className="sidebar-menu-item">
+            <li key={`${actualPath}-${index}`} className="sidebar-menu-item">
               <Tooltip title={item.label} placement="right" arrow>
                 <NavLink
-                  to={item.path}
+                  to={actualPath}
                   className={`nav-link ${isActive ? "nav-link-active" : ""}`}
                 >
                   <item.icon className="nav-icon" />

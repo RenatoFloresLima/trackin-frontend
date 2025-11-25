@@ -20,7 +20,7 @@ export interface RegistroPontoDetalheResponse {
   dataRegistro: string; // Ex: 2025-11-04
   horaRegistro: string; // Ex: 01:17
   horaSaida: string | null;
-  status: "PENDENTE_APROVACAO" | "APROVADO_AUTOMATICO" | "APROVADO_MANUAL" | "REJEITADO" | "PENDENTE" | "APROVADO";
+  status: "PENDENTE_APROVACAO" | "PENDENTE_APROVACAO_EXCESSO_HORAS" | "APROVADO_AUTOMATICO" | "APROVADO_MANUAL" | "REJEITADO" | "PENDENTE" | "APROVADO";
   tipoRegistro: string; // Ex: INICIO_INTERVALO
   temSolicitacaoAjuste: boolean;
   observacao?: string | null;
