@@ -50,3 +50,40 @@ export const aprovarPonto = async (
     observacaoAdmin,
   });
 };
+
+export type ConfirmacaoRegistroPontoDTO = {
+  funcionarioId?: number;
+  sedeId: number;
+  tipoRegistro: string;
+  observacao?: string;
+  fotoBase64?: string;
+  latitude?: number;
+  longitude?: number;
+  precisao?: number;
+  confirmado: boolean;
+  // Campos para registro manual
+  matricula?: string;
+  senha?: string;
+  horario?: string;
+};
+
+export type RegistroPontoResponse = {
+  id?: number;
+  mensagem: string;
+  requerConfirmacao?: boolean;
+  mensagemConfirmacao?: string;
+  foraTolerancia?: boolean;
+  horasExtras?: number;
+  excessoHoras?: boolean;
+  status?: string;
+};
+
+export const confirmarPonto = async (
+  confirmacao: ConfirmacaoRegistroPontoDTO
+): Promise<RegistroPontoResponse> => {
+  const { data } = await api.post<RegistroPontoResponse>(
+    "api/registros-ponto/confirmar",
+    confirmacao
+  );
+  return data;
+};

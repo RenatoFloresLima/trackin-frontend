@@ -3,6 +3,7 @@ import type { SubmitHandler } from "react-hook-form";
 import { useState, useEffect } from "react";
 import api from "../../services/api";
 import { format } from "date-fns";
+import { confirmarPonto, type ConfirmacaoRegistroPontoDTO } from "../../services/pontoService";
 
 // 🔑 IMPORTAÇÕES DO MUI
 import {
@@ -18,6 +19,11 @@ import {
   Alert,
   InputLabel,
   FormControl,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogContentText,
+  DialogActions,
 } from "@mui/material";
 import Grid from "@mui/material/Grid";
 
@@ -74,6 +80,10 @@ const RegistroPonto: React.FC = () => {
   const [isSuccess, setIsSuccess] = useState(false);
   const [loading, setLoading] = useState(false);
   const [dataLoading, setDataLoading] = useState(true);
+  const [confirmacaoPendente, setConfirmacaoPendente] = useState<{
+    mensagem: string;
+    dados: IFormInput;
+  } | null>(null);
 
   // ------------------------------------------
   // Lógica de Carregamento de Sedes
@@ -116,6 +126,16 @@ const RegistroPonto: React.FC = () => {
 
       const response = await api.post(API_REGISTROS, payload);
 
+      // Verifica se requer confirmação (status 202 ou requerConfirmacao = true)
+      if (response.status === 202 || response.data.requerConfirmacao) {
+        setConfirmacaoPendente({
+          mensagem: response.data.mensagemConfirmacao || response.data.mensagem,
+          dados: data,
+        });
+        setLoading(false);
+        return;
+      }
+
       setStatus(`Ponto registrado! ${response.data.mensagem}`);
       setIsSuccess(true);
       reset({
@@ -140,6 +160,52 @@ const RegistroPonto: React.FC = () => {
       }
 
       setStatus(`Falha no Ponto: ${errorMessage}`);
+      setIsSuccess(false);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // ------------------------------------------
+  // Lógica de Confirmação
+  // ------------------------------------------
+  const handleConfirmarRegistro = async (confirmado: boolean) => {
+    if (!confirmacaoPendente) return;
+
+    setLoading(true);
+    setConfirmacaoPendente(null);
+
+    try {
+      if (confirmado) {
+        const horarioCompleto = `${confirmacaoPendente.dados.dataRegistro}T${confirmacaoPendente.dados.horaRegistro}:00`;
+        
+        const confirmacaoDTO: ConfirmacaoRegistroPontoDTO = {
+          matricula: confirmacaoPendente.dados.matricula,
+          senha: confirmacaoPendente.dados.senha,
+          sedeId: parseInt(confirmacaoPendente.dados.sedeId),
+          tipoRegistro: confirmacaoPendente.dados.tipo,
+          horario: horarioCompleto,
+          observacao: confirmacaoPendente.dados.justificativa,
+          confirmado: true,
+        };
+
+        const response = await confirmarPonto(confirmacaoDTO);
+        setStatus(`Ponto registrado! ${response.mensagem}`);
+        setIsSuccess(true);
+        reset({
+          dataRegistro: format(new Date(), "yyyy-MM-dd"),
+          horaRegistro: format(new Date(), "HH:mm"),
+          tipo: confirmacaoPendente.dados.tipo,
+          sedeId: confirmacaoPendente.dados.sedeId,
+        });
+      } else {
+        setStatus("Registro cancelado. Você pode corrigir o horário e tentar novamente.");
+        setIsSuccess(false);
+      }
+    } catch (error: any) {
+      console.error("Erro ao confirmar registro:", error);
+      const errorMessage = error.response?.data?.message || "Erro ao confirmar registro.";
+      setStatus(`Falha: ${errorMessage}`);
       setIsSuccess(false);
     } finally {
       setLoading(false);
@@ -441,6 +507,49 @@ const RegistroPonto: React.FC = () => {
           </Grid>
         </form>
       </Paper>
+
+      {/* Dialog de Confirmação */}
+      <Dialog
+        open={confirmacaoPendente !== null}
+        onClose={() => handleConfirmarRegistro(false)}
+        maxWidth="sm"
+        fullWidth
+      >
+        <DialogTitle>
+          <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+            <Alert severity="warning" sx={{ flex: 1 }}>
+              Confirmação Necessária
+            </Alert>
+          </Box>
+        </DialogTitle>
+        <DialogContent>
+          <DialogContentText sx={{ mb: 2 }}>
+            {confirmacaoPendente?.mensagem || "Este ponto está fora do período de tolerância e requer sua confirmação."}
+          </DialogContentText>
+          <Alert severity="info" sx={{ mt: 2 }}>
+            Se você confirmar, o ponto será registrado e ficará pendente de aprovação do administrador.
+            Se você cancelar, poderá corrigir o horário e tentar novamente.
+          </Alert>
+        </DialogContent>
+        <DialogActions>
+          <Button
+            onClick={() => handleConfirmarRegistro(false)}
+            color="inherit"
+            disabled={loading}
+          >
+            Cancelar
+          </Button>
+          <Button
+            onClick={() => handleConfirmarRegistro(true)}
+            variant="contained"
+            color="primary"
+            disabled={loading}
+            startIcon={loading ? <CircularProgress size={20} /> : null}
+          >
+            {loading ? "Confirmando..." : "Confirmar Registro"}
+          </Button>
+        </DialogActions>
+      </Dialog>
     </Container>
   );
 };
