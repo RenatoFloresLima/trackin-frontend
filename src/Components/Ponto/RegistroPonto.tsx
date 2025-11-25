@@ -146,6 +146,8 @@ const RegistroPonto: React.FC = () => {
       });
     } catch (error: any) {
       console.error("Erro ao registrar ponto:", error);
+      console.error("Detalhes do erro:", error.response?.data);
+      
       const statusCode = error.response?.status;
       let errorMessage = "Erro desconhecido ao comunicar com o servidor.";
 
@@ -157,10 +159,14 @@ const RegistroPonto: React.FC = () => {
           "Permissão Negada (403): Seu login não tem acesso para registrar ponto manual.";
       } else if (statusCode === 409) {
         // Erro de conflito (registros pendentes, etc.)
+        // Tenta obter a mensagem do backend
         errorMessage = error.response?.data?.message || 
+          error.response?.data?.error ||
           "Conflito ao registrar ponto. Verifique se há registros pendentes que precisam ser fechados.";
       } else if (error.response?.data?.message) {
         errorMessage = error.response.data.message;
+      } else if (error.message) {
+        errorMessage = error.message;
       }
 
       setStatus(`Falha no Ponto: ${errorMessage}`);
