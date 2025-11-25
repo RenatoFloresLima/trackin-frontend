@@ -81,7 +81,8 @@ const RegistroPonto: React.FC = () => {
   useEffect(() => {
     const fetchSedes = async () => {
       try {
-        const response = await api.get<SedeDTO[]>(API_SEDES);
+        // Busca apenas as sedes do funcionário logado
+        const response = await api.get<SedeDTO[]>("/api/sedes/minhas-sedes");
         setSedes(response.data ?? []);
       } catch (error) {
         console.error("Erro ao carregar sedes:", error);
