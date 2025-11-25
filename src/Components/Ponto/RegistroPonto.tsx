@@ -155,6 +155,10 @@ const RegistroPonto: React.FC = () => {
       } else if (statusCode === 403) {
         errorMessage =
           "Permissão Negada (403): Seu login não tem acesso para registrar ponto manual.";
+      } else if (statusCode === 409) {
+        // Erro de conflito (registros pendentes, etc.)
+        errorMessage = error.response?.data?.message || 
+          "Conflito ao registrar ponto. Verifique se há registros pendentes que precisam ser fechados.";
       } else if (error.response?.data?.message) {
         errorMessage = error.response.data.message;
       }
