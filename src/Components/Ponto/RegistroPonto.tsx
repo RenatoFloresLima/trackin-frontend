@@ -214,7 +214,25 @@ const RegistroPonto: React.FC = () => {
       }
     } catch (error: any) {
       console.error("Erro ao confirmar registro:", error);
-      const errorMessage = error.response?.data?.message || "Erro ao confirmar registro.";
+      console.error("Detalhes do erro:", error.response?.data);
+      
+      let errorMessage = "Erro ao confirmar registro.";
+      
+      if (error.response?.status === 400) {
+        // Erro de validação
+        const errors = error.response?.data?.errors;
+        if (errors) {
+          const errorDetails = Object.entries(errors)
+            .map(([field, message]) => `${field}: ${message}`)
+            .join("; ");
+          errorMessage = `Erro de validação: ${errorDetails}`;
+        } else {
+          errorMessage = error.response?.data?.message || "Dados inválidos. Verifique os campos preenchidos.";
+        }
+      } else if (error.response?.data?.message) {
+        errorMessage = error.response.data.message;
+      }
+      
       setStatus(`Falha: ${errorMessage}`);
       setIsSuccess(false);
     } finally {
