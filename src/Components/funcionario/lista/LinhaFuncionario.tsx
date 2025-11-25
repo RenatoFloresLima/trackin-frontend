@@ -3,7 +3,6 @@
 import React from "react";
 import { TableCell, TableRow, IconButton, Tooltip, Chip, Stack, Typography } from "@mui/material";
 import EditIcon from "@mui/icons-material/Edit";
-import InfoIcon from "@mui/icons-material/Info";
 import PersonOffIcon from "@mui/icons-material/PersonOff";
 import { type FuncionarioAPI } from "../../../interfaces/funcionarioInterfaces";
 import { useNavigate } from "react-router-dom";
@@ -12,13 +11,11 @@ interface LinhaFuncionarioProps {
   funcionario: FuncionarioAPI;
   // 🔑 CORRIGIDO: onDesligar é uma função que não recebe argumentos, pois ListaFuncionarios já mapeia o objeto.
   onDesligar: () => void;
-  onInformacoes: (id: number) => void;
 }
 
 const LinhaFuncionario: React.FC<LinhaFuncionarioProps> = ({
   funcionario,
   onDesligar,
-  onInformacoes,
 }) => {
   const navigate = useNavigate();
 
@@ -52,16 +49,6 @@ const LinhaFuncionario: React.FC<LinhaFuncionarioProps> = ({
       </TableCell>
       <TableCell align="right">
         <Stack direction="row" spacing={1} justifyContent="flex-end">
-          <Tooltip title="Informações Detalhadas">
-            <IconButton
-              size="small"
-              color="info"
-              onClick={() => onInformacoes(funcionario.id)}
-            >
-              <InfoIcon fontSize="small" />
-            </IconButton>
-          </Tooltip>
-
           <Tooltip title="Editar Cadastro">
             <IconButton size="small" color="primary" onClick={handleEditClick}>
               <EditIcon fontSize="small" />

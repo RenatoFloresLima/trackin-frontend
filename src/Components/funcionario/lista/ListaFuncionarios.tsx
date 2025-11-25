@@ -161,12 +161,6 @@ const ListaFuncionarios: React.FC = () => {
     setFuncionarioADesligar(null);
   };
 
-  const handleInformacoes = (funcionarioId: number) => {
-    console.log(
-      `[Navegação] Redirecionar para /funcionarios/perfil/${funcionarioId}`
-    );
-    navigate(`/funcionarios/perfil/${funcionarioId}`);
-  };
 
   // ----------------------------------------------------
   // RENDERIZAÇÃO
@@ -238,7 +232,6 @@ const ListaFuncionarios: React.FC = () => {
                     key={funcionario.id}
                     funcionario={funcionario}
                     onDesligar={() => handleDesligar(funcionario)}
-                    onInformacoes={handleInformacoes}
                   />
                 ))}
               </TableBody>
