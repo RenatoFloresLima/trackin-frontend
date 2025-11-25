@@ -200,53 +200,71 @@ const AprovacaoPontoPage: React.FC = () => {
                   </TableCell>
                 </TableRow>
               ) : (
-                pontos.map((p) => (
-                  <TableRow
-                    key={p.id}
-                    sx={{
-                      // Usando o status real do backend
-                      bgcolor:
-                        p.status === "PENDENTE_APROVACAO"
-                          ? "warning.light"
-                          : "inherit",
-                    }}
-                  >
-                    <TableCell>{p.matricula}</TableCell>
-                    <TableCell>{p.funcionarioNome}</TableCell>
-                    <TableCell>{p.tipo}</TableCell>
-                    <TableCell>{formatDate(p.horario, "dd/MM/yyyy")}</TableCell>
-                    <TableCell>{formatDate(p.horario, "HH:mm:ss")}</TableCell>
-                    <TableCell>
-                      {formatDate(p.horarioCriacao, "HH:mm:ss")}
-                    </TableCell>
-                    <TableCell
+                pontos.map((p) => {
+                  const isPendente = p.status === "PENDENTE_APROVACAO";
+                  const isExcessoHoras = p.status === "PENDENTE_APROVACAO_EXCESSO_HORAS";
+                  const podeAprovar = isPendente || isExcessoHoras;
+                  
+                  return (
+                    <TableRow
+                      key={p.id}
                       sx={{
-                        color: p.status === "PENDENTE_APROVACAO" 
-                          ? "warning.dark" // Laranja escuro para contraste com fundo laranja claro
-                          : p.status === "APROVADO" 
-                          ? "success.main" 
-                          : "text.primary",
-                        fontWeight: "bold",
+                        // Destaca pontos pendentes e com excesso de horas
+                        bgcolor: isExcessoHoras
+                          ? "error.light" // Vermelho claro para excesso de horas
+                          : isPendente
+                          ? "warning.light" // Laranja claro para pendentes normais
+                          : "inherit",
+                        // Adiciona borda destacada para excesso de horas
+                        borderLeft: isExcessoHoras ? "4px solid" : "none",
+                        borderLeftColor: isExcessoHoras ? "error.main" : "transparent",
                       }}
                     >
-                      {p.status === "PENDENTE_APROVACAO"
-                        ? "Pendente"
-                        : p.status}
-                    </TableCell>
-                    <TableCell>
-                      {(isAdmin || isCompanyAdmin) && p.status === "PENDENTE_APROVACAO" && (
-                        <Button
-                          size="small"
-                          variant="contained"
-                          color="primary"
-                          onClick={() => handleAprovarPonto(p.id)}
-                        >
-                          Aprovar
-                        </Button>
-                      )}
-                    </TableCell>
-                  </TableRow>
-                ))
+                      <TableCell>{p.matricula}</TableCell>
+                      <TableCell>{p.funcionarioNome}</TableCell>
+                      <TableCell>{p.tipo}</TableCell>
+                      <TableCell>{formatDate(p.horario, "dd/MM/yyyy")}</TableCell>
+                      <TableCell>{formatDate(p.horario, "HH:mm:ss")}</TableCell>
+                      <TableCell>
+                        {formatDate(p.horarioCriacao, "HH:mm:ss")}
+                      </TableCell>
+                      <TableCell
+                        sx={{
+                          color: isExcessoHoras
+                            ? "error.dark" // Vermelho escuro para excesso de horas
+                            : isPendente
+                            ? "warning.dark" // Laranja escuro para pendentes normais
+                            : p.status === "APROVADO" || p.status === "APROVADO_AUTOMATICO" || p.status === "APROVADO_MANUAL"
+                            ? "success.main"
+                            : "text.primary",
+                          fontWeight: "bold",
+                        }}
+                      >
+                        {isExcessoHoras
+                          ? "⚠️ Pendente (Excesso de Horas)"
+                          : isPendente
+                          ? "Pendente"
+                          : p.status === "APROVADO_AUTOMATICO"
+                          ? "Aprovado Automático"
+                          : p.status === "APROVADO_MANUAL"
+                          ? "Aprovado Manual"
+                          : p.status}
+                      </TableCell>
+                      <TableCell>
+                        {(isAdmin || isCompanyAdmin) && podeAprovar && (
+                          <Button
+                            size="small"
+                            variant="contained"
+                            color={isExcessoHoras ? "error" : "primary"}
+                            onClick={() => handleAprovarPonto(p.id)}
+                          >
+                            Aprovar
+                          </Button>
+                        )}
+                      </TableCell>
+                    </TableRow>
+                  );
+                })
               )}
             </TableBody>
           </Table>
