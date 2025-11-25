@@ -6,6 +6,7 @@ import EditIcon from "@mui/icons-material/Edit";
 import PersonOffIcon from "@mui/icons-material/PersonOff";
 import { type FuncionarioAPI } from "../../../interfaces/funcionarioInterfaces";
 import { useNavigate } from "react-router-dom";
+import { useAuth } from "../../../contexts/AuthContext";
 
 interface LinhaFuncionarioProps {
   funcionario: FuncionarioAPI;
@@ -18,6 +19,7 @@ const LinhaFuncionario: React.FC<LinhaFuncionarioProps> = ({
   onDesligar,
 }) => {
   const navigate = useNavigate();
+  const { isAdmin, isCompanyAdmin } = useAuth();
 
   // 🔑 NOVO HANDLER: Apenas chama a função de prop que abre o modal.
   const handleDesligarClick = () => {
@@ -55,7 +57,7 @@ const LinhaFuncionario: React.FC<LinhaFuncionarioProps> = ({
             </IconButton>
           </Tooltip>
 
-          {funcionario.status === "ATIVO" && (
+          {funcionario.status === "ATIVO" && (isAdmin || isCompanyAdmin) && (
             <Tooltip title="Desligar Funcionário">
               <IconButton size="small" color="error" onClick={handleDesligarClick}>
                 <PersonOffIcon fontSize="small" />
