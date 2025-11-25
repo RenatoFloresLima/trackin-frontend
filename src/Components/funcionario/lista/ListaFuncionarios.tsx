@@ -12,7 +12,12 @@ import {
   TableBody,
   TableRow,
   TableCell,
+  Stack,
+  Button,
+  CircularProgress,
+  Alert,
 } from "@mui/material";
+import PersonAddIcon from "@mui/icons-material/PersonAdd";
 import { Navigate, useNavigate } from "react-router-dom";
 
 // Componentes da lista
@@ -27,7 +32,6 @@ import {
 } from "../../../interfaces/funcionarioInterfaces";
 import api from "../../../services/api";
 import { useAuth } from "../../../contexts/AuthContext";
-import "./Lista.css";
 
 // ----------------------------------------------------
 // VARIÁVEIS DE ROTA
@@ -174,20 +178,50 @@ const ListaFuncionarios: React.FC = () => {
   }
 
   return (
-    <Container className="container" maxWidth="xl" sx={{ mt: 5, mb: 5 }}>
-      <Typography variant="h4" gutterBottom>
-        Gestão de Funcionários
-      </Typography>
+    <Container maxWidth="lg" sx={{ py: 4 }}>
+      <Stack
+        direction={{ xs: "column", sm: "row" }}
+        justifyContent="space-between"
+        alignItems={{ xs: "flex-start", sm: "center" }}
+        spacing={2}
+        mb={3}
+      >
+        <Box>
+          <Typography variant="h4" fontWeight={600}>
+            Funcionários
+          </Typography>
+          <Typography variant="body2" color="text.secondary">
+            Gerencie os funcionários cadastrados no sistema.
+          </Typography>
+        </Box>
+        <Button
+          variant="contained"
+          startIcon={<PersonAddIcon />}
+          onClick={() => navigate("/funcionarios/novo")}
+        >
+          Novo Funcionário
+        </Button>
+      </Stack>
 
       <FiltroFuncionarios
         filtros={filtros}
         onFiltroChange={handleFiltroChange}
       />
 
-      <Box sx={{ mt: 3 }}>
-        <Paper elevation={3}>
+      <Paper elevation={0} sx={{ borderRadius: 3, border: "1px solid #e0e0e0" }}>
+        {loading ? (
+          <Box display="flex" justifyContent="center" p={4}>
+            <CircularProgress />
+          </Box>
+        ) : funcionarios.length === 0 ? (
+          <Box p={4} textAlign="center">
+            <Typography variant="body1" color="text.secondary">
+              Nenhum funcionário encontrado.
+            </Typography>
+          </Box>
+        ) : (
           <TableContainer>
-            <Table aria-label="lista de funcionários">
+            <Table>
               <TableHead>
                 <TableRow>
                   <TableCell>Nome</TableCell>
@@ -195,41 +229,25 @@ const ListaFuncionarios: React.FC = () => {
                   <TableCell>Sede</TableCell>
                   <TableCell>Função</TableCell>
                   <TableCell>Status</TableCell>
-                  <TableCell align="center">Ações</TableCell>
+                  <TableCell align="right">Ações</TableCell>
                 </TableRow>
               </TableHead>
               <TableBody>
-                {loading ? (
-                  <TableRow>
-                    <TableCell colSpan={6} align="center">
-                      Carregando...
-                    </TableCell>
-                  </TableRow>
-                ) : funcionarios.length > 0 ? (
-                  funcionarios.map((funcionario) => (
-                    <LinhaFuncionario
-                      key={funcionario.id}
-                      funcionario={funcionario}
-                      // Passa a função que abre o modal com o objeto correto
-                      onDesligar={() => handleDesligar(funcionario)}
-                      onInformacoes={handleInformacoes}
-                    />
-                  ))
-                ) : (
-                  // ✅ CORREÇÃO APLICADA: Bloco JSX válido para dados vazios
-                  <TableRow>
-                    <TableCell colSpan={6} align="center">
-                      Nenhum funcionário encontrado.
-                    </TableCell>
-                  </TableRow>
-                )}
+                {funcionarios.map((funcionario) => (
+                  <LinhaFuncionario
+                    key={funcionario.id}
+                    funcionario={funcionario}
+                    onDesligar={() => handleDesligar(funcionario)}
+                    onInformacoes={handleInformacoes}
+                  />
+                ))}
               </TableBody>
             </Table>
           </TableContainer>
-        </Paper>
-      </Box>
+        )}
+      </Paper>
 
-      {/* 🔑 NOVO: Modal de Desligamento */}
+      {/* 🔑 Modal de Desligamento */}
       {funcionarioADesligar && (
         <DesligamentoModal
           funcionario={funcionarioADesligar}

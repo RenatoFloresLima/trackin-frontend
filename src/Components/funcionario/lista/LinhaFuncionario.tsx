@@ -1,7 +1,7 @@
 // src/Components/funcionario/lista/LinhaFuncionario.tsx
 
 import React from "react";
-import { TableCell, TableRow, IconButton, Tooltip } from "@mui/material";
+import { TableCell, TableRow, IconButton, Tooltip, Chip, Stack, Typography } from "@mui/material";
 import EditIcon from "@mui/icons-material/Edit";
 import InfoIcon from "@mui/icons-material/Info";
 import PersonOffIcon from "@mui/icons-material/PersonOff";
@@ -35,38 +35,47 @@ const LinhaFuncionario: React.FC<LinhaFuncionarioProps> = ({
 
   return (
     <TableRow hover>
-      <TableCell>{funcionario.nome}</TableCell>
+      <TableCell>
+        <Typography variant="body2" fontWeight={500}>
+          {funcionario.nome}
+        </Typography>
+      </TableCell>
       <TableCell>{funcionario.matricula}</TableCell>
-      <TableCell>{funcionario.sedePrincipalNome}</TableCell>
-      <TableCell>{funcionario.funcaoNome}</TableCell>
-      <TableCell>{statusFuncionario}</TableCell>
-      <TableCell align="center">
-        {/* Botão Informações */}
-        <Tooltip title="Informações Detalhadas">
-          <IconButton
-            color="info"
-            onClick={() => onInformacoes(funcionario.id)}
-          >
-            <InfoIcon />
-          </IconButton>
-        </Tooltip>
-
-        {/* Botão Editar */}
-        <Tooltip title="Editar Cadastro">
-          <IconButton color="primary" onClick={handleEditClick}>
-            <EditIcon />
-          </IconButton>
-        </Tooltip>
-
-        {/* 🔑 Botão Desligar (Só ATIVO pode ser desligado) */}
-        {funcionario.status === "ATIVO" && (
-          <Tooltip title="Desligar Funcionário">
-            {/* Chama o handler simplificado */}
-            <IconButton color="error" onClick={handleDesligarClick}>
-              <PersonOffIcon />
+      <TableCell>{funcionario.sedePrincipalNome || "-"}</TableCell>
+      <TableCell>{funcionario.funcaoNome || "-"}</TableCell>
+      <TableCell>
+        <Chip
+          label={statusFuncionario}
+          color={statusFuncionario === "ATIVO" ? "success" : "default"}
+          size="small"
+        />
+      </TableCell>
+      <TableCell align="right">
+        <Stack direction="row" spacing={1} justifyContent="flex-end">
+          <Tooltip title="Informações Detalhadas">
+            <IconButton
+              size="small"
+              color="info"
+              onClick={() => onInformacoes(funcionario.id)}
+            >
+              <InfoIcon fontSize="small" />
             </IconButton>
           </Tooltip>
-        )}
+
+          <Tooltip title="Editar Cadastro">
+            <IconButton size="small" color="primary" onClick={handleEditClick}>
+              <EditIcon fontSize="small" />
+            </IconButton>
+          </Tooltip>
+
+          {funcionario.status === "ATIVO" && (
+            <Tooltip title="Desligar Funcionário">
+              <IconButton size="small" color="error" onClick={handleDesligarClick}>
+                <PersonOffIcon fontSize="small" />
+              </IconButton>
+            </Tooltip>
+          )}
+        </Stack>
       </TableCell>
     </TableRow>
   );
