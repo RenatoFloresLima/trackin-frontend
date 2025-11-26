@@ -70,7 +70,25 @@ const appRouter = createBrowserRouter(
           {/* Rotas gerais (funcionário/admin) */}
           <Route path="/meu-perfil" element={<FuncionarioDetalhesScreen />} />
           <Route path="/ponto" element={<RegistroPonto />} />
+          
+          {/* Rotas de Funcionários - Ordem: específicas primeiro, depois genéricas */}
+          <Route
+            path="/funcionarios/novo"
+            element={
+              <PrivateRoute roles={["ROLE_ADMIN", "ROLE_COMPANY_ADMIN"]}>
+                <CadastroFuncionario />
+              </PrivateRoute>
+            }
+          />
           <Route path="/funcionarios/editar/:id" element={<EditarFuncionario />} />
+          <Route
+            path="/funcionarios"
+            element={
+              <PrivateRoute roles={["ROLE_ADMIN", "ROLE_COMPANY_ADMIN"]}>
+                <ListaFuncionarios />
+              </PrivateRoute>
+            }
+          />
 
           {/* Rotas de Empresas */}
           {/* Listar todas e criar: apenas SYSTEM_ADMIN */}
