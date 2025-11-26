@@ -9,4 +9,12 @@ export default defineConfig({
       "@": path.resolve(__dirname, "src"), // ⬅️ agora @ aponta para src
     },
   },
+  // Configuração para SPA - redireciona todas as rotas para index.html
+  build: {
+    rollupOptions: {
+      output: {
+        manualChunks: undefined,
+      },
+    },
+  },
 });
