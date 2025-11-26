@@ -216,7 +216,7 @@ const SedeFormPage = () => {
         setFeedback({
           open: true,
           message: mensagem,
-          severity: "warning",
+          severity: "error",
         });
       },
       { enableHighAccuracy: true, timeout: 10000 }
