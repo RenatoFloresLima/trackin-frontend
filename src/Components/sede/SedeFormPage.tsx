@@ -196,13 +196,27 @@ const SedeFormPage = () => {
           severity: "success",
         });
       },
-      (error) => {
-        console.error("[SedeForm] Geolocalização não disponível:", error);
+      (error: GeolocationPositionError) => {
+        let mensagem = "Não foi possível obter a localização.";
+        
+        switch (error.code) {
+          case error.PERMISSION_DENIED:
+            mensagem = "Permissão de localização negada. Por favor, permita o acesso à localização nas configurações do navegador e tente novamente.";
+            break;
+          case error.POSITION_UNAVAILABLE:
+            mensagem = "Localização não disponível. Verifique se o GPS está ativado e tente novamente.";
+            break;
+          case error.TIMEOUT:
+            mensagem = "Tempo de espera esgotado ao obter a localização. Tente novamente.";
+            break;
+          default:
+            mensagem = "Erro ao obter localização. Você pode informar as coordenadas manualmente.";
+        }
+        
         setFeedback({
           open: true,
-          message:
-            "Não foi possível obter a localização. Verifique as permissões do navegador.",
-          severity: "error",
+          message: mensagem,
+          severity: "warning",
         });
       },
       { enableHighAccuracy: true, timeout: 10000 }
