@@ -190,7 +190,7 @@ const ListaFuncionarios: React.FC = () => {
         <Button
           variant="contained"
           startIcon={<PersonAddIcon />}
-          onClick={() => navigate("/funcionarios/novo")}
+          onClick={() => navigate("/cadastro")}
         >
           Novo Funcionário
         </Button>
